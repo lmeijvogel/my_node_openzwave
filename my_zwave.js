@@ -1,5 +1,6 @@
 var classy = require('classy');
 var Node = require('./node').node;
+var _ = require('lodash');
 
 var MyZWave = classy.define({
   zwave: null,
