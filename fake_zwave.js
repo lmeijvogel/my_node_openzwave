@@ -1,11 +1,16 @@
 _ = require('lodash');
-classy = require('classy');
+var classy = require('classy');
+var FakeRequestParser = require('./fake_request_parser').FakeRequestParser;
 
 FakeZWave = classy.define({
   callbacks: {},
   nodes: {},
   SWITCH_BINARY: 37,
   SWITCH_MULTILEVEL: 38,
+
+  init: function() {
+    this.fakeRequestParser = new FakeRequestParser();
+  },
 
   on: function(event_name, callback) {
     if (this.callbacks[event_name] == undefined) {
@@ -30,8 +35,21 @@ FakeZWave = classy.define({
     this.connected = false;
   },
 
+  /* To make it possible to test interactions
+   * without actually having to connect the ZWave
+   * unit: Web requests can be used to simulate a
+   * button press.
+   */
   tryParse: function(req, res) {
-    console.log("testmode");
+    var result = this.fakeRequestParser.parse(req);
+
+    if (result == null) {
+      return;
+    }
+
+    this.emit_event(result.type, [result.node, result.value]);
+
+    return result;
   },
 
   setLevel: function(nodeId, level) {
@@ -53,9 +71,14 @@ FakeZWave = classy.define({
   },
   initializeDevices: function() {
     this.nodes[2] = {level: 0};
+    this.nodes[3] = {};
     this.nodes[5] = {level: 0};
     this.nodes[7] = {value: false};
     this.nodes[8] = {level: 0};
+
+    // Node will never be ready since it is a battery powered
+    // switch, reporting as little as possible.
+    var node3_nodeinfo = {};
 
     var node2_nodeinfo = {
       manufacturer: 'Aeon Labs',
@@ -102,6 +125,7 @@ FakeZWave = classy.define({
     };
 
     this.emit_event('node added', [2]);
+    this.emit_event('node added', [3]);
     this.emit_event('node added', [5]);
     this.emit_event('node added', [7]);
     this.emit_event('node added', [8]);
@@ -130,7 +154,20 @@ FakeZWave = classy.define({
       max: 0,
       value: false };
 
+    var standaloneSwitchValue = { type: 'byte',
+      genre: 'all',
+      instance: 1,
+      index: 0,
+      label: 'Basic',
+      units: '',
+      read_only: false,
+      write_only: false,
+      min: 0,
+      max: 255,
+      value: 0 };
+
     this.emit_event('value added', [2, this.SWITCH_MULTILEVEL, dimValue]);
+    this.emit_event('value added', [3, 32, standaloneSwitchValue]);
     this.emit_event('value added', [5, this.SWITCH_MULTILEVEL, dimValue]);
     this.emit_event('value added', [7, this.SWITCH_BINARY, switchValue]);
     this.emit_event('value added', [8, this.SWITCH_MULTILEVEL, dimValue]);
@@ -141,7 +178,6 @@ FakeZWave = classy.define({
     this.emit_event('node ready', [8, node8_nodeinfo]);
 
     this.emit_event('event', [3, 255]);
-    this.emit_event('event', [3, 0]);
   },
 
   emit_event: function(event_name, params) {

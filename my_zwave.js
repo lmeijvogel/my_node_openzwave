@@ -4,10 +4,13 @@ var Node = require('./node').node;
 var MyZWave = classy.define({
   zwave: null,
   nodes: null,
+  eventListeners: null,
 
   init: function(zwave) {
     this.zwave = zwave;
     this.nodes = [];
+
+    this.eventListeners = {};
   },
 
   registerEvents: function() {
@@ -86,6 +89,12 @@ var MyZWave = classy.define({
     zwave.on('event', function(nodeid, event) {
         console.log("node%d: event", nodeid);
         console.log(".. ", event);
+
+        var node = Node.find(nodeid);
+
+        _(self.eventListeners['event']).each(function(handler) {
+          handler.call(this, node, event);
+        });
     });
     zwave.on('scan complete', function() {
         console.log('scan complete, hit ^C to finish.');
@@ -105,6 +114,14 @@ var MyZWave = classy.define({
   connect: function() {
     this.registerEvents();
     this.zwave.connect();
+  },
+
+  onEvent: function(handler) {
+    if (!this.eventListeners['event']) {
+      this.eventListeners['event'] = [];
+    }
+
+    this.eventListeners['event'].push(handler);
   },
 
   addNode: function(nodeid) {
@@ -133,18 +150,20 @@ var MyZWave = classy.define({
 
     console.log(node.toString());
 
-    _.chain(Node.all()).select(function(node) {
-      return node.isPollable();
-    }).each(function(node) {
+    if (node.isPollable()) {
+      console.log(".. enabling poll");
       self.enablePoll(node);
-    });
+    }
   },
 
   enablePoll: function(node) {
     _(node.pollableClasses()).each(function(commandClass) {
-      console.log("  %d", commandClass);
-      zwave.enablePoll(node.nodeId, commandClass);
+      this.zwave.enablePoll(node.nodeId, commandClass);
     });
+  },
+
+  setLevel: function(node, level) {
+    this.zwave.setLevel(node.nodeId, level);
   }
 });
 
