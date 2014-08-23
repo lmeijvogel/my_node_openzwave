@@ -1,13 +1,21 @@
-function create(testMode) {
-  if (testMode) {
-    var fake_zwave = require('./fake_zwave');
-    return new fake_zwave.FakeZWave();
-  } else {
-    var OpenZWave = require('openzwave');
-    return new OpenZWave('/dev/ttyUSB0', {
-      saveconfig: true,
-    });
-  }
-};
+var classy = require('classy');
 
-exports.create = create;
+var ZWaveFactory = classy.define({
+  init: function(testMode) {
+    this.testMode = testMode;
+  },
+
+  create: function() {
+    if (this.testMode) {
+      var FakeZWave = require('./fake_zwave');
+      return new FakeZWave();
+    } else {
+      var OpenZWave = require('openzwave');
+      return new OpenZWave('/dev/ttyUSB0', {
+        saveconfig: true,
+      });
+    }
+  }
+});
+
+module.exports = ZWaveFactory;

@@ -11,8 +11,8 @@ var port = config["http"]["port"];
 
 var testMode = process.argv[2] != 'live';
 
-var zwaveFactory = require('./zwave_factory');
-var zwave = zwaveFactory.create(testMode);
+var ZWaveFactory = require('./zwave_factory');
+var zwave = new ZWaveFactory(testMode).create();
 
 http.createServer(function (req, res) {
   var result = "";
@@ -31,6 +31,6 @@ process.on('SIGINT', function() {
     process.exit();
 });
 
-var myZWave = new MyZWave.MyZWave(zwave);
-var eventProcessor = new EventProcessor.EventProcessor(myZWave, config);
+var myZWave = new MyZWave(zwave);
+var eventProcessor = new EventProcessor(myZWave, config);
 myZWave.connect();

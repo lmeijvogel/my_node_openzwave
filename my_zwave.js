@@ -1,5 +1,5 @@
 var classy = require('classy');
-var Node = require('./node').node;
+var Node = require('./node');
 var _ = require('lodash');
 
 var MyZWave = classy.define({
@@ -176,4 +176,4 @@ var MyZWave = classy.define({
   }
 });
 
-exports.MyZWave = MyZWave;
+module.exports = MyZWave;

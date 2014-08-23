@@ -1,6 +1,6 @@
 _ = require('lodash');
 var classy = require('classy');
-var FakeRequestParser = require('./fake_request_parser').FakeRequestParser;
+var FakeRequestParser = require('./fake_request_parser');
 
 FakeZWave = classy.define({
   callbacks: {},
@@ -193,4 +193,4 @@ function create(http_server) {
   return new FakeZWave();
 }
 
-exports.FakeZWave = FakeZWave;
+module.exports = FakeZWave;
