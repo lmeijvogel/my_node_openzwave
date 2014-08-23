@@ -1,6 +1,8 @@
 var Node = require('./node').node;
 var classy = require('classy');
+var Programme = require('./programme');
 var NextProgrammeChooser = require('./next_programme_chooser').NextProgrammeChooser;
+var _ = require('lodash');
 
 var EventProcessor = classy.define({
   zwave: null,
@@ -11,7 +13,13 @@ var EventProcessor = classy.define({
   init: function(zwave, config) {
     this.zwave = zwave;
     this.lights = config.lights;
-    this.programmes = config.programmes;
+    this.programmes = {};
+
+    var self = this;
+    _(config.programmes).forIn(function(programme, name) {
+      self.programmes[name] = new Programme(programme, self.lights);
+    });
+
     this.nextProgrammeChooser = new NextProgrammeChooser();
 
     zwave.onEvent(this.onEvent.bind(this));
@@ -33,6 +41,8 @@ var EventProcessor = classy.define({
   mainSwitchPressed: function(event) {
     var nextProgrammeName = this.nextProgrammeChooser.handle(event);
     var nextProgramme = this.programmes[nextProgrammeName];
+
+    nextProgramme.apply(this.zwave);
 
     console.log(nextProgramme);
   }
