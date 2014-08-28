@@ -33,9 +33,19 @@ var EventProcessor = classy.define({
     var nextProgrammeName = this.nextProgrammeChooser.handle(event);
     var nextProgramme = this.programmes[nextProgrammeName];
 
-    nextProgramme.apply(this.zwave);
+    if (nextProgramme == null) {
+      console.log("ERROR: Programme '"+ nextProgrammeName +"' not found.");
+      return;
+    }
 
-    console.log(nextProgramme);
+    try {
+      nextProgramme.apply(this.zwave);
+
+      console.log(nextProgramme);
+    }
+    catch(e) {
+      console.log("ERROR: Could not start '"+ nextProgrammeName +"'");
+    }
   }
 });
 
