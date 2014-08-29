@@ -158,8 +158,9 @@ var MyZWave = classy.define({
   },
 
   enablePoll: function(node) {
+    var self = this;
     _(node.pollableClasses()).each(function(commandClass) {
-      this.zwave.enablePoll(node.nodeId, commandClass);
+      self.zwave.enablePoll(node.nodeId, commandClass);
     });
   },
 

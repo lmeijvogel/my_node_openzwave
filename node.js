@@ -6,6 +6,13 @@ var _ = require('lodash');
 var nodes = {}
 
 var Node = classy.define({
+  POLLABLE_CLASSES: [0x25, 0x26],
+
+  values: null,
+  info:   null,
+
+  ready: null,
+
   init: function(nodeId) {
     this.nodeId = nodeId;
 
@@ -72,19 +79,22 @@ var Node = classy.define({
   },
 
   isPollable: function() {
-    return _(this.pollableClasses()).any();
+    return _.any(this.pollableClasses());
   },
 
   pollableClasses: function() {
-    for (commandClassIdx in this.values) {
-      var commandClass = this.values[commandClassIdx];
-      switch (commandClassIdx) {
-        case 0x25: // COMMAND_CLASS_SWITCH_BINARY
-        case 0x26: // COMMAND_CLASS_SWITCH_MULTILEVEL
-          zwave.enablePoll(nodeid, comclass);
-          break;
-      }
-    }
+    var self = this;
+    var keys = _.keys(this.values);
+
+    return (_.select(keys, function(commandClassIdx) {
+      var commandClass = self.values[commandClassIdx];
+
+      var intCommandClassIdx = parseInt(commandClassIdx, 10);
+
+      // 0x25: COMMAND_CLASS_SWITCH_BINARY
+      // 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL
+      return (_.contains(self.POLLABLE_CLASSES, intCommandClassIdx))
+    }));
   }
 });
 
