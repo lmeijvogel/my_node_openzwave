@@ -9,6 +9,7 @@ var RedisInterface = require('./redis_interface');
 var ConfigReader = require('./config_reader');
 var config = ConfigReader.read("config.json");
 
+var runHttpServer = config["http"]["enabled"];
 var port = config["http"]["port"];
 
 var testMode = process.argv[2] != 'live';
@@ -16,16 +17,20 @@ var testMode = process.argv[2] != 'live';
 var ZWaveFactory = require('./zwave_factory');
 var zwave = new ZWaveFactory(testMode).create();
 
-http.createServer(function (req, res) {
-  var result = "";
-  if (testMode) {
-    result = zwave.tryParse(req, res);
-  }
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end(req.url+"<br/><pre>"+result+"</pre>");
-}).listen(port);
+if (runHttpServer) {
+  http.createServer(function (req, res) {
+    var result = "";
+    if (testMode) {
+      result = zwave.tryParse(req, res);
+    }
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end(req.url+"<br/><pre>"+result+"</pre>");
+  }).listen(port);
 
-console.log("Listening on 0.0.0.0:%d", port);
+  console.log("Listening on 0.0.0.0:%d", port);
+} else {
+  console.log("Not starting HTTP server. Disabled in config.");
+}
 
 var redisInterface = new RedisInterface();
 
