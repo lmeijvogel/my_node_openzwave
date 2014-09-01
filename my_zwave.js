@@ -99,16 +99,6 @@ var MyZWave = classy.define({
     });
     zwave.on('scan complete', function() {
         console.log('scan complete, hit ^C to finish.');
-
-        zwave.setLevel(2, 99);
-        zwave.setLevel(5, 99);
-        zwave.switchOn(7);
-        zwave.setLevel(8, 99);
-
-        zwave.setLevel(2, 0);
-        zwave.setLevel(5, 0);
-        zwave.switchOff(7);
-        zwave.setLevel(8, 0);
     });
   },
 
