@@ -1,5 +1,6 @@
 var classy = require('classy');
 var Redis  = require('redis');
+var _      = require('lodash');
 
 var RedisInterface = classy.define({
   subscriptionRedis: null,
