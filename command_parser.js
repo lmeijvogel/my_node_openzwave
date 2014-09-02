@@ -15,7 +15,11 @@ var CommandParser = classy.define({
 
     var match = command.match(programmeRegex);
     if (match) {
-      this.callProgrammeSelectedCallbacks(match[1]);
+      var programmeName = match[1];
+
+      if (this.programmes[programmeName]) {
+        this.callProgrammeSelectedCallbacks(programmeName);
+      }
     }
   },
 
