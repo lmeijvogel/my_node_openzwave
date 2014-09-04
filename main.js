@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var _  = require('lodash');
 
 var MyZWave = require('./my_zwave');
 var ProgrammeFactory = require('./programme_factory');
@@ -56,6 +57,12 @@ redisInterface.onCommandReceived(function(command) {
 
 commandParser.onProgrammeSelected(function(programmeName) {
   programmes[programmeName].apply(zwave);
+});
+
+myZWave.onValueChange(function(node, commandClass, value) {
+  console.log(config);
+  var lightName = _.invert(config["lights"])[""+node.nodeId];
+  redisInterface.storeValue(lightName, commandClass, value);
 });
 
 var eventProcessor = new EventProcessor(myZWave, programmes);

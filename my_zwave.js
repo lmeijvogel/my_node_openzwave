@@ -49,6 +49,10 @@ var MyZWave = classy.define({
         }
 
         node.setValue(comclass, value);
+
+        _.each(self.eventListeners['valueChange'], function(handler) {
+          handler.call(this, node, comclass, value);
+        });
     });
 
     zwave.on('value removed', function(nodeid, comclass, index) {
@@ -113,6 +117,14 @@ var MyZWave = classy.define({
     }
 
     this.eventListeners['event'].push(handler);
+  },
+
+  onValueChange: function(handler) {
+    if (!this.eventListeners['valueChange']) {
+      this.eventListeners['valueChange'] = [];
+    }
+
+    this.eventListeners['valueChange'].push(handler);
   },
 
   addNode: function(nodeid) {
