@@ -45,20 +45,19 @@ process.on('SIGINT', function() {
 var myZWave = new MyZWave(zwave);
 
 var redisInterface = new RedisInterface("MyZWave");
-var commandParser = new CommandParser(programmes);
+var commandParser = new CommandParser();
 
-var programmeFactory = new ProgrammeFactory(function(name) { redisInterface.programmeChanged(name); });
+var programmeFactory = new ProgrammeFactory();
 var programmes = programmeFactory.build(config);
+var eventProcessor = new EventProcessor(myZWave, programmes);
 
 redisInterface.onCommandReceived(function(command) {
   commandParser.parse(command);
 });
 
 commandParser.onProgrammeSelected(function(programmeName) {
-  programmes[programmeName].apply(zwave);
+  eventProcessor.programmeSelected(programmeName);
 });
-
-var eventProcessor = new EventProcessor(myZWave, programmes);
 
 redisInterface.start();
 myZWave.connect();

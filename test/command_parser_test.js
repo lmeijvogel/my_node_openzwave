@@ -29,20 +29,12 @@ describe("CommandParser", function() {
       });
     });
 
-    context("when an existing programme is selected", function() {
+    context("when a programme is selected", function() {
       it("calls the programmeSelected callback with the given programme name", function() {
         this.subject.parse("programme regular");
 
         assert.equal(this.programmeSelectedCallbackCalled, true, "programmeSelected callback should have been called");
         assert.equal(this.selectedProgrammeName, "regular");
-      });
-    });
-
-    context("when a nonexistent programme is requested", function() {
-      it("does not call the callback", function() {
-        this.subject.parse("programme unknown");
-
-        assert.equal(this.programmeSelectedCallbackCalled, false, "programmeSelected callback should not have been called");
       });
     });
   });
