@@ -33,8 +33,6 @@ if (runHttpServer) {
   console.log("Not starting HTTP server. Disabled in config.");
 }
 
-var redisInterface = new RedisInterface();
-
 process.on('SIGINT', function() {
     console.log('disconnecting...');
     zwave.disconnect();
