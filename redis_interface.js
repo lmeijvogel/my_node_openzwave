@@ -40,6 +40,12 @@ var RedisInterface = classy.define({
     this.commandReceivedHandlers.push(handler);
   },
 
+  storeValue: function(lightName, commandClass, value) {
+    this.dataRedis.hset("node_"+lightName, "class_"+commandClass, value.value);
+
+    console.log(lightName, commandClass, value.value);
+  },
+
   cleanUp: function() {
     this.subscriptionRedis.unsubscribe();
     this.subscriptionRedis.end();
