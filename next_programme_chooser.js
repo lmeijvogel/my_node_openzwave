@@ -1,53 +1,43 @@
-classy = require('classy');
+var classy = require('classy');
+var TimeStateMachine = require('./time_state_machine');
 
 var NextProgrammeChooser = classy.define({
   programme: null,
+  currentStateMachine: null,
+
+  init: function() {
+    this.stateMachines = this.buildStateMachines();
+
+    this.currentStateMachine = _.values(this.stateMachines)[0];
+  },
 
   setProgramme: function(programme) {
     this.programme = programme;
   },
 
   handle: function(event) {
-    if (event == "on") {
-      return this.onPressed();
-    } else {
-      return this.offPressed();
-    }
+    var currentState = this.currentStateMachine.state;
+
+    this.currentStateMachine = this.chooseStateMachine();
+    this.currentStateMachine.setState(currentState);
+
+    var newState = this.currentStateMachine.handle(event);
+
+    console.log("Entering state", newState);
+    return newState;
   },
 
-  onPressed: function() {
-    var cycledProgramme = this.tryCycle();
-
-    if (cycledProgramme != null) {
-      return cycledProgramme;
-    }
-
+  chooseStateMachine: function() {
     if (this.isEvening()) {
-      return "evening";
+      return this.stateMachines.evening;
     } else if (this.isMorning()) {
-      return "morning";
+      return this.stateMachines.morning;
     } else if (this.isNight()) {
-      return "night";
+      return this.stateMachines.night;
     } else {
-      // This should not occur, but make sure the lights can come on anyway.
-      return "evening";
+      console.log("WARNING: Unknown time");
+      return this.stateMachines.morning;
     }
-  },
-
-  offPressed: function() {
-    return "off";
-  },
-
-  tryCycle: function() {
-    if (this.programme == "evening") {
-      return "dimmed";
-    }
-
-    if (this.programme == "dimmed") {
-      return "evening";
-    }
-
-    return null;
   },
 
   isMorning: function() {
@@ -64,6 +54,31 @@ var NextProgrammeChooser = classy.define({
 
   hour: function() {
     return new Date().getHours();
+  },
+
+  buildStateMachines: function() {
+    var result = {};
+
+    result.evening = new TimeStateMachine({
+      on: {
+        default: "evening",
+        evening: "dimmed"
+      }
+    });
+
+    result.morning = new TimeStateMachine({
+      on: {
+        default: "morning"
+      }
+    });
+
+    result.night = new TimeStateMachine({
+      on: {
+        default: "night"
+      }
+    });
+
+    return result;
   }
 });
 
