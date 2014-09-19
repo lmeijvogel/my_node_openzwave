@@ -11,13 +11,14 @@ describe("NextProgrammeChooser", function() {
     var self = this;
 
     this.subject = new NextProgrammeChooser();
+    this.timeService = {};
+    this.subject.timeService = this.timeService;
 
     _(["isMorning", "isEvening", "isNight"]).each(function(method) {
-      self.subject[method] = stub(false);
+      self.timeService[method] = stub(false);
     });
   });
-
-  describe("handle", function() {
+  describe("chooseStateMachine", function() {
     _([
         ["isMorning", "morning"],
         ["isEvening", "evening"],
@@ -28,36 +29,41 @@ describe("NextProgrammeChooser", function() {
 
       context("when it is "+name, function() {
         beforeEach(function() {
-          this.subject[method] = stub(true);
+          this.timeService[method] = stub(true);
         });
 
         it("sets the correct state machine", function() {
-          this.subject.handle("on");
-          assert.equal(this.subject.currentStateMachine, this.subject.stateMachines[name]);
+          var result = this.subject.chooseStateMachine();
+
+          assert.equal(result, this.subject.stateMachines[name]);
         });
       });
     });
 
-    // This should of course never happen.
+    // This should of course never happen, but it's nice
+    // to know that at least some lights will always turn on.
     context("when the time is unknown", function() {
       it("default to 'morning'", function() {
-        this.subject.handle("on");
-        assert.equal(this.subject.currentStateMachine, this.subject.stateMachines.morning);
+        var result = this.subject.chooseStateMachine();
+        assert.equal(result, this.subject.stateMachines.morning);
       });
     });
   });
 
-  describe("the result", function() {
-    it("returns the chosen state", function() {
-      var mockStateMachine = {
-        handle:   function() { return "dimmed"; },
-        setState: function() {}
-      };
-      this.subject.chooseStateMachine = function() { return mockStateMachine; };
+  describe("handle", function() {
+    describe("the result", function() {
+      it("returns the chosen state", function() {
+        var mockStateMachine = {
+          handle:   function() { return "dimmed"; },
+          setState: function() {}
+        };
 
-      var result = this.subject.handle("on");
+        this.subject.chooseStateMachine = function() { return mockStateMachine; };
 
-      assert.equal(result, "dimmed");
+        var result = this.subject.handle("on");
+
+        assert.equal(result, "dimmed");
+      });
     });
   });
 });

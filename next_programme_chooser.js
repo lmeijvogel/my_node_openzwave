@@ -1,14 +1,17 @@
 var classy = require('classy');
+var TimeService = require('./time_service');
 var TimeStateMachine = require('./time_state_machine');
 
 var NextProgrammeChooser = classy.define({
   programme: null,
   stateMachines: null,
+  timeService: null,
 
   currentState: null,
 
   init: function() {
     this.stateMachines = this.buildStateMachines();
+    this.timeService = new TimeService();
   },
 
   setProgramme: function(programme) {
@@ -26,32 +29,16 @@ var NextProgrammeChooser = classy.define({
   },
 
   chooseStateMachine: function() {
-    if (this.isEvening()) {
+    if (this.timeService.isEvening()) {
       return this.stateMachines.evening;
-    } else if (this.isMorning()) {
+    } else if (this.timeService.isMorning()) {
       return this.stateMachines.morning;
-    } else if (this.isNight()) {
+    } else if (this.timeService.isNight()) {
       return this.stateMachines.night;
     } else {
       console.log("WARNING: Unknown time");
       return this.stateMachines.morning;
     }
-  },
-
-  isMorning: function() {
-    return (7 <= this.hour() && this.hour() < 14);
-  },
-
-  isEvening: function() {
-    return (14 <= this.hour() && this.hour() < 22);
-  },
-
-  isNight: function() {
-    return (this.hour() < 7 || 22 <= this.hour());
-  },
-
-  hour: function() {
-    return new Date().getHours();
   },
 
   buildStateMachines: function() {
