@@ -1,8 +1,5 @@
-classy = require("classy")
-ZWaveFactory = classy.define(
-  init: (testMode) ->
-    @testMode = testMode
-    return
+class ZWaveFactory
+  constructor: (@testMode) ->
 
   create: ->
     if @testMode
@@ -13,5 +10,5 @@ ZWaveFactory = classy.define(
       new OpenZWave("/dev/ttyUSB0",
         saveconfig: true
       )
-)
+
 module.exports = ZWaveFactory

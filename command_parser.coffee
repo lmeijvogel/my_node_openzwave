@@ -1,10 +1,10 @@
-classy = require("classy")
 _ = require("lodash")
-CommandParser = classy.define(
+
+class CommandParser
   programmeSelectedCallbacks: null
-  init: ->
+
+  constructor: ->
     @programmeSelectedCallbacks = []
-    return
 
   parse: (command) ->
     programmeRegex = /programme (.*)/
@@ -12,17 +12,12 @@ CommandParser = classy.define(
     if match
       programmeName = match[1]
       @callProgrammeSelectedCallbacks programmeName
-    return
 
   onProgrammeSelected: (handler) ->
     @programmeSelectedCallbacks.push handler
-    return
 
   callProgrammeSelectedCallbacks: (programmeName) ->
     _.each @programmeSelectedCallbacks, (handler) ->
       handler.call this, programmeName
-      return
 
-    return
-)
 module.exports = CommandParser

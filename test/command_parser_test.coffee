@@ -7,13 +7,12 @@ stub = (result) ->
 
 describe "CommandParser", ->
   beforeEach ->
-    self = this
     @programmeSelectedCallbackCalled = false
     @selectedProgrammeName = null
     @subject = new CommandParser(regular: {})
-    @subject.onProgrammeSelected (programmeName) ->
-      self.programmeSelectedCallbackCalled = true
-      self.selectedProgrammeName = programmeName
+    @subject.onProgrammeSelected (programmeName) =>
+      @programmeSelectedCallbackCalled = true
+      @selectedProgrammeName = programmeName
       return
 
     return

@@ -1,19 +1,18 @@
-classy = require("classy")
 TimeService = require("./time_service")
 TimeStateMachine = require("./time_state_machine")
-NextProgrammeChooser = classy.define(
+
+class NextProgrammeChooser
   programme: null
   stateMachines: null
   timeService: null
   currentState: null
-  init: ->
+
+  constructor: ->
     @stateMachines = @buildStateMachines()
     @timeService = new TimeService()
-    return
 
   setProgramme: (programme) ->
     @programme = programme
-    return
 
   handle: (event) ->
     currentStateMachine = @chooseStateMachine()
@@ -46,5 +45,5 @@ NextProgrammeChooser = classy.define(
       default: "night"
     )
     result
-)
+
 module.exports = NextProgrammeChooser

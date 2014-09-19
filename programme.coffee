@@ -1,19 +1,14 @@
-classy = require("classy")
 _ = require("lodash")
-Programme = classy.define(
+
+class Programme
   name: null
   lights: null
   data: null
-  init: (name, data, lights) ->
-    @name = name
-    @lights = lights
-    @data = data
-    return
+  constructor: (@name, @data, @lights) ->
 
   apply: (zwave) ->
-    self = this
-    _.forIn @data, (value, key) ->
-      nodeid = self.lights[key]
+    _.forIn @data, (value, key) =>
+      nodeid = @lights[key]
       try
         if value is true
           zwave.switchOn nodeid
@@ -22,9 +17,6 @@ Programme = classy.define(
         else
           zwave.setLevel nodeid, value
       catch e
-        console.log "ERROR in programme '" + self.name + "': Could not switch node '" + key + "'"
-      return
+        console.log "ERROR in programme '" + @name + "': Could not switch node '" + key + "'"
 
-    return
-)
 module.exports = Programme

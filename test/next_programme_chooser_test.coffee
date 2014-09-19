@@ -7,7 +7,6 @@ stub = (result) ->
 
 describe "NextProgrammeChooser", ->
   beforeEach ->
-    self = this
     @subject = new NextProgrammeChooser()
     @timeService = {}
     @subject.timeService = @timeService
@@ -15,8 +14,8 @@ describe "NextProgrammeChooser", ->
       "isMorning"
       "isEvening"
       "isNight"
-    ]).each (method) ->
-      self.timeService[method] = stub(false)
+    ]).each (method) =>
+      @timeService[method] = stub(false)
       return
 
     return

@@ -1,21 +1,19 @@
-classy = require("classy")
 NextProgrammeChooser = require("./next_programme_chooser")
 _ = require("lodash")
-EventProcessor = classy.define(
+
+class EventProcessor
   zwave: null
   programmes: null
   nextProgrammeChooser: null
-  init: (zwave, programmes) ->
-    @zwave = zwave
-    @programmes = programmes
+
+  constructor: (@zwave, @programmes) ->
     @nextProgrammeChooser = new NextProgrammeChooser()
     zwave.onEvent @onEvent.bind(this)
-    return
 
   onEvent: (node, event) ->
     switch node.nodeId
       when 3
-        onOff = (if (event is 255) then "on" else "off")
+        onOff = (if (event == 255) then "on" else "off")
         @mainSwitchPressed onOff
       else
         console.log "Event from unexpected node ", node
@@ -29,7 +27,6 @@ EventProcessor = classy.define(
       console.log "Programme selected:", programmeName
     else
       console.log "ERROR: Programme '" + programmeName + "' not found."
-    return
 
   mainSwitchPressed: (event) ->
     nextProgrammeName = @nextProgrammeChooser.handle(event)
@@ -40,6 +37,5 @@ EventProcessor = classy.define(
     catch e
       console.log "ERROR: Could not start '" + nextProgrammeName + "'"
       console.log e
-    return
-)
+
 module.exports = EventProcessor
