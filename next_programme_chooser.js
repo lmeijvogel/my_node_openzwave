@@ -3,12 +3,12 @@ var TimeStateMachine = require('./time_state_machine');
 
 var NextProgrammeChooser = classy.define({
   programme: null,
-  currentStateMachine: null,
+  stateMachines: null,
+
+  currentState: null,
 
   init: function() {
     this.stateMachines = this.buildStateMachines();
-
-    this.currentStateMachine = _.values(this.stateMachines)[0];
   },
 
   setProgramme: function(programme) {
@@ -16,15 +16,13 @@ var NextProgrammeChooser = classy.define({
   },
 
   handle: function(event) {
-    var currentState = this.currentStateMachine.state;
+    var currentStateMachine = this.chooseStateMachine();
+    currentStateMachine.setState(this.currentState);
 
-    this.currentStateMachine = this.chooseStateMachine();
-    this.currentStateMachine.setState(currentState);
+    this.currentState = currentStateMachine.handle(event);
 
-    var newState = this.currentStateMachine.handle(event);
-
-    console.log("Entering state", newState);
-    return newState;
+    console.log("Entering state", this.currentState);
+    return this.currentState;
   },
 
   chooseStateMachine: function() {
