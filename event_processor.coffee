@@ -21,9 +21,11 @@ class EventProcessor
 
   programmeSelected: (programmeName) ->
     programme = @programmes[programmeName]
+
     if programme
       programme.apply @zwave
       @nextProgrammeChooser.setProgramme programme
+
       console.log "Programme selected:", programmeName
     else
       console.log "ERROR: Programme '" + programmeName + "' not found."
@@ -31,7 +33,9 @@ class EventProcessor
   mainSwitchPressed: (event) ->
     nextProgrammeName = @nextProgrammeChooser.handle(event)
     nextProgramme = @programmes[nextProgrammeName]
+
     return  unless nextProgramme?
+
     try
       @programmeSelected nextProgrammeName
     catch e

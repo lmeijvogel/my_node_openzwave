@@ -22,28 +22,25 @@ class NextProgrammeChooser
     @currentState
 
   chooseStateMachine: ->
-    if @timeService.isEvening()
-      @stateMachines.evening
-    else if @timeService.isMorning()
-      @stateMachines.morning
-    else if @timeService.isNight()
-      @stateMachines.night
+    if      @timeService.isEvening() then @stateMachines.evening
+    else if @timeService.isMorning() then @stateMachines.morning
+    else if @timeService.isNight()   then @stateMachines.night
     else
       console.log "WARNING: Unknown time"
       @stateMachines.morning
 
   buildStateMachines: ->
-    result = {}
-    result.evening = new TimeStateMachine(on:
-      default: "evening"
-      evening: "dimmed"
-    )
-    result.morning = new TimeStateMachine(on:
-      default: "morning"
-    )
-    result.night = new TimeStateMachine(on:
-      default: "night"
-    )
-    result
+    {
+      evening: new TimeStateMachine(on:
+        default: "evening"
+        evening: "dimmed"
+      )
+      morning: new TimeStateMachine(on:
+        default: "morning"
+      )
+      night: new TimeStateMachine(on:
+        default: "night"
+      )
+    }
 
 module.exports = NextProgrammeChooser
