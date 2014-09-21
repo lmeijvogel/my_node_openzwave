@@ -33,7 +33,7 @@ class EventProcessor
       @nextProgrammeChooser.setProgramme programme
 
       _(@programmeSelectedCallbacks).each((callback) ->
-        callback(programmeName) if programmeName
+        callback(programmeName)
       )
 
       Logger.info("Programme selected: %s", programmeName)
