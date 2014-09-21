@@ -1,5 +1,6 @@
 Redis = require("redis")
 _ = require("lodash")
+Logger = require('./logger')
 
 class RedisInterface
   subscriptionRedis: null
@@ -14,7 +15,7 @@ class RedisInterface
     @subscriptionRedis = Redis.createClient()
     @dataRedis = Redis.createClient()
     @subscriptionRedis.on "message", (channel, message) =>
-      console.log "Message received: " + channel + ": '" + message + "'"
+      Logger.verbose("Message received: " + channel + ": '" + message + "'")
       if channel == @commandChannel
         _.each @commandReceivedHandlers, (handler) ->
           handler.call this, message
@@ -30,7 +31,7 @@ class RedisInterface
   storeValue: (lightName, commandClass, value) ->
     @dataRedis.hset("node_#{lightName}", "class_#{commandClass}", value.value)
 
-    console.log(lightName, commandClass, value.value)
+    Logger.debug("Stored in Redis: ", lightName, commandClass, value.value)
 
   cleanUp: ->
     @subscriptionRedis.unsubscribe()
