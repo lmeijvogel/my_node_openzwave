@@ -1,31 +1,14 @@
 winston = require('winston')
 moment = require('moment')
 
-class Logger
-  constructor: ->
-    @winston = new WinstonLogger()
-
-  debug: (str...) ->
-    @winston.debug(str...)
-  verbose: (str...) ->
-    @winston.verbose(str...)
-  info: (str...) ->
-    @winston.info(str...)
-  error: (str...) ->
-    @winston.error(str...)
-  warn: (str...) ->
-    @winston.warn(str...)
-
 class WinstonLogger
   constructor: ->
-    @logger = new (winston.Logger)(
-      transports: [
-        new (winston.transports.Console)({'timestamp': @timestamp, 'level': 'info'})
-      ]
-    )
+    @logger = @createLogger()
 
-  timestamp: (time) ->
-    moment(time).format("YYYY-MM-DD HH:mm:ss")
+  # Don't enable logging to file by default since it would then also do
+  # that while running tests
+  enableLogToFile: (filename) ->
+    @logger = @createLogger(filename)
 
   debug: (str...) ->
     @logger.log("debug", str...)
@@ -38,4 +21,19 @@ class WinstonLogger
   warn: (str...) ->
     @logger.log("warn", str...)
 
-module.exports = new Logger()
+  createLogger: (filename) ->
+    transports = [
+        new winston.transports.Console({'timestamp': @timestamp, 'level': 'info'})
+    ]
+
+    if filename
+      transports.push new winston.transports.File({'filename': 'log/node-zwave.log', 'timestamp': true, 'level': 'verbose'})
+
+    new (winston.Logger)(
+      transports: transports
+    )
+
+  timestamp: (time) ->
+    moment(time).format("YYYY-MM-DD HH:mm:ss")
+
+module.exports = new WinstonLogger()

@@ -8,7 +8,9 @@ EventProcessor = require("./event_processor")
 CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
 ConfigReader = require("./config_reader")
+
 Logger = require('./logger')
+Logger.enableLogToFile('log/openzwave.log')
 
 config = new ConfigReader().read("config.json")
 
