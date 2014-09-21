@@ -1,5 +1,7 @@
 Node = require("./node")
 _ = require("lodash")
+Logger = require('./logger')
+
 class MyZWave
   zwave: null
   nodes: null
@@ -12,16 +14,16 @@ class MyZWave
   registerEvents: ->
     zwave = @zwave
     zwave.on "driver ready", (homeid) ->
-      console.log "scanning homeid=0x%s...", homeid.toString(16)
+      Logger.verbose("Scanning homeid=0x%s...", homeid.toString(16))
 
     zwave.on "driver failed", ->
-      console.log "failed to start driver"
+      Logger.fatal "Failed to start driver"
       zwave.disconnect()
       process.exit()
 
     zwave.on "node added", (nodeid) =>
       @addNode nodeid
-      console.log "Added node %d", nodeid
+      Logger.verbose "Added node %d", nodeid
 
     zwave.on "value added", (nodeid, comclass, value) ->
       node = Node.find(nodeid)
@@ -29,7 +31,14 @@ class MyZWave
 
     zwave.on "value changed", (nodeid, comclass, value) =>
       node = Node.find(nodeid)
-      console.log "node%d: changed: %d:%s:%s->%s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]  if node.isReady()
+      if node.isReady()
+        if comclass == 38 || comclass == 37
+          Logger.info("Node %d: %s => %s", nodeid, value["label"], value["value"])
+        else
+          Logger.verbose "node%d: changed: %d:%s:%s->%s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
+      else
+        Logger.debug "(before nodeReady): node%d: changed: %d:%s:%s->%s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
+
       node.setValue comclass, value
 
       _.each(@eventListeners['valueChange'], (handler) =>
@@ -46,29 +55,28 @@ class MyZWave
     zwave.on "notification", (nodeid, notif) ->
       switch notif
         when 0
-          console.log "node%d: message complete", nodeid
+          Logger.info "node%d: message complete", nodeid
         when 1
-          console.log "node%d: timeout", nodeid
+          Logger.warn "node%d: timeout", nodeid
         when 2
-          console.log "node%d: nop", nodeid
+          Logger.info "node%d: nop", nodeid
         when 3
-          console.log "node%d: node awake", nodeid
+          Logger.info "node%d: node awake", nodeid
         when 4
-          console.log "node%d: node sleep", nodeid
+          Logger.info "node%d: node sleep", nodeid
         when 5
-          console.log "node%d: node dead", nodeid
+          Logger.warn "node%d: node dead", nodeid
         when 6
-          console.log "node%d: node alive", nodeid
+          Logger.info "node%d: node alive", nodeid
 
     zwave.on "event", (nodeid, event) =>
-      console.log "node%d: event", nodeid
-      console.log ".. ", event
+      Logger.verbose "node%d: event: %s", nodeid, event
       node = Node.find(nodeid)
       _(@eventListeners["event"]).each (handler) =>
         handler.call this, node, event
 
     zwave.on "scan complete", ->
-      console.log "scan complete, hit ^C to finish."
+      Logger.info "scan complete, hit ^C to finish."
 
   connect: ->
     @registerEvents()
@@ -102,9 +110,9 @@ class MyZWave
     node = Node.find(nodeid)
     node.setNodeInfo nodeinfo
     node.setReady()
-    console.log node.toString()
+    Logger.debug("Node ready, node: %s", node.toString())
     if node.isPollable()
-      console.log ".. enabling poll"
+      Logger.debug(".. enabling poll")
       this.enablePoll node
 
   enablePoll: (node) ->
