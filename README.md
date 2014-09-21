@@ -17,7 +17,7 @@ Nodejs:
 Clone nodejs from github
 `sudo apt-get -y install libudev-dev npm`
 
-`npm install classy lodash mocha git+https://github.com/lmeijvogel/node-openzwave`
+`npm install lodash mocha sinon coffee-script git+https://github.com/lmeijvogel/node-openzwave`
 
 ## Notes
 
