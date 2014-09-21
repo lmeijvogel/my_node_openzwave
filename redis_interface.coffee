@@ -23,6 +23,7 @@ class RedisInterface
     @subscriptionRedis.subscribe @commandChannel
 
   programmeChanged: (name) ->
+    Logger.verbose("Storing new programme in Redis: '%s'", name)
     @dataRedis.set "zwave_programme", name
 
   onCommandReceived: (handler) ->
