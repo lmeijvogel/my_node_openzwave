@@ -9,13 +9,14 @@ EventProcessor = require("./event_processor")
 CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
 ConfigReader = require("./config_reader")
+Logger = require('./logger')
 
 config = new ConfigReader().read("config.json")
-
-Logger = require('./logger')
-Logger.enableLogToFile('log/openzwave.log')
-
 argv = minimist(process.argv.slice(2))
+
+logFile = argv["logfile"] || "./log/openzwave.log"
+
+Logger.enableLogToFile(logFile)
 
 config = new ConfigReader().read(argv['config'] ||"./config.json")
 runLive = argv['live']
