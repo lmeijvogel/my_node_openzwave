@@ -11,14 +11,14 @@ RedisInterface = require("./redis_interface")
 ConfigReader = require("./config_reader")
 Logger = require('./logger')
 
-config = new ConfigReader().read("config.json")
 argv = minimist(process.argv.slice(2))
 
 logFile = argv["logfile"] || "./log/openzwave.log"
 
-Logger.enableLogToFile(logFile)
+configFile = argv['config'] ||"./config.json"
+config = new ConfigReader().read(configFile)
 
-config = new ConfigReader().read(argv['config'] ||"./config.json")
+Logger.enableLogToFile(logFile)
 runLive = argv['live']
 
 runHttpServer = config["http"]["enabled"]
