@@ -16,7 +16,6 @@ class Programme
           zwave.switchOn nodeid
         else if value == false
           Logger.verbose("Send command 'switch off' to node %d", nodeid)
-          zwave.switchOn nodeid
           zwave.switchOff nodeid
         else
           Logger.verbose("Send command 'level %d' to node %d", value, nodeid)
