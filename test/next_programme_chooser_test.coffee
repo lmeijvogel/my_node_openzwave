@@ -7,7 +7,13 @@ stub = (result) ->
 
 describe "NextProgrammeChooser", ->
   beforeEach ->
-    @subject = new NextProgrammeChooser()
+    @stateMachines =
+      morning: {}
+      evening: {}
+      night:   {}
+
+    @subject = new NextProgrammeChooser(@stateMachines)
+
     @timeService = {}
     @subject.timeService = @timeService
 
@@ -28,14 +34,14 @@ describe "NextProgrammeChooser", ->
 
         it "sets the correct state machine", ->
           result = @subject.chooseStateMachine()
-          assert.equal result, @subject.stateMachines[name]
+          assert.equal result, @stateMachines[name]
 
     # This should of course never happen, but it's nice
     # to know that at least some lights will always turn on.
     context "when the time is unknown", ->
       it "default to 'morning'", ->
         result = @subject.chooseStateMachine()
-        assert.equal result, @subject.stateMachines.morning
+        assert.equal result, @stateMachines.morning
 
   describe "handle", ->
     describe "the result", ->
@@ -44,7 +50,7 @@ describe "NextProgrammeChooser", ->
           handle: -> "dimmed"
           setState: ->
 
-        @subject.chooseStateMachine = (-> return mockStateMachine)
+        @subject.chooseStateMachine = (-> mockStateMachine)
 
         result = @subject.handle("on")
         assert.equal result, "dimmed"

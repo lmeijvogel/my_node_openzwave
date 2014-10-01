@@ -2,6 +2,7 @@ assert = require("assert")
 sinon = require("sinon")
 Programme = require("../programme")
 MyZWave = require("../my_zwave")
+
 describe "Programme", ->
   beforeEach ->
     @lightId1 = 12

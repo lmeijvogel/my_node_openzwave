@@ -5,6 +5,8 @@ _ = require("lodash")
 
 MyZWave = require("./my_zwave")
 ProgrammeFactory = require("./programme_factory")
+StateMachineBuilder = require("./state_machine_builder")
+NextProgrammeChooser = require("./next_programme_chooser")
 EventProcessor = require("./event_processor")
 CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
@@ -54,7 +56,11 @@ commandParser = new CommandParser()
 programmeFactory = new ProgrammeFactory()
 programmes = programmeFactory.build(config)
 
-eventProcessor = new EventProcessor(myZWave, programmes)
+stateMachineBuilder = new StateMachineBuilder(config)
+stateMachines = stateMachineBuilder.call()
+nextProgrammeChooser = new NextProgrammeChooser(stateMachines)
+
+eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser)
 
 myZWave.onValueChange((node, commandClass, value) ->
   lightName = _.invert(config["lights"])[""+node.nodeId]

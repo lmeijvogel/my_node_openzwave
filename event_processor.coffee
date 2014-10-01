@@ -1,4 +1,3 @@
-NextProgrammeChooser = require("./next_programme_chooser")
 Logger = require('./logger')
 
 _ = require("lodash")
@@ -8,8 +7,7 @@ class EventProcessor
   programmes: null
   nextProgrammeChooser: null
 
-  constructor: (@zwave, @programmes) ->
-    @nextProgrammeChooser = new NextProgrammeChooser()
+  constructor: (@zwave, @programmes, @nextProgrammeChooser) ->
     zwave.onEvent @onEvent.bind(this)
     @programmeSelectedCallbacks = []
 
