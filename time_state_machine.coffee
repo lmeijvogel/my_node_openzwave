@@ -13,14 +13,16 @@ class TimeStateMachine
   handle: (event) ->
     currentTransitions = @transitions[event]
 
+    # Missing 'on' somewhere in the chain
+
     unless currentTransitions
-      Logger.warn("No transition from ", @state, " for event ", event)
+      Logger.warn("No transition from '", @state, "' for event '", event, "'")
       return
 
     newState = currentTransitions[@state]
     newState = currentTransitions["default"]  unless newState
 
-    Logger.verbose("TimeStateMachine: Transition to", newState)
+    Logger.info("Transition to state ", newState)
     @setState newState
     newState
 
