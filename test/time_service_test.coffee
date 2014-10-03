@@ -1,3 +1,4 @@
+_ = require('lodash')
 assert = require('assert')
 
 TimeService = require('../time_service')
@@ -15,11 +16,33 @@ describe 'TimeServiceTest', ->
 
     @timeService = new TimeService(@config)
 
-  it "correctly parses and applies the configuration", ->
-    eveningDate = new Date()
-    eveningDate.setHours(16)
-    eveningDate.setMinutes(0)
+  # Primarily, test the behaviour at boundaries (and some more)
+  input_outputs = [
+    [ 0,  0, "night"],
+    [ 6, 59, "night"],
+    [ 7,  0, "morning"],
+    [ 8, 30, "morning"],
+    [15, 30, "evening"],
+    [22, 29, "evening"],
+    [22, 30, "night"],
+    [23, 59, "night"],
+  ]
 
-    period = @timeService.getPeriod(eveningDate)
+  _.each(input_outputs, (data) ->
+    [hour, minute, expected] = data
 
-    assert.equal(period, "evening")
+    context "when the time is #{hour}:#{minute}", ->
+      it "should return #{expected}", ->
+        date = createDate(hour, minute)
+
+        period = @timeService.getPeriod(date)
+
+        assert.equal(period, expected)
+  )
+
+createDate = (hours,minutes) ->
+  date = new Date()
+  date.setHours(hours)
+  date.setMinutes(minutes)
+
+  date
