@@ -9,8 +9,8 @@ class NextProgrammeChooser
 
   constructor: (@timeService, @stateMachines) ->
 
-  setProgramme: (programme) ->
-    @programme = programme
+  setCurrentState: (currentState) ->
+    @currentState = currentState
 
   handle: (event) ->
     currentStateMachine = @chooseStateMachine()
