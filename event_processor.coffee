@@ -1,15 +1,14 @@
 Logger = require('./logger')
-
 _ = require("lodash")
+EventEmitter = require("events").EventEmitter
 
-class EventProcessor
+class EventProcessor extends EventEmitter
   zwave: null
   programmes: null
   nextProgrammeChooser: null
 
   constructor: (@zwave, @programmes, @nextProgrammeChooser) ->
     zwave.onEvent @onEvent.bind(this)
-    @programmeSelectedCallbacks = []
 
   onEvent: (node, event) ->
     switch node.nodeId
@@ -20,9 +19,6 @@ class EventProcessor
         Logger.warn "Event from unexpected node ", node
         Logger.verbose ".. event: ", event
 
-  onProgrammeSelected: (callback) ->
-    @programmeSelectedCallbacks.push callback
-
   programmeSelected: (programmeName) ->
     programme = @programmes[programmeName]
 
@@ -30,9 +26,7 @@ class EventProcessor
       programme.apply @zwave
       @nextProgrammeChooser.setCurrentState programme
 
-      _(@programmeSelectedCallbacks).each((callback) ->
-        callback(programmeName)
-      )
+      @emit("programmeSelected", programmeName)
 
       Logger.info("Programme selected: %s", programmeName)
     else

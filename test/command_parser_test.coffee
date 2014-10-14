@@ -11,15 +11,18 @@ describe "CommandParser", ->
   describe "parse", ->
     context "when the command cannot be parsed", ->
       it "does not call programmeSelected callbacks", ->
-        @subject.parse "something something", ->
-          assert.fail("Callback should not have been called")
+        @subject.on "programmeChosen", (programmeName) -> assert.fail("programmeChosen callback should have not been called")
+
+        @subject.parse "something something"
 
     context "when a programme is selected", ->
       it "calls the given block with the given programme name", ->
-        programmeSelectedCallbackCalled = false
+        callbackCalled = false
 
-        @subject.parse "programme regular", (programmeName)->
-          programmeSelectedCallbackCalled = true
+        @subject.on "programmeChosen", (programmeName)->
+          callbackCalled = true
           assert.equal programmeName, "regular"
 
-        assert.equal programmeSelectedCallbackCalled, true, "programmeSelected callback should have been called"
+        @subject.parse "programme regular"
+
+        assert.equal callbackCalled, true, "programmeChosen callback should have been called"
