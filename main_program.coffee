@@ -38,7 +38,7 @@ if runHttpServer
     result = ""
     result = zwave.tryParse(req, res) if testMode
     res.writeHead 200,
-      "Content-Type": "text/plain"
+      "Content-Type": "text/html"
 
     res.end req.url + "<br/><pre>" + result + "</pre>"
   ).listen port
