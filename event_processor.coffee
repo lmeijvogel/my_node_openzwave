@@ -8,9 +8,9 @@ class EventProcessor extends EventEmitter
   nextProgrammeChooser: null
 
   constructor: (@zwave, @programmes, @nextProgrammeChooser) ->
-    zwave.onEvent @onEvent.bind(this)
+    zwave.onNodeEvent @onNodeEvent.bind(this)
 
-  onEvent: (node, event) ->
+  onNodeEvent: (node, event) ->
     switch node.nodeId
       when 3
         onOff = (if (event == 255) then "on" else "off")
