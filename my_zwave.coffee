@@ -135,4 +135,7 @@ class MyZWave
   getNeighbors: (nodeid) ->
     @zwave.getNeighbors(nodeid)
 
+  healNetwork: ->
+    @zwave.healNetwork()
+
 module.exports = MyZWave
