@@ -24,6 +24,9 @@ configFile = argv['config'] ||"./config.json"
 config = new ConfigReader().read(configFile)
 
 Logger.enableLogToFile(logFile)
+
+Logger.info "Starting server"
+
 runLive = argv['live']
 
 runHttpServer = config["http"]["enabled"]
