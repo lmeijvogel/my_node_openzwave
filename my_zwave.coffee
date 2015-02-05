@@ -135,6 +135,12 @@ class MyZWave
   getNeighbors: (nodeid) ->
     @zwave.getNeighbors(nodeid)
 
+  logValue: (nodeId, commandClass, index) ->
+    node = Node.find(nodeId)
+    value = node.getValue(commandClass, index)
+
+    Logger.info "Node value requested: node %d: %d:%s: %s", nodeId, commandClass, value["label"], value["value"]
+
   healNetwork: ->
     @zwave.healNetwork()
 

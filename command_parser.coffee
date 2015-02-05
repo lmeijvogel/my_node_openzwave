@@ -3,14 +3,16 @@ EventEmitter = require("events").EventEmitter
 
 class CommandParser extends EventEmitter
   constructor: ->
-    programmeRegex = /programme (.*)/
+    nodeValueRegex    = /get (\w+) (\w+) (\w+)/
+    programmeRegex    = /programme (.*)/
     getNeighborsRegex = /neighbors (.*)/
-    healNetworkRegex = /healNetwork/
+    healNetworkRegex  = /healNetwork/
 
     @handlers = [
-      [programmeRegex, @programmeChosen]
-      [getNeighborsRegex, @neighborsRequested],
-      [healNetworkRegex, @healNetworkRequested]
+      [nodeValueRegex,    @nodeValueRequested]
+      [programmeRegex,    @programmeChosen]
+      [getNeighborsRegex, @neighborsRequested]
+      [healNetworkRegex,  @healNetworkRequested]
     ]
 
   parse: (command) ->
@@ -22,6 +24,11 @@ class CommandParser extends EventEmitter
         value.call(this, match)
         return
     )
+
+  nodeValueRequested: (match) ->
+    [x, nodeId, commandClass, index] = match
+
+    @emit("nodeValueRequested", nodeId, commandClass, index)
 
   programmeChosen: (match) ->
     programmeName = match[1]
