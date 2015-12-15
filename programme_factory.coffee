@@ -3,12 +3,23 @@ Programme = require("./programme")
 
 class ProgrammeFactory
   build: (config) ->
-    self = this
     lights = config.lights
     programmes = {}
-    _(config.programmes).forIn (programme, name) ->
-      programmes[name] = new Programme(name, programme.displayName, programme.values, lights)
+
+    _.each(config.programmes, (programme, name) =>
+      newProgramme = new Programme(name, programme.displayName, programme.values, lights)
+      programmes[name] = newProgramme
+
+      _.each(@programmeCreatedCallbacks, (callback) ->
+        callback(newProgramme)
+      )
+    )
 
     programmes
+
+  onProgrammeCreated: (callback) ->
+    @programmeCreatedCallbacks ||= []
+
+    @programmeCreatedCallbacks.push(callback)
 
 module.exports = ProgrammeFactory
