@@ -5,7 +5,7 @@ class Programme
   name: null
   lights: null
   data: null
-  constructor: (@name, @data, @lights) ->
+  constructor: (@name, @displayName, @data, @lights) ->
 
   apply: (zwave) ->
     _.forIn @data, (value, key) =>
