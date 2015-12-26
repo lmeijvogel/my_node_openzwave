@@ -13,7 +13,7 @@ describe "TimeStateMachine", ->
 
     it "follows it", ->
       @subject.handle "on"
-      assert.equal @subject.state, "afternoon"
+      assert.equal @subject.getState(), "afternoon"
 
   context "when the transition is not configured", ->
     beforeEach ->
@@ -21,7 +21,7 @@ describe "TimeStateMachine", ->
 
     it "follows the default", ->
       @subject.handle "on"
-      assert.equal @subject.state, "evening"
+      assert.equal @subject.getState(), "evening"
 
   context "when the event is not configured", ->
     beforeEach ->
@@ -29,4 +29,4 @@ describe "TimeStateMachine", ->
 
     it "does not do anything", ->
       @subject.handle "something"
-      assert.equal @subject.state, "afternoon"
+      assert.equal @subject.getState(), "afternoon"
