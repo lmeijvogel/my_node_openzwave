@@ -107,7 +107,8 @@ class FakeZWave
     @nodes[5] = level: 0
     @nodes[7] = value: false
     @nodes[8] = level: 0
-    node3_nodeinfo = {}
+    @nodes[9] = level: 0
+
     node2_nodeinfo =
       manufacturer: "Aeon Labs"
       manufacturerid: "0086"
@@ -117,6 +118,8 @@ class FakeZWave
       type: "Multilevel Power Switch"
       name: ""
       loc: ""
+
+    node3_nodeinfo = {}
 
     node5_nodeinfo =
       manufacturer: "FIBARO System"
@@ -148,11 +151,22 @@ class FakeZWave
       name: ""
       loc: ""
 
+    node9_nodeinfo =
+      manufacturer: "Aeon Labs"
+      manufacturerid: "0086"
+      product: "Smart Energy Illuminator"
+      producttype: "0003"
+      productid: "0008"
+      type: "Multilevel Power Switch"
+      name: ""
+      loc: ""
+
     @emit_event "node added", [2]
     @emit_event "node added", [3]
     @emit_event "node added", [5]
     @emit_event "node added", [7]
     @emit_event "node added", [8]
+    @emit_event "node added", [9]
     dimValue =
       type: "byte"
       genre: "user"
@@ -217,6 +231,11 @@ class FakeZWave
       this.SWITCH_MULTILEVEL
       dimValue
     ]
+    @emit_event "value added", [
+      9
+      this.SWITCH_MULTILEVEL
+      dimValue
+    ]
     @emit_event "node ready", [
       2
       node2_nodeinfo
@@ -233,10 +252,19 @@ class FakeZWave
       8
       node8_nodeinfo
     ]
+    @emit_event "node ready", [
+      9
+      node9_nodeinfo
+    ]
     @emit_event "node event", [
       3
       255
     ]
+    @emit_event "node event", [
+      3
+      0
+    ]
+
 
   emit_event: (event_name, params) ->
     _.each @callbacks[event_name], (callback) ->
