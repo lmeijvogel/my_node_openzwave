@@ -12,6 +12,11 @@ describe 'StateMachineBuilder', ->
             on: {
               default: "evening"
               evening: "dimmed"
+            },
+
+            off: {
+              default: "tree",
+              tree: "off"
             }
           }
 
@@ -30,7 +35,8 @@ describe 'StateMachineBuilder', ->
           default: "evening"
           evening: "dimmed"
         off:
-          default: "off"
+          default: "tree",
+          tree: "off"
       )
 
       assert.deepEqual(eveningTSMachine._getTransitions(), result.evening._getTransitions())

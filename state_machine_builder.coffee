@@ -9,7 +9,7 @@ class StateMachineBuilder
     result = {}
 
     _(_.keys(@config.transitions)).each((period) =>
-      result[period] = new TimeStateMachine(on: @config.transitions[period].on)
+      result[period] = new TimeStateMachine(@config.transitions[period])
     )
 
     result
