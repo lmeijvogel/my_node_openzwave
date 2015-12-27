@@ -19,6 +19,10 @@ function Node(nodeId) {
   }
 
   function setValue(commandClass, value) {
+    if (!commandClassExists(commandClass)) {
+      throw "Command class '"+ commandClass +"' was never added to this node ("+ nodeId +")";
+    }
+
     values[commandClass][value.index] = value;
   }
 
