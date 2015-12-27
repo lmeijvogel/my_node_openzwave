@@ -11,7 +11,7 @@ function Node(nodeId) {
   var ready = null;
 
   function addValue(commandClass, value) {
-    if (!values[commandClass]) {
+    if (!commandClassExists(commandClass)) {
       values[commandClass] = [];
     }
 
@@ -23,7 +23,7 @@ function Node(nodeId) {
   }
 
   function getValue(commandClass, index) {
-    if (values[commandClass]) {
+    if (commandClassExists(commandClass)) {
       return values[commandClass][index];
     }
     else {
@@ -31,8 +31,12 @@ function Node(nodeId) {
     }
   }
 
+  function commandClassExists(commandClass) {
+    return !!values[commandClass];
+  }
+
   function removeValue(commandClass, index) {
-    if (values[commandClass] && values[commandClass][index]) {
+    if (commandClassExists(commandClass) && values[commandClass][index]) {
       delete values[commandClass][index];
     }
   }
