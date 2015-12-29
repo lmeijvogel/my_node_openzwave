@@ -1,0 +1,18 @@
+---
+extends:
+  - "defaults"
+rules:
+  no-new: 2
+  max-len: [2, 120]
+  space-before-function-paren: [2, {"anonymous": "always", "named": "never"}]
+  dot-location: [2, "property"]
+  key-spacing: [2, {"beforeColon": false, "afterColon": true, "mode": "minimum"}]
+  semi: [2, "always"]
+  eqeqeq: 2
+globals:
+  require: false
+  module: false
+  describe: false
+  context: false
+  before: false
+  it: false

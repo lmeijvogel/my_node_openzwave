@@ -1,20 +1,20 @@
-var assert               = require('assert')
-var Node                 = require('../node')
-var _                    = require('lodash')
+var assert               = require('assert');
+var Node                 = require('../node');
+var _                    = require('lodash');
 
-var NextProgrammeChooser = require('../next_programme_chooser')
-var TimeStateMachine     = require('../time_state_machine')
-var EventProcessor       = require('../event_processor')
+var NextProgrammeChooser = require('../next_programme_chooser');
+var TimeStateMachine     = require('../time_state_machine');
+var EventProcessor       = require('../event_processor');
 
-describe("integration", function() {
+describe("integration", function () {
   var handler;
 
   var myZWave = {
-    onNodeEvent: function(h) { handler = h; }
+    onNodeEvent: function (h) { handler = h; }
   };
 
   var timeService = {
-    getPeriod: function() { return "evening"; }
+    getPeriod: function () { return "evening"; }
   };
 
   var switchOff = function () {
@@ -44,23 +44,22 @@ describe("integration", function() {
   _(['evening', 'tree', 'dimmed', 'off']).each( function (name) {
     programmes[name] = {
       name:  name,
-      apply: function() {
+      apply: function () {
         programme = name;
       }
-    }
+    };
   });
 
   var nextProgrammeChooser;
-  var eventProcessor;
 
   before(function () {
     nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-    eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+    EventProcessor(myZWave, programmes, nextProgrammeChooser);
   });
 
-  context("when switching the lights off and on", function() {
-    it("ends up in 'evening' state", function() {
+  context("when switching the lights off and on", function () {
+    it("ends up in 'evening' state", function () {
       switchOff();
       assert.equal(programme, "off");
 
@@ -69,8 +68,8 @@ describe("integration", function() {
     });
   });
 
-  context("when alternating between programmes", function() {
-    it("works", function() {
+  context("when alternating between programmes", function () {
+    it("works", function () {
       switchOff();
       assert.equal(programme, "off");
 
@@ -85,7 +84,7 @@ describe("integration", function() {
     });
   });
 
-  context("when there are multiple 'off' steps", function() {
+  context("when there are multiple 'off' steps", function () {
     var stateMachines = {
       evening: TimeStateMachine({
         on: {
@@ -99,13 +98,13 @@ describe("integration", function() {
       })
     };
 
-    before(function() {
+    before(function () {
       nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-      eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+      EventProcessor(myZWave, programmes, nextProgrammeChooser);
     });
 
-    it('traverses all steps', function() {
+    it('traverses all steps', function () {
       switchOn();
 
       switchOff();

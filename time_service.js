@@ -20,7 +20,7 @@ function TimeService(config) {
   }
 
   function stringToTimeToday(timeString) {
-    var splittedString = timeString.split(":")
+    var splittedString = timeString.split(":");
     var hoursMinutes = _.map(splittedString, function (str) {
       return parseInt(str, 10);
     });
