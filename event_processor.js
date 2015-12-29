@@ -54,7 +54,8 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
   }
 
   return {
-    on: on
+    on: on,
+    programmeSelected: programmeSelected
   };
 }
 module.exports = EventProcessor;

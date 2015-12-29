@@ -1,12 +1,14 @@
+var _ = require('lodash');
 var Logger = require('./logger');
 
 function TimeStateMachine(transitions) {
   var state = null;
 
-    //@transitions = transitions//_.defaults(transitions,
-      //off:
-        //default: "off"
-    //)
+  transitions = _.defaults({}, transitions, {
+    off: {
+      default: "off"
+    }
+  });
 
   function handle(event) {
     var currentTransitions = transitions[event];
