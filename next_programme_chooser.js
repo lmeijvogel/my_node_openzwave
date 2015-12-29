@@ -1,3 +1,5 @@
+"use strict";
+
 var Logger = require('./logger');
 
 function NextProgrammeChooser(timeService, stateMachines) {

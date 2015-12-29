@@ -1,3 +1,5 @@
+"use strict";
+
 var Redis = require("redis");
 var Logger = require('./logger');
 var EventEmitter = require("events").EventEmitter;

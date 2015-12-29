@@ -1,3 +1,5 @@
+"use strict";
+
 function FakeRequestParser() {
   function parse(request) {
     var eventPattern = "^/([^/]*)/([^/]*)/(.*)$";

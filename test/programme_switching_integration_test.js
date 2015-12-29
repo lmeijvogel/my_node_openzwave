@@ -1,3 +1,5 @@
+"use strict";
+
 var assert               = require('assert');
 var Node                 = require('../node');
 var _                    = require('lodash');

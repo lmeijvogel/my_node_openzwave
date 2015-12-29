@@ -1,3 +1,5 @@
+"use strict";
+
 var _ = require('lodash');
 var TimeStateMachine = require("./time_state_machine");
 
