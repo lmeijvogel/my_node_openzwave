@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert               = require('assert');
 var Node                 = require('../node');
@@ -8,7 +8,7 @@ var NextProgrammeChooser = require('../next_programme_chooser');
 var TimeStateMachine     = require('../time_state_machine');
 var EventProcessor       = require('../event_processor');
 
-describe("integration", function () {
+describe('integration', function () {
   var handler;
 
   var myZWave = {
@@ -16,7 +16,7 @@ describe("integration", function () {
   };
 
   var timeService = {
-    getPeriod: function () { return "evening"; }
+    getPeriod: function () { return 'evening'; }
   };
 
   var switchOff = function () {
@@ -30,12 +30,12 @@ describe("integration", function () {
   var stateMachines = {
     evening: TimeStateMachine({
       on: {
-        evening: "dimmed",
-        default: "evening"
+        evening: 'dimmed',
+        default: 'evening'
       },
 
       off: {
-        default: "off"
+        default: 'off'
       }
     })
   };
@@ -43,7 +43,7 @@ describe("integration", function () {
   var programme;
   var programmes = {};
 
-  _(['evening', 'tree', 'dimmed', 'off']).each( function (name) {
+  _(['evening', 'tree', 'dimmed', 'off']).each(function (name) {
     programmes[name] = {
       name:  name,
       apply: function () {
@@ -60,42 +60,42 @@ describe("integration", function () {
     EventProcessor(myZWave, programmes, nextProgrammeChooser);
   });
 
-  context("when switching the lights off and on", function () {
-    it("ends up in 'evening' state", function () {
+  context('when switching the lights off and on', function () {
+    it('ends up in "evening" state', function () {
       switchOff();
-      assert.equal(programme, "off");
+      assert.equal(programme, 'off');
 
       switchOn();
-      assert.equal(programme, "evening");
+      assert.equal(programme, 'evening');
     });
   });
 
-  context("when alternating between programmes", function () {
-    it("works", function () {
+  context('when alternating between programmes', function () {
+    it('works', function () {
       switchOff();
-      assert.equal(programme, "off");
+      assert.equal(programme, 'off');
 
       switchOn();
-      assert.equal(programme, "evening");
+      assert.equal(programme, 'evening');
 
       switchOn();
-      assert.equal(programme, "dimmed");
+      assert.equal(programme, 'dimmed');
 
       switchOn();
-      assert.equal(programme, "evening");
+      assert.equal(programme, 'evening');
     });
   });
 
-  context("when there are multiple 'off' steps", function () {
+  context('when there are multiple "off" steps', function () {
     var stateMachines = {
       evening: TimeStateMachine({
         on: {
-          default: "evening"
+          default: 'evening'
         },
 
         off: {
-          default: "tree",
-          tree:    "off"
+          default: 'tree',
+          tree:    'off'
         }
       })
     };
@@ -110,10 +110,10 @@ describe("integration", function () {
       switchOn();
 
       switchOff();
-      assert.equal(programme, "tree");
+      assert.equal(programme, 'tree');
 
       switchOff();
-      assert.equal(programme, "off");
+      assert.equal(programme, 'off');
     });
   });
 });

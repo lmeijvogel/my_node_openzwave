@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
  * This is for testing to see some feedback.
@@ -12,9 +12,9 @@
  * switch, reporting as little as possible.
  */
 
-var _                 = require("lodash");
+var _                 = require('lodash');
 
-var FakeRequestParser = require("./fake_request_parser");
+var FakeRequestParser = require('./fake_request_parser');
 var Logger            = require('./logger');
 
 function FakeZWave() {
@@ -25,21 +25,22 @@ function FakeZWave() {
 
   var fakeRequestParser = FakeRequestParser();
 
-  function on(event_name, callback) {
-    if (!callbacks[event_name]) {
-      callbacks[event_name] = [];
+  function on(eventName, callback) {
+    if (!callbacks[eventName]) {
+      callbacks[eventName] = [];
     }
 
-    callbacks[event_name].push(callback);
+    callbacks[eventName].push(callback);
   }
 
   function connect() {
-    var homeId = "128";
-    emit_event("driver ready", [homeId]);
+    var homeId = '128';
+
+    emitEvent('driver ready', [homeId]);
 
     initializeDevices();
 
-    emit_event("scan complete");
+    emitEvent('scan complete');
     setLevel(2, 99);
 
     setLevel(5, 99);
@@ -58,7 +59,7 @@ function FakeZWave() {
     var result = fakeRequestParser.parse(req);
 
     if (result) {
-      emit_event(result.type, [
+      emitEvent(result.type, [
         result.node,
         result.value
       ]);
@@ -66,22 +67,23 @@ function FakeZWave() {
   }
 
   function logValue(nodeId, commandClass) {
-    var value = { label: "TestLabel", value: 12};
-    Logger.info("Node value requested: node %d: %d:%s: %s",
+    var value = {label: 'TestLabel', value: 12};
+
+    Logger.info('Node value requested: node %d: %d:%s: %s',
       parseInt(nodeId, 10),
       commandClass,
-      value["label"],
-      value["value"]
+      value['label'],
+      value['value']
     );
   }
 
   function setLevel(nodeId, level) {
-    nodes[nodeId]["level"] = level;
-    emit_event("value changed", [
+    nodes[nodeId]['level'] = level;
+    emitEvent('value changed', [
       nodeId,
       38,
       {
-        label: "level",
+        label: 'level',
         index: 0,
         value: level
       }
@@ -89,12 +91,12 @@ function FakeZWave() {
   }
 
   function switchOn(nodeId) {
-    nodes[nodeId]["value"] = true;
-    emit_event("value changed", [
+    nodes[nodeId]['value'] = true;
+    emitEvent('value changed', [
       nodeId,
       37,
       {
-        label: "Switch",
+        label: 'Switch',
         index: 0,
         value: true
       }
@@ -102,12 +104,12 @@ function FakeZWave() {
   }
 
   function switchOff(nodeId) {
-    nodes[nodeId]["value"] = false;
-    emit_event("value changed", [
+    nodes[nodeId]['value'] = false;
+    emitEvent('value changed', [
       nodeId,
       37,
       {
-        label: "Switch",
+        label: 'Switch',
         index: 0,
         value: false
       }
@@ -115,7 +117,7 @@ function FakeZWave() {
   }
 
   function enablePoll(nodeid, commandClass) {
-    Logger.debug("FAKE: EnablePoll", nodeid, commandClass);
+    Logger.debug('FAKE: EnablePoll', nodeid, commandClass);
   }
 
   function initializeDevices() {
@@ -126,174 +128,174 @@ function FakeZWave() {
     nodes[8] = {level: 0};
     nodes[9] = {level: 0};
 
-    var node2_nodeinfo = {
-      manufacturer: "Aeon Labs",
-      manufacturerid: "0086",
-      product: "Smart Energy Illuminator",
-      producttype: "0003",
-      productid: "0008",
-      type: "Multilevel Power Switch",
-      name: "",
-      loc: ""
+    var node2NodeInfo = {
+      manufacturer: 'Aeon Labs',
+      manufacturerid: '0086',
+      product: 'Smart Energy Illuminator',
+      producttype: '0003',
+      productid: '0008',
+      type: 'Multilevel Power Switch',
+      name: '',
+      loc: ''
     };
 
     // node 3 is never ready, since it is on battery and doesn't listen to events to save power
     // var node3_nodeinfo = {};
 
-    var node5_nodeinfo = {
-      manufacturer: "FIBARO System",
-      manufacturerid: "010f",
-      product: "",
-      producttype: "0100",
-      productid: "100a",
-      type: "Multilevel Power Switch",
-      name: "",
-      loc: ""
+    var node5NodeInfo = {
+      manufacturer: 'FIBARO System',
+      manufacturerid: '010f',
+      product: '',
+      producttype: '0100',
+      productid: '100a',
+      type: 'Multilevel Power Switch',
+      name: '',
+      loc: ''
     };
-    var node7_nodeinfo = {
-      manufacturer: "Z-Wave.Me",
-      manufacturerid: "0115",
-      product: "ZME_054313Z Flush-Mountable Switch",
-      producttype: "1000",
-      productid: "0001",
-      type: "Binary Power Switch",
-      name: "",
-      loc: ""
-    };
-
-    var node8_nodeinfo = {
-      manufacturer: "Z-Wave.Me",
-      manufacturerid: "0115",
-      product: "ZME_06433 Wall Flush-Mountable Dimmer",
-      producttype: "1000",
-      productid: "0002",
-      type: "Multilevel Power Switch",
-      name: "",
-      loc: ""
+    var node7NodeInfo = {
+      manufacturer: 'Z-Wave.Me',
+      manufacturerid: '0115',
+      product: 'ZME_054313Z Flush-Mountable Switch',
+      producttype: '1000',
+      productid: '0001',
+      type: 'Binary Power Switch',
+      name: '',
+      loc: ''
     };
 
-    var node9_nodeinfo = {
-      manufacturer: "Aeon Labs",
-      manufacturerid: "0086",
-      product: "Smart Energy Illuminator",
-      producttype: "0003",
-      productid: "0008",
-      type: "Multilevel Power Switch",
-      name: "",
-      loc: ""
+    var node8NodeInfo = {
+      manufacturer: 'Z-Wave.Me',
+      manufacturerid: '0115',
+      product: 'ZME_06433 Wall Flush-Mountable Dimmer',
+      producttype: '1000',
+      productid: '0002',
+      type: 'Multilevel Power Switch',
+      name: '',
+      loc: ''
     };
 
-    emit_event("node added", [2]);
-    emit_event("node added", [3]);
-    emit_event("node added", [5]);
-    emit_event("node added", [7]);
-    emit_event("node added", [8]);
-    emit_event("node added", [9]);
+    var node9NodeInfo = {
+      manufacturer: 'Aeon Labs',
+      manufacturerid: '0086',
+      product: 'Smart Energy Illuminator',
+      producttype: '0003',
+      productid: '0008',
+      type: 'Multilevel Power Switch',
+      name: '',
+      loc: ''
+    };
+
+    emitEvent('node added', [2]);
+    emitEvent('node added', [3]);
+    emitEvent('node added', [5]);
+    emitEvent('node added', [7]);
+    emitEvent('node added', [8]);
+    emitEvent('node added', [9]);
     var dimValue = {
-      type: "byte",
-      genre: "user",
+      type: 'byte',
+      genre: 'user',
       instance: 1,
       index: 0,
-      label: "Level",
-      units: "",
-      read_only: false,
-      write_only: false,
+      label: 'Level',
+      units: '',
+      'read_only': false,
+      'write_only': false,
       min: 0,
       max: 255,
       value: 0
     };
 
     var switchValue = {
-      type: "bool",
-      genre: "user",
+      type: 'bool',
+      genre: 'user',
       instance: 1,
       index: 0,
-      label: "Switch",
-      units: "",
-      read_only: false,
-      write_only: false,
+      label: 'Switch',
+      units: '',
+      'read_only': false,
+      'write_only': false,
       min: 0,
       max: 0,
       value: false
     };
 
     var standaloneSwitchValue = {
-      type: "byte",
-      genre: "all",
+      type: 'byte',
+      genre: 'all',
       instance: 1,
       index: 0,
-      label: "Basic",
-      units: "",
-      read_only: false,
-      write_only: false,
+      label: 'Basic',
+      units: '',
+      'read_only': false,
+      'write_only': false,
       min: 0,
       max: 255,
       value: 0
     };
 
-    emit_event("value added", [
+    emitEvent('value added', [
       2,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emit_event("value added", [
+    emitEvent('value added', [
       3,
       32,
       standaloneSwitchValue
     ]);
-    emit_event("value added", [
+    emitEvent('value added', [
       5,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emit_event("value added", [
+    emitEvent('value added', [
       7,
       SWITCH_BINARY,
       switchValue
     ]);
-    emit_event("value added", [
+    emitEvent('value added', [
       8,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emit_event("value added", [
+    emitEvent('value added', [
       9,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emit_event("node ready", [
+    emitEvent('node ready', [
       2,
-      node2_nodeinfo
+      node2NodeInfo
     ]);
-    emit_event("node ready", [
+    emitEvent('node ready', [
       5,
-      node5_nodeinfo
+      node5NodeInfo
     ]);
-    emit_event("node ready", [
+    emitEvent('node ready', [
       7,
-      node7_nodeinfo
+      node7NodeInfo
     ]);
-    emit_event("node ready", [
+    emitEvent('node ready', [
       8,
-      node8_nodeinfo
+      node8NodeInfo
     ]);
-    emit_event("node ready", [
+    emitEvent('node ready', [
       9,
-      node9_nodeinfo
+      node9NodeInfo
     ]);
-    emit_event("node event", [
+    emitEvent('node event', [
       3,
       255
     ]);
-    emit_event("node event", [
+    emitEvent('node event', [
       3,
       0
     ]);
   }
 
-  function emit_event(event_name, params) {
-    _.each(callbacks[event_name], function (callback) {
-      callback.apply(this, params);
+  function emitEvent(eventName, params) {
+    _.each(callbacks[eventName], function (callback) {
+      callback.apply(null, params);
     });
   }
 

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var Redis = require("redis");
+var Redis = require('redis');
 var Logger = require('./logger');
-var EventEmitter = require("events").EventEmitter;
+var EventEmitter = require('events').EventEmitter;
 
 function RedisInterface(commandChannel) {
   var subscriptionRedis;
@@ -14,10 +14,10 @@ function RedisInterface(commandChannel) {
     subscriptionRedis = Redis.createClient();
     dataRedis = Redis.createClient();
 
-    subscriptionRedis.on("message", function (channel, message) {
-      Logger.verbose("Message received: " + channel + ": '" + message + "'");
+    subscriptionRedis.on('message', function (channel, message) {
+      Logger.verbose('Message received: ' + channel + ': "' + message + '"');
       if (channel === commandChannel) {
-        eventEmitter.emit("commandReceived", message);
+        eventEmitter.emit('commandReceived', message);
       }
     });
 
@@ -25,22 +25,22 @@ function RedisInterface(commandChannel) {
   }
 
   function programmeChanged(name) {
-    Logger.verbose("Storing new programme in Redis: '%s'", name);
-    dataRedis.set("zwave_programme", name);
+    Logger.verbose('Storing new programme in Redis: "%s"', name);
+    dataRedis.set('zwave_programme', name);
   }
 
   function storeValue(lightName, commandClass, value) {
-    dataRedis.hset("node_"+lightName, "class_"+commandClass, value.value);
+    dataRedis.hset('node_' + lightName, 'class_' + commandClass, value.value);
 
-    Logger.debug("Stored in Redis: ", lightName, commandClass, value.value);
+    Logger.debug('Stored in Redis: ', lightName, commandClass, value.value);
   }
 
   function clearAvailableProgrammes() {
-    dataRedis.del("zwave_available_programmes");
+    dataRedis.del('zwave_available_programmes');
   }
 
   function addAvailableProgramme(name, displayName) {
-    dataRedis.hset("zwave_available_programmes", name, displayName);
+    dataRedis.hset('zwave_available_programmes', name, displayName);
   }
 
   function cleanUp() {

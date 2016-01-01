@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var Logger = require('./logger');
@@ -8,7 +8,7 @@ function TimeStateMachine(transitions) {
 
   transitions = _.defaults({}, transitions, {
     off: {
-      default: "off"
+      default: 'off'
     }
   });
 
@@ -18,17 +18,17 @@ function TimeStateMachine(transitions) {
     // Missing 'on' somewhere in the chain
 
     if (!currentTransitions) {
-      Logger.warn("No transition from '", state, "' for event '", event, "'");
+      Logger.warn('No transition from "', state, '" for event "', event, '"');
       return;
     }
 
     var newState = currentTransitions[state];
 
     if (!newState) {
-      newState = currentTransitions["default"];
+      newState = currentTransitions['default'];
     }
 
-    Logger.info("Transition to state ", newState);
+    Logger.info('Transition to state ', newState);
     setState(newState);
     return newState;
   }

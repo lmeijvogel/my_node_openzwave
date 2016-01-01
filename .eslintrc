@@ -1,6 +1,7 @@
 ---
 extends:
   - "defaults"
+  - "defaults/configurations/google"
 rules:
   no-new: 2
   max-len: [2, 120]
@@ -10,11 +11,7 @@ rules:
   semi: [2, "always"]
   eqeqeq: 2
   strict: [2, "global"]
-globals:
-  require: false
-  module: false
-  describe: false
-  context: false
-  before: false
-  it: false
-  process: false
+  new-cap: 0
+env:
+  node: true
+  mocha: true

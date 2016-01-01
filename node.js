@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var util = require("util");
-var _ = require("lodash");
+var util = require('util');
+var _ = require('lodash');
 
 var nodes = {};
 
@@ -22,7 +22,7 @@ function Node(nodeId) {
 
   function setValue(commandClass, value) {
     if (!commandClassExists(commandClass)) {
-      throw "Command class '"+ commandClass +"' was never added to this node ("+ nodeId +")";
+      throw 'Command class "' +  commandClass  + '" was never added to this node (' +  nodeId  + ')';
     }
 
     values[commandClass][value.index] = value;
@@ -31,9 +31,8 @@ function Node(nodeId) {
   function getValue(commandClass, index) {
     if (commandClassExists(commandClass)) {
       return values[commandClass][index];
-    }
-    else {
-      return {label: "Unknown", value: "-"};
+    } else {
+      return {label: 'Unknown', value: '-'};
     }
   }
 
@@ -56,24 +55,24 @@ function Node(nodeId) {
   }
 
   function setNodeInfo(nodeInfo) {
-    info["manufacturer"] = nodeInfo.manufacturer;
-    info["manufacturerid"] = nodeInfo.manufacturerid;
-    info["product"] = nodeInfo.product;
-    info["producttype"] = nodeInfo.producttype;
-    info["productid"] = nodeInfo.productid;
-    info["type"] = nodeInfo.type;
-    info["name"] = nodeInfo.name;
-    info["loc"] = nodeInfo.loc;
+    info['manufacturer'] = nodeInfo.manufacturer;
+    info['manufacturerid'] = nodeInfo.manufacturerid;
+    info['product'] = nodeInfo.product;
+    info['producttype'] = nodeInfo.producttype;
+    info['productid'] = nodeInfo.productid;
+    info['type'] = nodeInfo.type;
+    info['name'] = nodeInfo.name;
+    info['loc'] = nodeInfo.loc;
   }
 
   function toString() {
-    var result = "";
+    var result = '';
 
     _.forIn(values, function (commandClass, commandClassIdx) {
-      result += util.format("node%d: class %d\n", nodeId, commandClassIdx);
+      result += util.format('node%d: class %d\n', nodeId, commandClassIdx);
 
       _.forIn(commandClass, function (command) {
-        result += util.format("node%d:   %s=%s", nodeId, command["label"], command["value"]);
+        result += util.format('node%d:   %s=%s', nodeId, command['label'], command['value']);
       });
     });
 

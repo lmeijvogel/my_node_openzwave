@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var _ = require("lodash");
-var Programme = require("./programme");
+var _ = require('lodash');
+var Programme = require('./programme');
 
 function ProgrammeFactory() {
   var programmeCreatedCallbacks = [];
@@ -12,6 +12,7 @@ function ProgrammeFactory() {
 
     _.each(config.programmes, function (programme, name) {
       var newProgramme = new Programme(name, programme.displayName, programme.values, lights);
+
       programmes[name] = newProgramme;
 
       _.each(programmeCreatedCallbacks, function (callback) {
