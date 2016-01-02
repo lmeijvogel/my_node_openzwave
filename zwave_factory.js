@@ -11,11 +11,12 @@ function ZWaveFactory(testMode) {
       return new FakeZWave();
     } else {
       Logger.verbose('ZWaveFactory: Creating real ZWave');
-      var OpenZWave = require('openzwave');
 
-      return new OpenZWave('/dev/ttyUSB0', {
-        saveconfig: true,
-        retrytimeout: 3000
+      var OpenZWave = require('openzwave-shared');
+
+      return new OpenZWave({
+        SaveConfig: true,
+        RetryTimeout: 3000
       });
     }
   }
