@@ -1,16 +1,16 @@
 'use strict';
 
-var Logger = require('./logger');
-var EventEmitter = require('events').EventEmitter;
+const Logger = require('./logger');
+const EventEmitter = require('events').EventEmitter;
 
 function EventProcessor(zwave, programmes, nextProgrammeChooser) {
-  var eventEmitter = new EventEmitter();
+  const eventEmitter = new EventEmitter();
 
   zwave.onNodeEvent(onNodeEvent);
 
   function onNodeEvent(node, event) {
     if (node.nodeId === 3) {
-      var onOff = event === 255 ? 'on' : 'off';
+      const onOff = event === 255 ? 'on' : 'off';
 
       mainSwitchPressed(onOff);
     } else {
@@ -24,7 +24,7 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
   }
 
   function programmeSelected(programmeName) {
-    var programme = programmes[programmeName];
+    const programme = programmes[programmeName];
 
     if (programme) {
       programme.apply(zwave);
@@ -41,8 +41,8 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
   function mainSwitchPressed(onOff) {
     Logger.info('Switch pressed: ' + onOff);
 
-    var nextProgrammeName = nextProgrammeChooser.handle(onOff);
-    var nextProgramme = programmes[nextProgrammeName];
+    const nextProgrammeName = nextProgrammeChooser.handle(onOff);
+    const nextProgramme = programmes[nextProgrammeName];
 
     if (!nextProgramme) {
       return;

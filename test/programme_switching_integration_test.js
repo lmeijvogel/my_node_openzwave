@@ -1,33 +1,33 @@
 'use strict';
 
-var assert               = require('assert');
-var Node                 = require('../node');
-var _                    = require('lodash');
+const assert               = require('assert');
+const Node                 = require('../node');
+const _                    = require('lodash');
 
-var NextProgrammeChooser = require('../next_programme_chooser');
-var TimeStateMachine     = require('../time_state_machine');
-var EventProcessor       = require('../event_processor');
+const NextProgrammeChooser = require('../next_programme_chooser');
+const TimeStateMachine     = require('../time_state_machine');
+const EventProcessor       = require('../event_processor');
 
 describe('integration', function () {
-  var handler;
+  let handler;
 
-  var myZWave = {
+  const myZWave = {
     onNodeEvent: function (h) { handler = h; }
   };
 
-  var timeService = {
+  const timeService = {
     getPeriod: function () { return 'evening'; }
   };
 
-  var switchOff = function () {
+  const switchOff = function () {
     handler.call(myZWave, Node(3), 0);
   };
 
-  var switchOn  = function () {
+  const switchOn  = function () {
     handler.call(myZWave, Node(3), 255);
   };
 
-  var stateMachines = {
+  const stateMachines = {
     evening: TimeStateMachine({
       on: {
         evening: 'dimmed',
@@ -40,8 +40,8 @@ describe('integration', function () {
     })
   };
 
-  var programme;
-  var programmes = {};
+  let programme;
+  let programmes = {};
 
   _(['evening', 'tree', 'dimmed', 'off']).each(function (name) {
     programmes[name] = {
@@ -52,7 +52,7 @@ describe('integration', function () {
     };
   });
 
-  var nextProgrammeChooser;
+  let nextProgrammeChooser;
 
   before(function () {
     nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
@@ -87,7 +87,7 @@ describe('integration', function () {
   });
 
   context('when there are multiple "off" steps', function () {
-    var stateMachines = {
+    const stateMachines = {
       evening: TimeStateMachine({
         on: {
           default: 'evening'

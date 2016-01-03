@@ -1,10 +1,10 @@
 'use strict';
 
-var _ = require('lodash');
-var Logger = require('./logger');
+const _ = require('lodash');
+const Logger = require('./logger');
 
 function TimeStateMachine(transitions) {
-  var state = null;
+  let state = null;
 
   transitions = _.defaults({}, transitions, {
     off: {
@@ -13,7 +13,7 @@ function TimeStateMachine(transitions) {
   });
 
   function handle(event) {
-    var currentTransitions = transitions[event];
+    const currentTransitions = transitions[event];
 
     // Missing 'on' somewhere in the chain
 
@@ -22,11 +22,7 @@ function TimeStateMachine(transitions) {
       return;
     }
 
-    var newState = currentTransitions[state];
-
-    if (!newState) {
-      newState = currentTransitions['default'];
-    }
+    const newState = currentTransitions[state] || currentTransitions['default'];
 
     Logger.info('Transition to state ', newState);
     setState(newState);

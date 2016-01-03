@@ -1,12 +1,12 @@
 'use strict';
 
-var Node = require('./node');
-var _ = require('lodash');
-var Logger = require('./logger');
+const Node = require('./node');
+const _ = require('lodash');
+const Logger = require('./logger');
 
 function MyZWave(zwave) {
-  var nodes = [];
-  var eventListeners = {};
+  let nodes = [];
+  let eventListeners = {};
 
   function registerEvents() {
     zwave.on('driver ready', function (homeid) {
@@ -25,13 +25,13 @@ function MyZWave(zwave) {
     });
 
     zwave.on('value added', function (nodeid, comclass, value) {
-      var node = Node.find(nodeid);
+      const node = Node.find(nodeid);
 
       node.addValue(comclass, value);
     });
 
     zwave.on('value changed', function (nodeid, comclass, value) {
-      var node = Node.find(nodeid);
+      const node = Node.find(nodeid);
 
       node.setValue(comclass, value);
 
@@ -41,7 +41,7 @@ function MyZWave(zwave) {
     });
 
     zwave.on('value removed', function (nodeid, comclass, index) {
-      var node = Node.find(nodeid);
+      const node = Node.find(nodeid);
 
       node.removeValue(comclass, index);
     });
@@ -82,7 +82,7 @@ function MyZWave(zwave) {
     zwave.on('node event', function (nodeid, event) {
       Logger.verbose('node%d: event: %s', nodeid, event);
 
-      var node = Node.find(nodeid);
+      const node = Node.find(nodeid);
 
       _(eventListeners['node event']).each(function (handler) {
         handler.call(null, node, event);
@@ -90,7 +90,7 @@ function MyZWave(zwave) {
     });
 
     zwave.on('neighbors', function (nodeid, neighbors) {
-      var formattedNeighbors = neighbors.join(', ');
+      const formattedNeighbors = neighbors.join(', ');
 
       Logger.info('node%d: neighbors: [ %s ]', nodeid, formattedNeighbors);
     });
@@ -136,7 +136,7 @@ function MyZWave(zwave) {
   }
 
   function nodeReady(nodeid, nodeinfo) {
-    var node = Node.find(nodeid);
+    const node = Node.find(nodeid);
 
     node.setNodeInfo(nodeinfo);
     node.setReady();
@@ -170,8 +170,8 @@ function MyZWave(zwave) {
   }
 
   function logValue(nodeId, commandClass, index) {
-    var node = Node.find(nodeId);
-    var value = node.getValue(commandClass, index);
+    const node = Node.find(nodeId);
+    const value = node.getValue(commandClass, index);
 
     Logger.info('Node value requested: node %d: %d:%s: %s', nodeId, commandClass, value['label'], value['value']);
   }

@@ -1,9 +1,9 @@
 'use strict';
 
-var Logger = require('./logger');
+const Logger = require('./logger');
 
 function NextProgrammeChooser(timeService, stateMachines) {
-  var currentState = null;
+  let currentState = null;
 
   function setCurrentState(newCurrentState) {
     Logger.debug('NextProgrammeChooser: Registering current state as', currentState);
@@ -13,7 +13,7 @@ function NextProgrammeChooser(timeService, stateMachines) {
   function handle(event) {
     Logger.debug('Leaving state', currentState);
 
-    var currentStateMachine = chooseStateMachine();
+    const currentStateMachine = chooseStateMachine();
 
     currentState = currentStateMachine.handle(event);
 
@@ -23,10 +23,10 @@ function NextProgrammeChooser(timeService, stateMachines) {
   }
 
   function chooseStateMachine() {
-    var now = new Date();
-    var currentPeriod = timeService.getPeriod(now);
+    const now = new Date();
+    const currentPeriod = timeService.getPeriod(now);
 
-    var stateMachine = stateMachines[currentPeriod];
+    const stateMachine = stateMachines[currentPeriod];
 
     if (stateMachine) {
       return stateMachine;

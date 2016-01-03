@@ -1,12 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var Logger = require('./logger');
+const _ = require('lodash');
+const Logger = require('./logger');
 
 function Programme(name, displayName, data, lights) {
   function apply(zwave) {
     _.forIn(data, function (value, key) {
-      var nodeid = lights[key];
+      const nodeid = lights[key];
 
       try {
         if (value === true) {

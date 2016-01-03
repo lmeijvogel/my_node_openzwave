@@ -1,36 +1,36 @@
 'use strict';
 
-var _ = require('lodash');
+const _ = require('lodash');
 
 function TimeService(config) {
   if (!config.periodStarts) {
     throw 'No periodStarts defined in config';
   }
 
-  var lookupTable = config.periodStarts;
+  const lookupTable = config.periodStarts;
 
   function getPeriod(now) {
-    var candidateKeys = _.chain(_.keys(lookupTable)).select(function (k) {
-      var periodStart = stringToTimeToday(k);
+    const candidateKeys = _.chain(_.keys(lookupTable)).select(function (k) {
+      const periodStart = stringToTimeToday(k);
 
       return periodStart < now;
     }).value();
 
-    var key = _.last(candidateKeys);
+    const key = _.last(candidateKeys);
 
     return lookupTable[key];
   }
 
   function stringToTimeToday(timeString) {
-    var splittedString = timeString.split(':');
-    var hoursMinutes = _.map(splittedString, function (str) {
+    const splittedString = timeString.split(':');
+    const hoursMinutes = _.map(splittedString, function (str) {
       return parseInt(str, 10);
     });
 
-    var hours = hoursMinutes[0];
-    var minutes = hoursMinutes[1];
+    const hours = hoursMinutes[0];
+    const minutes = hoursMinutes[1];
 
-    var result = new Date();
+    let result = new Date();
 
     result.setHours(hours);
     result.setMinutes(minutes);

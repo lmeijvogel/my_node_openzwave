@@ -1,10 +1,10 @@
 'use strict';
 
-var fs = require('fs');
+const fs = require('fs');
 
 function ConfigReader() {
   function read(filename) {
-    var contents = fs.readFileSync(filename, 'utf8');
+    const contents = fs.readFileSync(filename, 'utf8');
 
     return JSON.parse(contents);
   }
