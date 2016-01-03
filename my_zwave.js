@@ -33,18 +33,6 @@ function MyZWave(zwave) {
     zwave.on('value changed', function (nodeid, comclass, value) {
       var node = Node.find(nodeid);
 
-      if (node.isReady()) {
-        if (comclass === 38 || comclass === 37) {
-          Logger.info('Received node change: node %d: %s => %s', nodeid, value['label'], value['value']);
-        } else {
-          Logger.verbose('Received node change: node %d: %d:%s:%s => %s',
-            nodeid, comclass, value['label'], node.getValue(comclass, value.index)['value'], value['value']);
-        }
-      } else {
-        Logger.debug('Received node change: node %d: %d:%s:%s => %s (before nodeReady event)',
-          nodeid, comclass, value['label'], node.getValue(comclass, value.index)['value'], value['value']);
-      }
-
       node.setValue(comclass, value);
 
       _.each(eventListeners['valueChange'], function (handler) {
