@@ -94,6 +94,16 @@ redisInterface.on('commandReceived', function (command) {
   commandParser.parse(command);
 });
 
+myZWave.onNodeEvent(function (node, event) {
+  if (node.nodeId === 3) {
+    eventProcessor.mainSwitchPressed(event);
+  } else {
+    Logger.warn('Event from unexpected node ', node);
+    Logger.verbose('.. event: ', event);
+  }
+
+});
+
 commandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
   myZWave.logValue(nodeId, commandClass, index);
 });

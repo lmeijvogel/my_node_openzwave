@@ -6,19 +6,6 @@ const EventEmitter = require('events').EventEmitter;
 function EventProcessor(zwave, programmes, nextProgrammeChooser) {
   const eventEmitter = new EventEmitter();
 
-  zwave.onNodeEvent(onNodeEvent);
-
-  function onNodeEvent(node, event) {
-    if (node.nodeId === 3) {
-      const onOff = event === 255 ? 'on' : 'off';
-
-      mainSwitchPressed(onOff);
-    } else {
-      Logger.warn('Event from unexpected node ', node);
-      Logger.verbose('.. event: ', event);
-    }
-  }
-
   function on(eventName, callback) {
     eventEmitter.on(eventName, callback);
   }
@@ -38,7 +25,9 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
     }
   }
 
-  function mainSwitchPressed(onOff) {
+  function mainSwitchPressed(value) {
+    const onOff = value === 255 ? 'on' : 'off';
+
     Logger.info('Switch pressed: ' + onOff);
 
     const nextProgrammeName = nextProgrammeChooser.handle(onOff);
@@ -58,6 +47,7 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
 
   return {
     on: on,
+    mainSwitchPressed: mainSwitchPressed,
     programmeSelected: programmeSelected
   };
 }
