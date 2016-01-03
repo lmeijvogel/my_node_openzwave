@@ -1,12 +1,12 @@
 _ = require("lodash")
 assert = require("assert")
-CommandParser = require("../command_parser")
+RedisCommandParser = require("../redis_command_parser")
 
 stub = (result) -> (-> return result)
 
-describe "CommandParser", ->
+describe "RedisCommandParser", ->
   beforeEach ->
-    @subject = new CommandParser(regular: {})
+    @subject = new RedisCommandParser(regular: {})
 
   describe "parse", ->
     context "when the command cannot be parsed", ->

@@ -12,7 +12,7 @@ const TimeService = require('./time_service');
 const NextProgrammeChooser = require('./next_programme_chooser');
 
 const EventProcessor = require('./event_processor');
-const CommandParser = require('./command_parser');
+const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
@@ -65,7 +65,7 @@ process.on('SIGTERM', stopProgramme);
 
 const myZWave = MyZWave(zwave);
 const redisInterface = RedisInterface('MyZWave');
-const commandParser = CommandParser();
+const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
 
@@ -91,7 +91,7 @@ myZWave.onValueChange(function (node, commandClass, value) {
 });
 
 redisInterface.on('commandReceived', function (command) {
-  commandParser.parse(command);
+  redisCommandParser.parse(command);
 });
 
 myZWave.onNodeEvent(function (node, event) {
@@ -104,19 +104,19 @@ myZWave.onNodeEvent(function (node, event) {
 
 });
 
-commandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
+redisCommandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
   myZWave.logValue(nodeId, commandClass, index);
 });
 
-commandParser.on('programmeChosen', function (programmeName) {
+redisCommandParser.on('programmeChosen', function (programmeName) {
   eventProcessor.programmeSelected(programmeName);
 });
 
-commandParser.on('neighborsRequested', function (nodeId) {
+redisCommandParser.on('neighborsRequested', function (nodeId) {
   zwave.getNeighbors(nodeId);
 });
 
-commandParser.on('healNetworkRequested', function () {
+redisCommandParser.on('healNetworkRequested', function () {
   Logger.info('Requested healing the network');
   zwave.healNetwork();
 });

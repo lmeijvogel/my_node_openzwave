@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
-function CommandParser() {
+function RedisCommandParser() {
   const nodeValueRegex    = /get (\w+) (\w+) (\w+)/;
   const programmeRegex    = /programme (.*)/;
   const getNeighborsRegex = /neighbors (.*)/;
@@ -66,4 +66,4 @@ function CommandParser() {
   };
 }
 
-module.exports = CommandParser;
+module.exports = RedisCommandParser;
