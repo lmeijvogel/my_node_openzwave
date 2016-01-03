@@ -3,6 +3,7 @@
 const Redis = require('redis');
 const Logger = require('./logger');
 const EventEmitter = require('events').EventEmitter;
+const _ = require('lodash');
 
 function RedisInterface(commandChannel) {
   let subscriptionRedis;
@@ -35,8 +36,30 @@ function RedisInterface(commandChannel) {
     Logger.debug('Stored in Redis: ', lightName, commandClass, value.value);
   }
 
+  function clearCurrentLightLevels() {
+    return new Promise(function (resolve, reject) {
+      dataRedis.keys('node_*', function (err, keys) {
+        const deletePromises = _.map(keys, function (key) {
+          return new Promise(function (resolveDelete, rejectDelete) {
+            dataRedis.del(key, function () {
+              resolveDelete();
+            });
+          });
+        });
+
+        Promise.all(deletePromises).then(function () {
+          resolve();
+        });
+      });
+    });
+  }
+
   function clearAvailableProgrammes() {
-    dataRedis.del('zwave_available_programmes');
+    return new Promise(function (resolve) {
+      dataRedis.del('zwave_available_programmes', function () {
+        resolve();
+      });
+    });
   }
 
   function addAvailableProgramme(name, displayName) {
@@ -57,6 +80,7 @@ function RedisInterface(commandChannel) {
     start:                    start,
     programmeChanged:         programmeChanged,
     storeValue:               storeValue,
+    clearCurrentLightLevels:  clearCurrentLightLevels,
     clearAvailableProgrammes: clearAvailableProgrammes,
     addAvailableProgramme:    addAvailableProgramme,
     on:                       on,

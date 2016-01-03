@@ -63,68 +63,71 @@ function stopProgramme() {
 process.on('SIGINT', stopProgramme);
 process.on('SIGTERM', stopProgramme);
 
-const myZWave = MyZWave(zwave);
 const redisInterface = RedisInterface('MyZWave');
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
+Promise.all([
+  redisInterface.clearCurrentLightLevels(),
+  redisInterface.clearAvailableProgrammes()
+]).then(function () {
+  const myZWave = MyZWave(zwave);
+  const programmeFactory = ProgrammeFactory();
 
-redisInterface.clearAvailableProgrammes();
-const programmeFactory = ProgrammeFactory();
+  programmeFactory.onProgrammeCreated(function (programme) {
+    redisInterface.addAvailableProgramme(programme.name, programme.displayName);
+  });
 
-programmeFactory.onProgrammeCreated(function (programme) {
-  redisInterface.addAvailableProgramme(programme.name, programme.displayName);
+  const programmes = programmeFactory.build(config);
+
+  const stateMachines = StateMachineBuilder(config).call();
+
+  const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
+
+  const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+
+  myZWave.onValueChange(function (node, commandClass, value) {
+    const lightName = _.invert(config['lights'])['' + node.nodeId];
+
+    redisInterface.storeValue(lightName, commandClass, value);
+  });
+
+  redisInterface.on('commandReceived', function (command) {
+    redisCommandParser.parse(command);
+  });
+
+  myZWave.onNodeEvent(function (node, event) {
+    if (node.nodeId === 3) {
+      eventProcessor.mainSwitchPressed(event);
+    } else {
+      Logger.warn('Event from unexpected node ', node);
+      Logger.verbose('.. event: ', event);
+    }
+
+  });
+
+  redisCommandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
+    myZWave.logValue(nodeId, commandClass, index);
+  });
+
+  redisCommandParser.on('programmeChosen', function (programmeName) {
+    eventProcessor.programmeSelected(programmeName);
+  });
+
+  redisCommandParser.on('neighborsRequested', function (nodeId) {
+    zwave.getNeighbors(nodeId);
+  });
+
+  redisCommandParser.on('healNetworkRequested', function () {
+    Logger.info('Requested healing the network');
+    zwave.healNetwork();
+  });
+
+  eventProcessor.on('programmeSelected', function (programmeName) {
+    if (programmeName) {
+      redisInterface.programmeChanged(programmeName);
+    }
+  });
+
+  myZWave.connect();
 });
-
-const programmes = programmeFactory.build(config);
-
-const stateMachines = StateMachineBuilder(config).call();
-
-const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
-
-const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
-
-myZWave.onValueChange(function (node, commandClass, value) {
-  const lightName = _.invert(config['lights'])['' + node.nodeId];
-
-  redisInterface.storeValue(lightName, commandClass, value);
-});
-
-redisInterface.on('commandReceived', function (command) {
-  redisCommandParser.parse(command);
-});
-
-myZWave.onNodeEvent(function (node, event) {
-  if (node.nodeId === 3) {
-    eventProcessor.mainSwitchPressed(event);
-  } else {
-    Logger.warn('Event from unexpected node ', node);
-    Logger.verbose('.. event: ', event);
-  }
-
-});
-
-redisCommandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
-  myZWave.logValue(nodeId, commandClass, index);
-});
-
-redisCommandParser.on('programmeChosen', function (programmeName) {
-  eventProcessor.programmeSelected(programmeName);
-});
-
-redisCommandParser.on('neighborsRequested', function (nodeId) {
-  zwave.getNeighbors(nodeId);
-});
-
-redisCommandParser.on('healNetworkRequested', function () {
-  Logger.info('Requested healing the network');
-  zwave.healNetwork();
-});
-
-eventProcessor.on('programmeSelected', function (programmeName) {
-  if (programmeName) {
-    redisInterface.programmeChanged(programmeName);
-  }
-});
-
-myZWave.connect();
