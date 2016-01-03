@@ -116,6 +116,19 @@ function FakeZWave() {
     ]);
   }
 
+  function setValue(nodeId, commandClass, instance, index, value) {
+    nodes[nodeId]['value'] = value;
+    emitEvent('value changed', [
+      nodeId,
+      commandClass,
+      {
+        label: 'Switch',
+        index: index,
+        value: value
+      }
+    ]);
+  }
+
   function enablePoll(nodeid, commandClass) {
     Logger.debug('FAKE: EnablePoll', nodeid, commandClass);
   }
@@ -305,9 +318,7 @@ function FakeZWave() {
     disconnect: disconnect,
     tryParse: tryParse,
     enablePoll: enablePoll,
-    setLevel: setLevel,
-    switchOff: switchOff,
-    switchOn: switchOn,
+    setValue: setValue,
     logValue: logValue
   };
 }
