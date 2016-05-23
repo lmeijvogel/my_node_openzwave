@@ -10,7 +10,7 @@ function TimeService(config) {
   const lookupTable = config.periodStarts;
 
   function getPeriod(now) {
-    const candidateKeys = _.chain(_.keys(lookupTable)).select(function (k) {
+    const candidateKeys = _.chain(_.keys(lookupTable)).filter(function (k) {
       const periodStart = stringToTimeToday(k);
 
       return periodStart < now;
