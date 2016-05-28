@@ -66,6 +66,18 @@ function RedisInterface(commandChannel) {
     dataRedis.hset('zwave_available_programmes', name, displayName);
   }
 
+  function vacationModeStarted(startTime, endTime) {
+    dataRedis.hset('zwave_vacation_mode', 'state', 'on');
+    dataRedis.hset('zwave_vacation_mode', 'start_time', startTime);
+    dataRedis.hset('zwave_vacation_mode', 'end_time', endTime);
+  }
+
+  function vacationModeStopped() {
+    dataRedis.hset('zwave_vacation_mode', 'state', 'off');
+    dataRedis.hdel('zwave_vacation_mode', 'start_time');
+    dataRedis.hdel('zwave_vacation_mode', 'end_time');
+  }
+
   function cleanUp() {
     subscriptionRedis.unsubscribe();
     subscriptionRedis.end();
@@ -79,6 +91,8 @@ function RedisInterface(commandChannel) {
   return {
     start:                    start,
     programmeChanged:         programmeChanged,
+    vacationModeStarted:      vacationModeStarted,
+    vacationModeStopped:      vacationModeStopped,
     storeValue:               storeValue,
     clearCurrentLightLevels:  clearCurrentLightLevels,
     clearAvailableProgrammes: clearAvailableProgrammes,
