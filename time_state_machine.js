@@ -13,7 +13,12 @@ function TimeStateMachine(transitions) {
   });
 
   function handle(event) {
+    Logger.debug('TimeStateMachine.handle: Handling event: ', event);
+    Logger.debug('TimeStateMachine.handle: Current state: ', state);
+
     const currentTransitions = transitions[event];
+
+    Logger.debug('TimeStateMachine.handle: Transition table: ', currentTransitions);
 
     // Missing 'on' somewhere in the chain
 
@@ -22,7 +27,21 @@ function TimeStateMachine(transitions) {
       return;
     }
 
-    const newState = currentTransitions[state] || currentTransitions['default'];
+    let newState = null;
+
+    const transitionFromTable = currentTransitions[state];
+
+    if (transitionFromTable) {
+      Logger.debug('TimeStateMachine.handle: Found transition: ', transitionFromTable);
+
+      newState = transitionFromTable;
+    } else {
+      const defaultTransition = currentTransitions['default'];
+
+      Logger.debug('TimeStateMachine.handle: No transition found, using default: ', defaultTransition);
+
+      newState = defaultTransition;
+    }
 
     Logger.info('Transition to state ', newState);
     setState(newState);
@@ -34,6 +53,7 @@ function TimeStateMachine(transitions) {
   }
 
   function setState(newState) {
+    Logger.debug('TimeStateMachine.setState: newState: ', newState);
     state = newState;
   }
 

@@ -140,7 +140,7 @@ function MyZWave(zwave) {
 
     node.setNodeInfo(nodeinfo);
     node.setReady();
-    Logger.debug('Node ready, node: %s', node.toString());
+    Logger.debug('Node ready, node: %s', node);
     if (node.isPollable()) {
       Logger.debug('.. enabling poll');
       enablePoll(node);
