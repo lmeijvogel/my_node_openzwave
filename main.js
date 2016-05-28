@@ -19,12 +19,12 @@ const Logger = require('./logger');
 
 const argv = minimist(process.argv.slice(2));
 
-const logFile = argv['logfile'] || './log/openzwave.log';
-
 const configFile = argv['config'] || './config.json';
 const config = ConfigReader().read(configFile);
 
-Logger.enableLogToFile(logFile);
+const logFile = argv['logfile'] || config['log']['file'] || './log/openzwave.log';
+
+Logger.enableLogToFile(logFile, config['log']['level']);
 
 Logger.info('Starting server');
 

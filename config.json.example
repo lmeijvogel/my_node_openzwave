@@ -4,6 +4,11 @@
     "enabled": false,
     "port": 4567
   },
+  "log": {
+    "file": "./log/openzwave.log",
+    "level": "debug",
+    "stdout_level": "info"
+  },
 
  "lights": {
     "uplight":     2,

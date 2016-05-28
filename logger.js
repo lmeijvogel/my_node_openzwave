@@ -8,8 +8,8 @@ function WinstonLogger() {
 
   // Don't enable logging to file by default since it would then also do
   // that while running tests
-  function enableLogToFile(filename) {
-    logger = createLogger(filename);
+  function enableLogToFile(filename, level) {
+    logger = createLogger(filename, level);
   }
 
   function setSilent(silent) {
@@ -40,13 +40,13 @@ function WinstonLogger() {
     logger.log.apply(logger, args);
   }
 
-  function createLogger(filename) {
+  function createLogger(filename, level) {
     const transports = [
       new winston.transports.Console({'timestamp': timestamp, 'level': 'info'})
     ];
 
     if (filename) {
-      transports.push(new winston.transports.File({'filename': filename, 'timestamp': true, 'level': 'verbose'}));
+      transports.push(new winston.transports.File({'filename': filename, 'timestamp': true, 'level': level}));
     }
 
     return new winston.Logger({
