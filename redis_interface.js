@@ -54,6 +54,14 @@ function RedisInterface(commandChannel) {
     });
   }
 
+  function getVacationMode() {
+    return new Promise(function (resolve, reject) {
+      dataRedis.hgetall('zwave_vacation_mode', function (err, values) {
+        resolve(values);
+      });
+    });
+  }
+
   function clearAvailableProgrammes() {
     return new Promise(function (resolve) {
       dataRedis.del('zwave_available_programmes', function () {
@@ -91,6 +99,7 @@ function RedisInterface(commandChannel) {
   return {
     start:                    start,
     programmeChanged:         programmeChanged,
+    getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
     storeValue:               storeValue,

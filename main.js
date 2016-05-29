@@ -211,5 +211,15 @@ Promise.all([
     }
   }
 
+  redisInterface.getVacationMode().then(function (data) {
+    if (data.state === 'on') {
+      Logger.info('Vacation mode was still on. Enabling.');
+      const meanStartTime = data.start_time;
+      const meanEndTime   = data.end_time;
+
+      startVacationMode(meanStartTime, meanEndTime);
+    }
+  });
+
   myZWave.connect();
 });
