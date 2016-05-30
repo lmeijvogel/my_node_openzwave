@@ -15,7 +15,7 @@ function NextProgrammeChooser(timeService, stateMachines) {
 
     const currentStateMachine = chooseStateMachine();
 
-    currentState = currentStateMachine.handle(event);
+    currentState = currentStateMachine.handle(event, currentState);
 
     Logger.verbose('NextProgrammeChooser.handle: new currentState: ', currentState);
 

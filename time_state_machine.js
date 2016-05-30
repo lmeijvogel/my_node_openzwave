@@ -4,57 +4,38 @@ const _ = require('lodash');
 const Logger = require('./logger');
 
 function TimeStateMachine(transitions) {
-  let state = null;
-
   transitions = _.defaults({}, transitions, {
     off: {
       default: 'off'
     }
   });
 
-  function handle(event) {
+  function handle(event, currentState) {
     Logger.debug('TimeStateMachine.handle: Handling event: ', event);
-    Logger.debug('TimeStateMachine.handle: Current state: ', state);
+    Logger.debug('TimeStateMachine.handle: Current state: ', currentState);
 
     const currentTransitions = transitions[event];
 
     Logger.debug('TimeStateMachine.handle: Transition table: ', currentTransitions);
 
-    // Missing 'on' somewhere in the chain
-
     if (!currentTransitions) {
-      Logger.warn('No transition from "', state, '" for event "', event, '"');
-      return;
+      Logger.warn('No transition from "', currentState, '" for event "', event, '"');
+      return currentState;
     }
 
-    let newState = null;
-
-    const transitionFromTable = currentTransitions[state];
+    const transitionFromTable = currentTransitions[currentState];
 
     if (transitionFromTable) {
-      Logger.debug('TimeStateMachine.handle: Found transition: ', JSON.stringify(transitionFromTable));
+      Logger.info('TimeStateMachine.handle: Found transition:', transitionFromTable);
 
-      newState = transitionFromTable;
+      return transitionFromTable;
     } else {
       const defaultTransition = currentTransitions['default'];
 
-      Logger.debug('TimeStateMachine.handle: No transition found, using default: ', defaultTransition);
+      Logger.info('TimeStateMachine.handle: No transition found, using default: ', defaultTransition);
 
-      newState = defaultTransition;
+      return defaultTransition;
     }
-
-    Logger.info('Transition to state ', newState);
-    setState(newState);
-    return newState;
-  }
-
-  function getState() {
-    return state;
-  }
-
-  function setState(newState) {
-    Logger.debug('TimeStateMachine.setState: newState: ', newState);
-    state = newState;
   }
 
   function getTransitions() {
@@ -62,9 +43,7 @@ function TimeStateMachine(transitions) {
   }
 
   return {
-    getState: getState,
     handle: handle,
-    setState: setState,
     _getTransitions: getTransitions
   };
 }
