@@ -59,8 +59,7 @@ describe('NextProgrammeChooser', function () {
         timeService.getPeriod = function () { return 'morning'; };
 
         stateMachines['morning'] = {
-          handle: function () { return 'dimmed'; },
-          setState: function () { }
+          handle: function () { return 'dimmed'; }
         };
 
         subject = NextProgrammeChooser(timeService, stateMachines);

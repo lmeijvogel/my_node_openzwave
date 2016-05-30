@@ -20,43 +20,36 @@ describe('TimeStateMachine', function () {
   });
 
   context('when the transition is configured', function () {
-    beforeEach(function () {
-      subject.setState('morning');
-    });
-
     it('follows it', function () {
-      subject.handle('on');
-      assert.equal(subject.getState(), 'afternoon');
+      const state = subject.handle('on', 'morning');
+
+      assert.equal(state, 'afternoon');
     });
 
     it('even works on the off switch', function () {
-      subject.handle('off');
-      assert.equal(subject.getState(), 'mostlyOff');
+      const state = subject.handle('off', 'morning');
 
-      subject.handle('off');
-      assert.equal(subject.getState(), 'off');
+      assert.equal(state, 'mostlyOff');
+
+      const nextState = subject.handle('off', state);
+
+      assert.equal(nextState, 'off');
     });
   });
 
   context('when the transition is not configured', function () {
-    beforeEach(function () {
-      subject.setState('something');
-    });
-
     it('follows the default', function () {
-      subject.handle('on');
-      assert.equal(subject.getState(), 'evening');
+      const state = subject.handle('on', 'something');
+
+      assert.equal(state, 'evening');
     });
   });
 
   context('when the event is not configured', function () {
-    beforeEach(function () {
-      subject.setState('afternoon');
-    });
-
     it('does not do anything', function () {
-      subject.handle('something');
-      assert.equal(subject.getState(), 'afternoon');
+      const state = subject.handle('something', 'afternoon');
+
+      assert.equal(state, 'afternoon');
     });
   });
 });
