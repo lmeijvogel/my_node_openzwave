@@ -39,8 +39,14 @@ function TimeService(config) {
     return result;
   }
 
+  function currentTime() {
+    return new Date();
+  }
+
   return {
-    getPeriod: getPeriod
+    currentTime: currentTime,
+    getPeriod: getPeriod,
+    stringToTimeToday: stringToTimeToday
   };
 }
 
