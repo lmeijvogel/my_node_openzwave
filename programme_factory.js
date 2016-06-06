@@ -4,8 +4,6 @@ const _ = require('lodash');
 const Programme = require('./programme');
 
 function ProgrammeFactory() {
-  let programmeCreatedCallbacks = [];
-
   function build(config) {
     const lights = config.lights;
     let programmes = {};
@@ -14,22 +12,13 @@ function ProgrammeFactory() {
       const newProgramme = new Programme(name, programme.displayName, programme.values, lights);
 
       programmes[name] = newProgramme;
-
-      _.each(programmeCreatedCallbacks, function (callback) {
-        callback(newProgramme);
-      });
     });
 
     return programmes;
   }
 
-  function onProgrammeCreated(callback) {
-    programmeCreatedCallbacks.push(callback);
-  }
-
   return {
-    build: build,
-    onProgrammeCreated: onProgrammeCreated
+    build: build
   };
 }
 
