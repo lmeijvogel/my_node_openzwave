@@ -15,6 +15,7 @@ const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
+const EventLogger = require('./event_logger');
 
 const VacationMode = require('./vacation_mode');
 
@@ -36,8 +37,14 @@ const zwave = ZWaveFactory(testMode).create();
 
 function stopProgramme() {
   Logger.info('disconnecting...');
+  eventLogger.store({
+    initiator: null,
+    event: 'Daemon stopped',
+    data: null
+  });
   zwave.disconnect();
   redisInterface.cleanUp();
+  eventLogger.stop();
 
   process.exit();
 }
@@ -45,7 +52,10 @@ function stopProgramme() {
 process.on('SIGINT', stopProgramme);
 process.on('SIGTERM', stopProgramme);
 
+const eventLogger = EventLogger();
+
 const redisInterface = RedisInterface('MyZWave');
+
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
@@ -54,6 +64,14 @@ Promise.all([
   redisInterface.clearAvailableProgrammes()
 ]).then(function () {
   let currentProgramme = null;
+
+  eventLogger.start();
+
+  eventLogger.store({
+    initiator: null,
+    event: 'Daemon started',
+    data: null
+  });
 
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
@@ -103,6 +121,12 @@ Promise.all([
     Logger.debug('Event from node ', node.nodeId);
     if (node.nodeId === 3) {
       eventProcessor.mainSwitchPressed(event, currentProgramme);
+      eventLogger.store({
+        initiator: 'wall switch',
+        event: 'switch pressed',
+        data: event === 255 ? 'on' : 'off'
+      });
+
     } else {
       Logger.warn('Event from unexpected node ', node);
       Logger.verbose('.. event: ', event);
@@ -142,6 +166,12 @@ Promise.all([
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       redisInterface.programmeChanged(programmeName);
+
+      eventLogger.store({
+        initiator: 'event processor',
+        event: 'programme selected',
+        data: programmeName
+      });
     }
   });
 
