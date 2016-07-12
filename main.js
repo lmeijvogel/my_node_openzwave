@@ -165,6 +165,7 @@ Promise.all([
 
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
+      currentProgramme = programmeName;
       redisInterface.programmeChanged(programmeName);
 
       eventLogger.store({
