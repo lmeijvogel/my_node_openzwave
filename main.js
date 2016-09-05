@@ -138,6 +138,20 @@ Promise.all([
     myZWave.logValue(nodeId, commandClass, index);
   });
 
+  redisCommandParser.on('setNodeValue', function (nodeId, value) {
+    switch (value) {
+    case 'on':
+      myZWave.switchOn(nodeId);
+      break;
+    case 'off':
+      myZWave.switchOff(nodeId);
+      break;
+    default:
+      myZWave.setLevel(nodeId, value);
+      break;
+    }
+  });
+
   redisCommandParser.on('programmeChosen', function (programmeName) {
     eventProcessor.programmeSelected(programmeName);
   });
