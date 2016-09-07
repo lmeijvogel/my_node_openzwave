@@ -108,7 +108,7 @@ Promise.all([
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
 
-    redisInterface.storeValue(lightName, commandClass, value);
+    redisInterface.storeValue(lightName, node.nodeId, commandClass, value);
   });
 
   redisInterface.on('commandReceived', function (command) {
