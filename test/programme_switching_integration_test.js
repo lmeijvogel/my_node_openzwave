@@ -60,7 +60,7 @@ describe('integration', function () {
     eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
     myZWave.onNodeEvent(function (node, event) {
-      eventProcessor.mainSwitchPressed(event);
+      eventProcessor.mainSwitchPressed(event, programme);
     });
   });
 
@@ -110,7 +110,7 @@ describe('integration', function () {
       eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
       myZWave.onNodeEvent(function (node, event) {
-        eventProcessor.mainSwitchPressed(event);
+        eventProcessor.mainSwitchPressed(event, programme);
       });
     });
 
