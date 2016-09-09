@@ -4,22 +4,28 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
-  const nodeValueRegex       = /get (\w+) (\w+) (\w+)/;
-  const programmeRegex       = /programme (.*)/;
-  const getNeighborsRegex    = /neighbors (.*)/;
-  const healNetworkRegex     = /healNetwork/;
-  const setVacationModeRegex = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
-  const setNodeValueRegex    = /set (\w+) (\w+)/;
+  const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
+  const programmeRegex           = /programme (.*)/;
+  const getNeighborsRegex        = /neighbors (.*)/;
+  const healNetworkRegex         = /healNetwork/;
+  const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
+  const setNodeValueRegex        = /set (\w+) (\w+)/;
+  const disableSwitchRegex       = /disableSwitch/;
+  const enableSwitchRegex        = /enableSwitch/;
+  const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
 
   const eventEmitter = new EventEmitter();
 
   const handlers = [
-    [nodeValueRegex,       nodeValueRequested],
-    [programmeRegex,       programmeChosen],
-    [getNeighborsRegex,    neighborsRequested],
-    [healNetworkRegex,     healNetworkRequested],
-    [setVacationModeRegex, setVacationModeRequested],
-    [setNodeValueRegex,    setNodeValue]
+    [nodeValueRegex,           nodeValueRequested],
+    [programmeRegex,           programmeChosen],
+    [getNeighborsRegex,        neighborsRequested],
+    [healNetworkRegex,         healNetworkRequested],
+    [setVacationModeRegex,     setVacationModeRequested],
+    [setNodeValueRegex,        setNodeValue],
+    [disableSwitchRegex,       disableSwitch],
+    [enableSwitchRegex,        enableSwitch],
+    [simulateSwitchPressRegex, simulateSwitchPress]
   ];
 
   function parse(command) {
@@ -78,6 +84,19 @@ function RedisCommandParser() {
     }
   }
 
+  function disableSwitch() {
+    eventEmitter.emit('temporarilyDisableSwitch');
+  }
+
+  function enableSwitch() {
+    eventEmitter.emit('enableSwitch');
+  }
+
+  function simulateSwitchPress(match) {
+    const event = parseInt(match[1], 10);
+
+    eventEmitter.emit('simulateSwitchPress', event);
+  }
   function on(eventName, handler) {
     eventEmitter.on(eventName, handler);
   }
