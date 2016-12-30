@@ -4,11 +4,10 @@ const _ = require('lodash');
 const Programme = require('./programme');
 
 function ProgrammeFactory() {
-  function build(config) {
-    const lights = config.lights;
+  function build(programmesConfiguration, lights) {
     let programmes = {};
 
-    _.each(config.programmes, function (programme, name) {
+    _.each(programmesConfiguration, function (programme, name) {
       const newProgramme = new Programme(name, programme.displayName, programme.values, lights);
 
       programmes[name] = newProgramme;
