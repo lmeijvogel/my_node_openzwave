@@ -30,8 +30,13 @@ function RedisInterface(commandChannel) {
     dataRedis.set('zwave_programme', name);
   }
 
-  function storeValue(lightName, nodeId, commandClass, value) {
+  function storeNode(lightName, nodeId) {
     dataRedis.hset('node_' + lightName, 'node_id', nodeId);
+
+    Logger.debug('Stored in Redis: ', lightName, nodeId, displayName);
+  }
+
+  function storeValue(lightName, nodeId, commandClass, value) {
     dataRedis.hset('node_' + lightName, 'class_' + commandClass, value.value);
 
     Logger.debug('Stored in Redis: ', lightName, nodeId, commandClass, value.value);
@@ -111,6 +116,7 @@ function RedisInterface(commandChannel) {
     getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
+    storeNode:                storeNode,
     storeValue:               storeValue,
     clearCurrentLightLevels:  clearCurrentLightLevels,
     clearAvailableProgrammes: clearAvailableProgrammes,

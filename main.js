@@ -79,6 +79,12 @@ Promise.all([
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
 
+  _(config.lights).each(function (light, key) {
+    const lightName = key;
+
+    redisInterface.storeNode(lightName, light.id);
+  });
+
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
   _(programmes).values().each(function (programme) {
