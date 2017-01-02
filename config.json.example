@@ -6,12 +6,22 @@
     "stdout_level": "info"
   },
 
- "lights": {
-    "uplight":     2,
-    "diningTable": 5,
-    "coffeeTable": 7,
-    "kitchen":     8,
-    "tree":        9
+  "lights": {
+    "uplight": {
+      "id": 2
+    }
+    "diningTable": {
+      "id": 5
+    }
+    "coffeeTable": {
+      "id": 7
+    }
+    "kitchen": {
+      "id": 8
+    }
+    "tree": {
+      "id": 9
+    }
   },
 
   "programmes": {
