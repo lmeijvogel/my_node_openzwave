@@ -9,16 +9,14 @@ let timeService = null;
 
 describe('TimeServiceTest', function () {
   beforeEach(function () {
-    const config = {
-      periodStarts: {
-        '00:00': 'night',
-        '07:00': 'morning',
-        '14:00': 'evening',
-        '22:30': 'night'
-      }
+    const periodStarts = {
+      '00:00': 'night',
+      '07:00': 'morning',
+      '14:00': 'evening',
+      '22:30': 'night'
     };
 
-    timeService = new TimeService(config);
+    timeService = new TimeService(periodStarts);
   });
 
   // Primarily, test the behaviour at boundaries (and some more)

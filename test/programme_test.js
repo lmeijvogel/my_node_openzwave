@@ -36,9 +36,9 @@ describe('Programme', function () {
 
     lights = {};
 
-    lights[lightName1] = lightId1;
-    lights[lightName2] = lightId2;
-    lights[lightName3] = lightId3;
+    lights[lightName1] = {id: lightId1, displayName: 'light'};
+    lights[lightName2] = {id: lightId2, displayName: 'light'};
+    lights[lightName3] = {id: lightId3, displayName: 'light'};
 
     data = {};
 
