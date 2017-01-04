@@ -51,6 +51,20 @@ describe('Programme', function () {
     zwaveMock = sinon.mock(zwave);
   });
 
+  context('when it is built', function () {
+    it('fails if any light name does not exist', function () {
+      const lightValues = {
+        nonexistent: 12
+      };
+
+      const lights = [];
+
+      assert.throws(function () {
+        programme = Programme('name', 'displayName', lightValues, lights);
+      }, /node "nonexistent" does not exist/);
+    });
+  });
+
   context('when it is applied', function () {
     it('applies all settings', function () {
       zwaveMock.expects('setLevel').withArgs(lightId1, intensity1);
