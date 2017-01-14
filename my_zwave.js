@@ -1,5 +1,13 @@
 'use strict';
 
+const MESSAGE_COMPLETE = 0;
+const TIMEOUT = 1;
+const NOP = 2;
+const NODE_AWAKE = 3;
+const NODE_SLEEP = 4;
+const NODE_DEAD = 5;
+const NODE_ALIVE = 6;
+
 const Node = require('./node');
 const _ = require('lodash');
 const Logger = require('./logger');
@@ -54,25 +62,25 @@ function MyZWave(zwave) {
 
     zwave.on('notification', function (nodeid, notif) {
       switch(notif) {
-      case 0:
+      case MESSAGE_COMPLETE:
         Logger.info('node%d: message complete', nodeid);
         break;
-      case 1:
+      case TIMEOUT:
         Logger.warn('node%d: timeout', nodeid);
         break;
-      case 2:
+      case NOP:
         Logger.info('node%d: nop', nodeid);
         break;
-      case 3:
+      case NODE_AWAKE:
         Logger.info('node%d: node awake', nodeid);
         break;
-      case 4:
+      case NODE_SLEEP:
         Logger.info('node%d: node sleep', nodeid);
         break;
-      case 5:
+      case NODE_DEAD:
         Logger.warn('node%d: node dead', nodeid);
         break;
-      case 6:
+      case NODE_ALIVE:
         Logger.info('node%d: node alive', nodeid);
         break;
       default:
