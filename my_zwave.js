@@ -60,8 +60,8 @@ function MyZWave(zwave) {
       nodeReady(nodeid, nodeinfo);
     });
 
-    zwave.on('notification', function (nodeid, notif) {
-      switch(notif) {
+    zwave.on('notification', function (nodeid, notificationType) {
+      switch(notificationType) {
       case MESSAGE_COMPLETE:
         Logger.info('node%d: message complete', nodeid);
         break;
