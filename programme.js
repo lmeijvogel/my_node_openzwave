@@ -3,15 +3,15 @@
 const _ = require('lodash');
 const Logger = require('./logger');
 
-function Programme(name, displayName, data, lights) {
-  const actions = _(data).map(function (value, key) {
-    if (!lights[key]) {
-      throw 'Error creating Programme "' + name + '": node "' + key + '" does not exist';
+function Programme(name, displayName, lightValues, lights) {
+  const actions = _(lightValues).map(function (value, nodeName) {
+    if (!lights[nodeName]) {
+      throw 'Error creating Programme "' + name + '": node "' + nodeName + '" does not exist';
     }
 
     return {
-      nodeName: key,
-      nodeid: lights[key].id,
+      nodeName: nodeName,
+      nodeid: lights[nodeName].id,
       value: value
     };
   }).value();
