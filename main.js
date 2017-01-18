@@ -13,6 +13,7 @@ const NextProgrammeChooser = require('./next_programme_chooser');
 const EventProcessor = require('./event_processor');
 const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
+const LightsStore = require('./lights_store');
 const RedisCommandListener = require('./redis_command_listener');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
@@ -47,6 +48,7 @@ function stopProgramme() {
   zwave.disconnect();
   redisCommandListener.cleanUp();
   redisInterface.cleanUp();
+  lightsStore.cleanUp();
   vacationModeStore.cleanUp();
   eventLogger.stop();
 
@@ -59,16 +61,18 @@ process.on('SIGTERM', stopProgramme);
 const eventLogger = EventLogger();
 
 const redisInterface = RedisInterface();
+const lightsStore = LightsStore();
 const vacationModeStore = VacationModeStore();
 const redisCommandListener = RedisCommandListener('MyZWave');
 
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
+lightsStore.start();
 vacationModeStore.start();
 redisCommandListener.start();
 Promise.all([
-  redisInterface.clearCurrentLightLevels(),
+  lightsStore.clearNodes(),
   redisInterface.clearAvailableProgrammes()
 ]).then(function () {
   let currentProgramme = null;
@@ -90,7 +94,7 @@ Promise.all([
   _(config.lights).each(function (light, key) {
     const lightName = key;
 
-    redisInterface.storeNode(lightName, light.id, light.displayName);
+    lightsStore.storeNode(lightName, light.id, light.displayName);
   });
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
@@ -127,7 +131,7 @@ Promise.all([
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
 
-    redisInterface.storeValue(lightName, node.nodeId, commandClass, value);
+    lightsStore.storeValue(lightName, node.nodeId, commandClass, value);
   });
 
   redisCommandListener.on('commandReceived', function (command) {
