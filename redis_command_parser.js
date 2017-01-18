@@ -8,7 +8,7 @@ function RedisCommandParser() {
   const programmeRegex           = /programme (.*)/;
   const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
-  const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
+  const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|vacationMode (off)/;
   const setNodeValueRegex        = /set (\w+) (\w+)/;
   const disableSwitchRegex       = /disableSwitch/;
   const enableSwitchRegex        = /enableSwitch/;
