@@ -13,7 +13,7 @@ const NextProgrammeChooser = require('./next_programme_chooser');
 const EventProcessor = require('./event_processor');
 
 const RedisCommandParser = require('./redis_command_parser');
-const RedisInterface = require('./redis_interface');
+const MainSwitchState = require('./main_switch_state');
 const LightsStore = require('./lights_store');
 const ProgrammesStore = require('./programmes_store');
 const RedisCommandListener = require('./redis_command_listener');
@@ -50,7 +50,7 @@ function stopProgramme() {
   });
   zwave.disconnect();
   redisCommandListener.cleanUp();
-  redisInterface.cleanUp();
+  mainSwitchState.cleanUp();
   lightsStore.cleanUp();
   programmesStore.cleanUp();
   vacationModeStore.cleanUp();
@@ -64,7 +64,7 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
-const redisInterface = RedisInterface();
+const mainSwitchState = MainSwitchState();
 const lightsStore = LightsStore();
 const programmesStore = ProgrammesStore();
 const vacationModeStore = VacationModeStore();
@@ -72,7 +72,7 @@ const redisCommandListener = RedisCommandListener('MyZWave');
 
 const redisCommandParser = RedisCommandParser();
 
-redisInterface.start();
+mainSwitchState.start();
 lightsStore.start();
 programmesStore.start();
 vacationModeStore.start();
@@ -84,7 +84,7 @@ Promise.all([
   let currentProgramme = null;
   let switchEnabled = true;
 
-  redisInterface.switchEnabled();
+  mainSwitchState.switchEnabled();
 
   eventLogger.start();
 
@@ -202,19 +202,19 @@ Promise.all([
 
   redisCommandParser.on('temporarilyDisableSwitch', function () {
     Logger.info('Temporarily disabling switch');
-    redisInterface.switchDisabled();
+    mainSwitchState.switchDisabled();
     switchEnabled = false;
 
     setTimeout(function () {
       Logger.info('Automatically enabling switch');
-      redisInterface.switchEnabled();
+      mainSwitchState.switchEnabled();
       switchEnabled = true;
     }, 120000);
   });
 
   redisCommandParser.on('enableSwitch', function () {
     Logger.info('Manually enabling switch');
-    redisInterface.switchEnabled();
+    mainSwitchState.switchEnabled();
     switchEnabled = true;
   });
 

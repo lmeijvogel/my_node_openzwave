@@ -2,7 +2,7 @@
 
 const Redis = require('redis');
 
-function RedisInterface() {
+function MainSwitchState() {
   let redis;
 
   function start() {
@@ -30,4 +30,4 @@ function RedisInterface() {
 
 }
 
-module.exports = RedisInterface;
+module.exports = MainSwitchState;
