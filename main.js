@@ -13,6 +13,7 @@ const NextProgrammeChooser = require('./next_programme_chooser');
 const EventProcessor = require('./event_processor');
 const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
+const RedisCommandListener = require('./redis_command_listener');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
 const EventLogger = require('./event_logger');
@@ -43,6 +44,7 @@ function stopProgramme() {
     data: null
   });
   zwave.disconnect();
+  redisCommandListener.cleanUp();
   redisInterface.cleanUp();
   eventLogger.stop();
 
@@ -54,11 +56,13 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
-const redisInterface = RedisInterface('MyZWave');
+const redisInterface = RedisInterface();
+const redisCommandListener = RedisCommandListener('MyZWave');
 
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
+redisCommandListener.start();
 Promise.all([
   redisInterface.clearCurrentLightLevels(),
   redisInterface.clearAvailableProgrammes()
@@ -122,7 +126,7 @@ Promise.all([
     redisInterface.storeValue(lightName, node.nodeId, commandClass, value);
   });
 
-  redisInterface.on('commandReceived', function (command) {
+  redisCommandListener.on('commandReceived', function (command) {
     Logger.debug('Received command via Redis: ', command);
 
     redisCommandParser.parse(command);
