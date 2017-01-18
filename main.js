@@ -19,6 +19,7 @@ const Logger = require('./logger');
 const EventLogger = require('./event_logger');
 
 const VacationMode = require('./vacation_mode');
+const VacationModeStore = require('./vacation_mode_store');
 
 const argv = minimist(process.argv.slice(2));
 
@@ -46,6 +47,7 @@ function stopProgramme() {
   zwave.disconnect();
   redisCommandListener.cleanUp();
   redisInterface.cleanUp();
+  vacationModeStore.cleanUp();
   eventLogger.stop();
 
   process.exit();
@@ -57,11 +59,13 @@ process.on('SIGTERM', stopProgramme);
 const eventLogger = EventLogger();
 
 const redisInterface = RedisInterface();
+const vacationModeStore = VacationModeStore();
 const redisCommandListener = RedisCommandListener('MyZWave');
 
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
+vacationModeStore.start();
 redisCommandListener.start();
 Promise.all([
   redisInterface.clearCurrentLightLevels(),
@@ -108,11 +112,11 @@ Promise.all([
   });
 
   vacationMode.onStart(function (meanStartTime, meanEndTime) {
-    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+    vacationModeStore.vacationModeStarted(meanStartTime, meanEndTime);
   });
 
   vacationMode.onStop(function () {
-    redisInterface.vacationModeStopped();
+    vacationModeStore.vacationModeStopped();
   });
 
   myZWave.onValueChange(function (node, commandClass, value) {
@@ -221,7 +225,7 @@ Promise.all([
     switchPressed(event);
   });
 
-  redisInterface.getVacationMode().then(function (data) {
+  vacationModeStore.getVacationMode().then(function (data) {
     if (data.state === 'on') {
       Logger.info('Vacation mode was still on. Enabling.');
 

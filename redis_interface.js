@@ -47,14 +47,6 @@ function RedisInterface() {
     });
   }
 
-  function getVacationMode() {
-    return new Promise(function (resolve, reject) {
-      redis.hgetall('zwave_vacation_mode', function (err, values) {
-        resolve(values);
-      });
-    });
-  }
-
   function clearAvailableProgrammes() {
     return new Promise(function (resolve) {
       redis.del('zwave_available_programmes', function () {
@@ -65,18 +57,6 @@ function RedisInterface() {
 
   function addAvailableProgramme(name, displayName) {
     redis.hset('zwave_available_programmes', name, displayName);
-  }
-
-  function vacationModeStarted(startTime, endTime) {
-    redis.hset('zwave_vacation_mode', 'state', 'on');
-    redis.hset('zwave_vacation_mode', 'start_time', startTime);
-    redis.hset('zwave_vacation_mode', 'end_time', endTime);
-  }
-
-  function vacationModeStopped() {
-    redis.hset('zwave_vacation_mode', 'state', 'off');
-    redis.hdel('zwave_vacation_mode', 'start_time');
-    redis.hdel('zwave_vacation_mode', 'end_time');
   }
 
   function switchDisabled() {
@@ -94,9 +74,6 @@ function RedisInterface() {
   return {
     start:                    start,
     programmeChanged:         programmeChanged,
-    getVacationMode:          getVacationMode,
-    vacationModeStarted:      vacationModeStarted,
-    vacationModeStopped:      vacationModeStopped,
     storeNode:                storeNode,
     storeValue:               storeValue,
     clearCurrentLightLevels:  clearCurrentLightLevels,
