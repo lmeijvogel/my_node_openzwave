@@ -11,10 +11,13 @@ const TimeService = require('./time_service');
 const NextProgrammeChooser = require('./next_programme_chooser');
 
 const EventProcessor = require('./event_processor');
+
 const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
 const LightsStore = require('./lights_store');
+const ProgrammesStore = require('./programmes_store');
 const RedisCommandListener = require('./redis_command_listener');
+
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
 const EventLogger = require('./event_logger');
@@ -49,6 +52,7 @@ function stopProgramme() {
   redisCommandListener.cleanUp();
   redisInterface.cleanUp();
   lightsStore.cleanUp();
+  programmesStore.cleanUp();
   vacationModeStore.cleanUp();
   eventLogger.stop();
 
@@ -62,6 +66,7 @@ const eventLogger = EventLogger();
 
 const redisInterface = RedisInterface();
 const lightsStore = LightsStore();
+const programmesStore = ProgrammesStore();
 const vacationModeStore = VacationModeStore();
 const redisCommandListener = RedisCommandListener('MyZWave');
 
@@ -69,11 +74,12 @@ const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
 lightsStore.start();
+programmesStore.start();
 vacationModeStore.start();
 redisCommandListener.start();
 Promise.all([
   lightsStore.clearNodes(),
-  redisInterface.clearAvailableProgrammes()
+  programmesStore.clearProgrammes()
 ]).then(function () {
   let currentProgramme = null;
   let switchEnabled = true;
@@ -100,7 +106,7 @@ Promise.all([
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
   _(programmes).values().each(function (programme) {
-    redisInterface.addAvailableProgramme(programme.name, programme.displayName);
+    programmesStore.addProgramme(programme.name, programme.displayName);
   });
 
   const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
@@ -215,7 +221,7 @@ Promise.all([
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
-      redisInterface.programmeChanged(programmeName);
+      programmesStore.programmeChanged(programmeName);
 
       eventLogger.store({
         initiator: 'event processor',
