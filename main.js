@@ -16,7 +16,6 @@ const RedisCommandParser = require('./redis_command_parser');
 const MainSwitchState = require('./main_switch_state');
 const LightsStore = require('./lights_store');
 const ProgrammesStore = require('./programmes_store');
-const RedisCommandListener = require('./redis_command_listener');
 
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
@@ -68,15 +67,17 @@ const mainSwitchState = MainSwitchState();
 const lightsStore = LightsStore();
 const programmesStore = ProgrammesStore();
 const vacationModeStore = VacationModeStore();
+const RedisCommandListener = require('./redis_command_listener');
 const redisCommandListener = RedisCommandListener('MyZWave');
-
-const redisCommandParser = RedisCommandParser();
 
 mainSwitchState.start();
 lightsStore.start();
 programmesStore.start();
 vacationModeStore.start();
 redisCommandListener.start();
+
+const redisCommandParser = RedisCommandParser(redisCommandListener);
+
 Promise.all([
   lightsStore.clearNodes(),
   programmesStore.clearProgrammes()
@@ -138,12 +139,6 @@ Promise.all([
     Logger.debug('New value: ', commandClass, ': ', value);
 
     lightsStore.storeValue(lightName, node.nodeId, commandClass, value);
-  });
-
-  redisCommandListener.on('commandReceived', function (command) {
-    Logger.debug('Received command via Redis: ', command);
-
-    redisCommandParser.parse(command);
   });
 
   myZWave.onNodeEvent(function (node, event) {

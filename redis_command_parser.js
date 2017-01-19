@@ -1,9 +1,10 @@
 'use strict';
 
 const _ = require('lodash');
+const Logger = require('./logger');
 const EventEmitter = require('events').EventEmitter;
 
-function RedisCommandParser() {
+function RedisCommandParser(commandSource) {
   const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
   const programmeRegex           = /programme (.*)/;
   const getNeighborsRegex        = /neighbors (.*)/;
@@ -27,6 +28,12 @@ function RedisCommandParser() {
     [enableSwitchRegex,        enableSwitch],
     [simulateSwitchPressRegex, simulateSwitchPress]
   ];
+
+  commandSource.on('commandReceived', function (command) {
+    Logger.debug('Received command via Redis: ', command);
+
+    parse(command);
+  });
 
   function parse(command) {
     _.each(handlers, function (handler) {
