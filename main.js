@@ -24,6 +24,8 @@ const EventLogger = require('./event_logger');
 const VacationMode = require('./vacation_mode');
 const VacationModeStore = require('./vacation_mode_store');
 
+const Redis = require('redis');
+
 const argv = minimist(process.argv.slice(2));
 
 const configFile = argv['config'] || './config.json';
@@ -40,6 +42,8 @@ const testMode = !argv['live'];
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
 
+const redis = Redis.createClient();
+
 function stopProgramme() {
   Logger.info('disconnecting...');
   eventLogger.store({
@@ -48,11 +52,10 @@ function stopProgramme() {
     data: null
   });
   zwave.disconnect();
-  redisCommandListener.cleanUp();
-  mainSwitchState.cleanUp();
-  lightsStore.cleanUp();
-  programmesStore.cleanUp();
-  vacationModeStore.cleanUp();
+
+  redisCommandListener.end();
+  redis.end();
+
   eventLogger.stop();
 
   process.exit();
@@ -63,17 +66,13 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
-const mainSwitchState = MainSwitchState();
-const lightsStore = LightsStore();
-const programmesStore = ProgrammesStore();
-const vacationModeStore = VacationModeStore();
+const mainSwitchState = MainSwitchState(redis);
+const lightsStore = LightsStore(redis);
+const programmesStore = ProgrammesStore(redis);
+const vacationModeStore = VacationModeStore(redis);
 const RedisCommandListener = require('./redis_command_listener');
 const redisCommandListener = RedisCommandListener('MyZWave');
 
-mainSwitchState.start();
-lightsStore.start();
-programmesStore.start();
-vacationModeStore.start();
 redisCommandListener.start();
 
 const redisCommandParser = RedisCommandParser(redisCommandListener);

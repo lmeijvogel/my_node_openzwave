@@ -1,14 +1,6 @@
 'use strict';
 
-const Redis = require('redis');
-
-function MainSwitchState() {
-  let redis;
-
-  function start() {
-    redis = Redis.createClient();
-  }
-
+function MainSwitchState(redis) {
   function switchDisabled() {
     redis.set('zwave_switch_enabled', false);
   }
@@ -17,15 +9,9 @@ function MainSwitchState() {
     redis.set('zwave_switch_enabled', true);
   }
 
-  function cleanUp() {
-    redis.end();
-  }
-
   return {
-    start:                    start,
     switchEnabled:            switchEnabled,
     switchDisabled:           switchDisabled,
-    cleanUp:                  cleanUp
   };
 
 }

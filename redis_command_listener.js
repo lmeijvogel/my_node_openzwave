@@ -22,7 +22,7 @@ function RedisCommandListener(subscribedChannel) {
     redis.subscribe(subscribedChannel);
   }
 
-  function cleanUp() {
+  function end() {
     redis.unsubscribe();
     redis.end();
   }
@@ -32,9 +32,9 @@ function RedisCommandListener(subscribedChannel) {
   }
 
   return {
-    start:                    start,
-    on:                       on,
-    cleanUp:                  cleanUp
+    start: start,
+    on:    on,
+    end:   end
   };
 
 }

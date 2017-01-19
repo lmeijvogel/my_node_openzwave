@@ -1,14 +1,6 @@
 'use strict';
 
-const Redis = require('redis');
-
-function VacationModeStore() {
-  let redis;
-
-  function start() {
-    redis = Redis.createClient();
-  }
-
+function VacationModeStore(redis) {
   function getVacationMode() {
     return new Promise(function (resolve, reject) {
       redis.hgetall('zwave_vacation_mode', function (err, values) {
@@ -29,16 +21,10 @@ function VacationModeStore() {
     redis.hdel('zwave_vacation_mode', 'end_time');
   }
 
-  function cleanUp() {
-    redis.end();
-  }
-
   return {
-    start:                    start,
     getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
-    cleanUp:                  cleanUp
   };
 
 }

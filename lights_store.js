@@ -1,16 +1,9 @@
 'use strict';
 
-const Redis = require('redis');
 const Logger = require('./logger');
 const _ = require('lodash');
 
-function LightsStore() {
-  let redis;
-
-  function start() {
-    redis = Redis.createClient();
-  }
-
+function LightsStore(redis) {
   function storeNode(lightName, nodeId, displayName) {
     redis.hset('node_' + lightName, 'node_id', nodeId);
     redis.hset('node_' + lightName, 'display_name', displayName);
@@ -42,16 +35,10 @@ function LightsStore() {
     });
   }
 
-  function cleanUp() {
-    redis.end();
-  }
-
   return {
-    start:      start,
     storeNode:  storeNode,
     storeValue: storeValue,
     clearNodes: clearNodes,
-    cleanUp:    cleanUp
   };
 
 }
