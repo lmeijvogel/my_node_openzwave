@@ -117,17 +117,10 @@ Promise.all([
   const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
   const vacationMode = new VacationMode({
+    store: vacationModeStore,
     timeService: TimeService(config.periodStarts),
     onFunction: function () { eventProcessor.programmeSelected('evening'); },
     offFunction: function () { eventProcessor.programmeSelected('off'); }
-  });
-
-  vacationMode.onStart(function (meanStartTime, meanEndTime) {
-    vacationModeStore.vacationModeStarted(meanStartTime, meanEndTime);
-  });
-
-  vacationMode.onStop(function () {
-    vacationModeStore.vacationModeStopped();
   });
 
   myZWave.onValueChange(function (node, commandClass, value) {
@@ -228,14 +221,6 @@ Promise.all([
 
   redisCommandParser.on('simulateSwitchPress', function (event) {
     switchPressed(event);
-  });
-
-  vacationModeStore.getVacationMode().then(function (data) {
-    if (data.state === 'on') {
-      Logger.info('Vacation mode was still on. Enabling.');
-
-      vacationMode.start(data.start_time, data.end_time);
-    }
   });
 
   myZWave.connect();

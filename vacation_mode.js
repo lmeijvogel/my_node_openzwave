@@ -1,19 +1,24 @@
 'use strict';
 const Ticker = require('./ticker');
 const AutomaticRunner = require('./automatic_runner');
-
-const _ = require('lodash');
+const Logger = require('./logger');
 
 module.exports = function (options) {
+  const store       = options.store;
   const timeService = options.timeService;
   const onFunction  = options.onFunction;
   const offFunction = options.offFunction;
 
-  let startCallbacks = [];
-  let stopCallbacks  = [];
-
   let onTicker  = null;
   let offTicker = null;
+
+  store.getVacationMode().then(function (data) {
+    if (data.state === 'on') {
+      Logger.info('Vacation mode was still on. Enabling.');
+
+      start(data.start_time, data.end_time);
+    }
+  });
 
   function start(meanStartTime, meanEndTime) {
     const offsetProvider = () => 15 - Math.round(Math.random() * 30);
@@ -34,12 +39,10 @@ module.exports = function (options) {
       offsetProvider: offsetProvider
     }), 15000);
 
-    triggerStarted(meanStartTime, meanEndTime);
+    store.vacationModeStarted(meanStartTime, meanEndTime);
   }
 
   function stop() {
-    triggerStopped();
-
     if (onTicker) {
       onTicker.stop();
     }
@@ -47,32 +50,12 @@ module.exports = function (options) {
     if (offTicker) {
       offTicker.stop();
     }
-  }
 
-  function onStart(callback) {
-    startCallbacks.push(callback);
-  }
-
-  function onStop(callback) {
-    stopCallbacks.push(callback);
-  }
-
-  function triggerStarted(startTime, endTime) {
-    _.each(startCallbacks, function (callback) {
-      callback(startTime, endTime);
-    });
-  }
-
-  function triggerStopped(startTime, endTime) {
-    _.each(stopCallbacks, function (callback) {
-      callback();
-    });
+    store.vacationModeStopped();
   }
 
   return {
     start: start,
     stop: stop,
-    onStart: onStart,
-    onStop: onStop
   };
 };
