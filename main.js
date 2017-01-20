@@ -42,6 +42,7 @@ const testMode = !argv['live'];
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
 
+const listenerRedis = Redis.createClient();
 const redis = Redis.createClient();
 
 function stopProgramme() {
@@ -53,7 +54,7 @@ function stopProgramme() {
   });
   zwave.disconnect();
 
-  redisCommandListener.end();
+  listenerRedis.end();
   redis.end();
 
   eventLogger.stop();
@@ -74,7 +75,7 @@ const programmesStore = ProgrammesStore(redis);
 const vacationModeStore = VacationModeStore(redis);
 
 const RedisCommandListener = require('./redis_command_listener');
-const redisCommandListener = RedisCommandListener('MyZWave', redisCommandParser);
+const redisCommandListener = RedisCommandListener(listenerRedis, 'MyZWave', redisCommandParser);
 
 redisCommandListener.start();
 
