@@ -2,12 +2,9 @@
 
 const Redis = require('redis');
 const Logger = require('./logger');
-const EventEmitter = require('events').EventEmitter;
 
-function RedisCommandListener(subscribedChannel) {
+function RedisCommandListener(subscribedChannel, parser) {
   let redis;
-
-  const eventEmitter = new EventEmitter();
 
   function start() {
     redis = Redis.createClient();
@@ -15,7 +12,7 @@ function RedisCommandListener(subscribedChannel) {
     redis.on('message', function (sourceChannel, message) {
       Logger.verbose('Message received: ' + sourceChannel + ': "' + message + '"');
       if (sourceChannel === subscribedChannel) {
-        eventEmitter.emit('commandReceived', message);
+        parser.parse(message);
       }
     });
 
@@ -27,13 +24,8 @@ function RedisCommandListener(subscribedChannel) {
     redis.end();
   }
 
-  function on(eventName, callback) {
-    eventEmitter.on(eventName, callback);
-  }
-
   return {
     start: start,
-    on:    on,
     end:   end
   };
 

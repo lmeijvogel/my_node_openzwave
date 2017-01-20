@@ -66,16 +66,18 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
+const redisCommandParser = RedisCommandParser();
+
 const mainSwitchState = MainSwitchState(redis);
 const lightsStore = LightsStore(redis);
 const programmesStore = ProgrammesStore(redis);
 const vacationModeStore = VacationModeStore(redis);
+
 const RedisCommandListener = require('./redis_command_listener');
-const redisCommandListener = RedisCommandListener('MyZWave');
+const redisCommandListener = RedisCommandListener('MyZWave', redisCommandParser);
 
 redisCommandListener.start();
 
-const redisCommandParser = RedisCommandParser(redisCommandListener);
 
 Promise.all([
   lightsStore.clearNodes(),
