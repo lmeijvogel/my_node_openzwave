@@ -32,7 +32,10 @@ function TimeStateMachine(transitions) {
     } else {
       const defaultTransition = currentTransitions['default'];
 
-      Logger.info('TimeStateMachine.handle: No transition found, using default: ', defaultTransition);
+      Logger.info('TimeStateMachine.handle: No transition from',
+        currentState,
+        'found, using default: ',
+        defaultTransition);
 
       return defaultTransition;
     }
