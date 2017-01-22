@@ -195,11 +195,14 @@ Promise.all([
     mainSwitchState.switchDisabled();
     switchEnabled = false;
 
-    setTimeout(function () {
-      Logger.info('Automatically enabling switch');
-      mainSwitchState.switchEnabled();
-      switchEnabled = true;
-    }, 120000);
+    // Automatically enabling the switch does not work correctly:
+    // For some reason, after the function is executed, no events
+    // are processed anymore.
+    //setTimeout(function () {
+      //Logger.info('Automatically enabling switch');
+      //mainSwitchState.switchEnabled();
+      //switchEnabled = true;
+    //}, 120000);
   });
 
   redisCommandParser.on('enableSwitch', function () {
