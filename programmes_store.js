@@ -3,7 +3,15 @@
 const Logger = require('./logger');
 
 function ProgrammesStore(redis) {
+  let _currentProgramme;
+
+  function currentProgramme() {
+    return _currentProgramme;
+  }
+
   function programmeChanged(name) {
+    _currentProgramme = name;
+
     Logger.verbose('Storing new programme in Redis: "%s"', name);
     redis.set('zwave_programme', name);
   }
@@ -21,6 +29,7 @@ function ProgrammesStore(redis) {
   }
 
   return {
+    currentProgramme: currentProgramme,
     programmeChanged: programmeChanged,
     clearProgrammes:  clearProgrammes,
     addProgramme:     addProgramme,

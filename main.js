@@ -84,7 +84,6 @@ Promise.all([
   lightsStore.clearNodes(),
   programmesStore.clearProgrammes()
 ]).then(function () {
-  let currentProgramme = null;
   let switchEnabled = true;
 
   mainSwitchState.switchEnabled();
@@ -213,7 +212,6 @@ Promise.all([
 
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
-      currentProgramme = programmeName;
       programmesStore.programmeChanged(programmeName);
 
       eventLogger.store({
@@ -232,7 +230,7 @@ Promise.all([
 
   function switchPressed(event) {
     if (switchEnabled) {
-      eventProcessor.mainSwitchPressed(event, currentProgramme);
+      eventProcessor.mainSwitchPressed(event, programmesStore.currentProgramme());
       eventLogger.store({
         initiator: 'wall switch',
         event: 'switch pressed',
