@@ -27,7 +27,7 @@ describe('RedisCommandParser', function () {
       it('calls the given block with the given programme name', function () {
         let callbackCalled = false;
 
-        subject.on('programmeChosen', function (programmeName) {
+        subject.on('programmeRequested', function (programmeName) {
           callbackCalled = true;
           assert.equal(programmeName, 'regular');
         });

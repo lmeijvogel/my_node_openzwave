@@ -164,7 +164,7 @@ Promise.all([
     }
   });
 
-  redisCommandParser.on('programmeChosen', function (programmeName) {
+  redisCommandParser.on('programmeRequested', function (programmeName) {
     eventProcessor.programmeSelected(programmeName);
   });
 
