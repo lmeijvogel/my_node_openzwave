@@ -84,9 +84,7 @@ Promise.all([
   lightsStore.clearNodes(),
   programmesStore.clearProgrammes()
 ]).then(function () {
-  let switchEnabled = true;
-
-  mainSwitchState.switchEnabled();
+  mainSwitchState.enableSwitch();
 
   eventLogger.start();
 
@@ -191,23 +189,21 @@ Promise.all([
 
   redisCommandParser.on('temporarilyDisableSwitch', function () {
     Logger.info('Temporarily disabling switch');
-    mainSwitchState.switchDisabled();
-    switchEnabled = false;
+    mainSwitchState.disableSwitch();
 
     // Automatically enabling the switch does not work correctly:
     // For some reason, after the function is executed, no events
     // are processed anymore.
     //setTimeout(function () {
       //Logger.info('Automatically enabling switch');
-      //mainSwitchState.switchEnabled();
-      //switchEnabled = true;
+      //mainSwitchState.enableSwitch();
+      //enableSwitch = true;
     //}, 120000);
   });
 
   redisCommandParser.on('enableSwitch', function () {
     Logger.info('Manually enabling switch');
-    mainSwitchState.switchEnabled();
-    switchEnabled = true;
+    mainSwitchState.enableSwitch();
   });
 
   eventProcessor.on('programmeSelected', function (programmeName) {
@@ -229,7 +225,7 @@ Promise.all([
   myZWave.connect();
 
   function switchPressed(event) {
-    if (switchEnabled) {
+    if (mainSwitchState.switchEnabled()) {
       eventProcessor.mainSwitchPressed(event, programmesStore.currentProgramme());
       eventLogger.store({
         initiator: 'wall switch',

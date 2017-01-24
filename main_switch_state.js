@@ -1,17 +1,26 @@
 'use strict';
 
 function MainSwitchState(redis) {
-  function switchDisabled() {
+  let _switchEnabled = true;
+
+  function switchEnabled() {
+    return _switchEnabled;
+  }
+
+  function disableSwitch() {
+    _switchEnabled = false;
     redis.set('zwave_switch_enabled', false);
   }
 
-  function switchEnabled() {
+  function enableSwitch() {
+    _switchEnabled = true;
     redis.set('zwave_switch_enabled', true);
   }
 
   return {
-    switchEnabled:            switchEnabled,
-    switchDisabled:           switchDisabled,
+    switchEnabled:           switchEnabled,
+    enableSwitch:            enableSwitch,
+    disableSwitch:           disableSwitch,
   };
 
 }
