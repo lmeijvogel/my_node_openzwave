@@ -64,7 +64,7 @@ function RedisInterface(commandChannel) {
   function getVacationMode() {
     return new Promise(function (resolve, reject) {
       dataRedis.hgetall('zwave_vacation_mode', function (err, values) {
-        resolve(values);
+        resolve(values || { state: 'off' });
       });
     });
   }
