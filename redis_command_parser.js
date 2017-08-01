@@ -13,6 +13,7 @@ function RedisCommandParser() {
   const disableSwitchRegex       = /disableSwitch/;
   const enableSwitchRegex        = /enableSwitch/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
+  const refreshNodeRegex         = /refreshNode (\d+)/;
 
   const eventEmitter = new EventEmitter();
 
@@ -25,7 +26,8 @@ function RedisCommandParser() {
     [setNodeValueRegex,        setNodeValue],
     [disableSwitchRegex,       disableSwitch],
     [enableSwitchRegex,        enableSwitch],
-    [simulateSwitchPressRegex, simulateSwitchPress]
+    [simulateSwitchPressRegex, simulateSwitchPress],
+    [refreshNodeRegex,         refreshNodeRequested]
   ];
 
   function parse(command) {
@@ -97,6 +99,13 @@ function RedisCommandParser() {
 
     eventEmitter.emit('simulateSwitchPress', event);
   }
+
+  function refreshNodeRequested(match) {
+    const nodeId = parseInt(match[1], 10);
+
+    eventEmitter.emit('refreshNodeRequested', nodeId);
+  }
+
   function on(eventName, handler) {
     eventEmitter.on(eventName, handler);
   }
