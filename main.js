@@ -180,20 +180,14 @@ Promise.all([
 
   });
 
-  redisCommandParser.on('temporarilyDisableSwitch', function () {
-    Logger.info('Temporarily disabling switch');
+  redisCommandParser.on('disableSwitch', function () {
+    Logger.info('Disabling switch');
     redisInterface.switchDisabled();
     switchEnabled = false;
-
-    setTimeout(function () {
-      Logger.info('Automatically enabling switch');
-      redisInterface.switchEnabled();
-      switchEnabled = true;
-    }, 120000);
   });
 
   redisCommandParser.on('enableSwitch', function () {
-    Logger.info('Manually enabling switch');
+    Logger.info('Enabling switch');
     redisInterface.switchEnabled();
     switchEnabled = true;
   });

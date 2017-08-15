@@ -95,7 +95,7 @@ function RedisCommandParser() {
   }
 
   function disableSwitch() {
-    eventEmitter.emit('temporarilyDisableSwitch');
+    eventEmitter.emit('disableSwitch');
   }
 
   function enableSwitch() {
