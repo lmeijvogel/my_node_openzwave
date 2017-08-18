@@ -15,8 +15,14 @@ module.exports = function (options) {
   let onTicker  = null;
   let offTicker = null;
 
+  let _meanStartTime = null;
+  let _meanEndTime = null;
+
   function start(meanStartTime, meanEndTime) {
     const offsetProvider = () => 15 - Math.round(Math.random() * 30);
+
+    _meanStartTime = meanStartTime;
+    _meanEndTime = meanEndTime;
 
     onTicker = new Ticker('startProgramme');
     onTicker.start(AutomaticRunner(onFunction, {
@@ -38,6 +44,9 @@ module.exports = function (options) {
   }
 
   function stop() {
+    _meanStartTime = null;
+    _meanEndTime = null;
+
     triggerStopped();
 
     if (onTicker) {
@@ -69,9 +78,18 @@ module.exports = function (options) {
     });
   }
 
+  function getState() {
+    return {
+      state: _meanStartTime !== null,
+      meanStartTime: _meanStartTime,
+      meanEndTime: _meanEndTime
+    }
+  }
+
   return {
     start: start,
     stop: stop,
+    getState: getState,
     onStart: onStart,
     onStop: onStop
   };
