@@ -19,6 +19,7 @@ module.exports = function (options) {
 
   let onHealNetworkRequestedCallback = function() {};
   let onRefreshNodeRequestedCallback = function() {};
+  let onSimulateSwitchPressRequestedCallback = function() {};
 
   let programmes = {};
 
@@ -105,6 +106,12 @@ module.exports = function (options) {
     res.send({status: "sent"});
   });
 
+  app.post('/debug/simulate_switch_press/:signal(0|255)', (req, res) => {
+    onSimulateSwitchPressRequestedCallback(parseInt(req.params.signal));
+
+    res.send({status: "sent"});
+  });
+
   const start = () => {
     server = app.listen(port);
     Logger.info("REST interface listening on port", port);
@@ -130,6 +137,11 @@ module.exports = function (options) {
   const onRefreshNodeRequested = (callback) => {
     onRefreshNodeRequestedCallback = callback;
   };
+
+  const onSimulateSwitchPressRequested = (callback) => {
+    onSimulateSwitchPressRequestedCallback = callback;
+  };
+
 
   const setMainSwitchStateFinder = (callback) => {
     switchStateFinderCallback = callback;
@@ -159,6 +171,7 @@ module.exports = function (options) {
 
     onHealNetworkRequested: onHealNetworkRequested,
     onRefreshNodeRequested: onRefreshNodeRequested,
+    onSimulateSwitchPressRequested: onSimulateSwitchPressRequested,
 
     setMainSwitchStateFinder: setMainSwitchStateFinder,
     setProgrammesListFinder: setProgrammesListFinder,
