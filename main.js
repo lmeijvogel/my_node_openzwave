@@ -170,10 +170,6 @@ Promise.resolve().then(function () {
     switchEnabled = enabled;
   });
 
-  redisCommandParser.on('neighborsRequested', function (nodeId) {
-    zwave.getNeighbors(nodeId);
-  });
-
   redisCommandParser.on('healNetworkRequested', function () {
     Logger.info('Requested healing the network');
     zwave.healNetwork();

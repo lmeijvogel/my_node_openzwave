@@ -181,10 +181,6 @@ function MyZWave(zwave) {
     }
   }
 
-  function getNeighbors(nodeid) {
-    zwave.getNeighbors(nodeid);
-  }
-
   function logValue(nodeId, commandClass, index) {
     const node = Node.find(nodeId);
     const value = node.getValue(commandClass, index);
@@ -204,7 +200,6 @@ function MyZWave(zwave) {
     setLevel:      setLevel,
     switchOn:      switchOn,
     switchOff:     switchOff,
-    getNeighbors:  getNeighbors,
     logValue:      logValue,
     healNetwork:   healNetwork
   };

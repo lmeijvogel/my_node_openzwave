@@ -5,7 +5,6 @@ const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
   const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
-  const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
   const refreshNodeRegex         = /refreshNode (\d+)/;
@@ -14,7 +13,6 @@ function RedisCommandParser() {
 
   const handlers = [
     [nodeValueRegex,           nodeValueRequested],
-    [getNeighborsRegex,        neighborsRequested],
     [healNetworkRegex,         healNetworkRequested],
     [simulateSwitchPressRegex, simulateSwitchPress],
     [refreshNodeRegex,         refreshNodeRequested]
@@ -40,12 +38,6 @@ function RedisCommandParser() {
     const index        = match[3];
 
     eventEmitter.emit('nodeValueRequested', nodeId, commandClass, index);
-  }
-
-  function neighborsRequested(match) {
-    const nodeId = parseInt(match[1], 10);
-
-    eventEmitter.emit('neighborsRequested', nodeId);
   }
 
   function healNetworkRequested() {
