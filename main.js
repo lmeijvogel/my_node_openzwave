@@ -64,7 +64,6 @@ const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
 Promise.all([
-  redisInterface.clearCurrentLightLevels(),
   redisInterface.clearAvailableProgrammes()
 ]).then(function () {
   let currentProgramme = null;
@@ -82,12 +81,6 @@ Promise.all([
 
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
-
-  _(config.lights).each(function (light, key) {
-    const lightName = key;
-
-    redisInterface.storeNode(lightName, light.id, light.displayName);
-  });
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
@@ -120,10 +113,13 @@ Promise.all([
       return light.id === node.nodeId;
     });
 
+    if (!config.lights[lightName].values) {
+      config.lights[lightName].values = {};
+    }
+    config.lights[lightName].values[commandClass] = value;
+
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
-
-    redisInterface.storeValue(lightName, node.nodeId, commandClass, value);
   });
 
   redisInterface.on('commandReceived', function (command) {

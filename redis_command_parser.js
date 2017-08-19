@@ -9,8 +9,6 @@ function RedisCommandParser() {
   const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
   const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
-  const switchNodeRegex          = /switch (\d+) (on|off)/;
-  const dimNodeRegex             = /dim (\d+) (\d+)/;
   const disableSwitchRegex       = /disableSwitch/;
   const enableSwitchRegex        = /enableSwitch/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
@@ -24,8 +22,6 @@ function RedisCommandParser() {
     [getNeighborsRegex,        neighborsRequested],
     [healNetworkRegex,         healNetworkRequested],
     [setVacationModeRegex,     setVacationModeRequested],
-    [dimNodeRegex,             dimNode],
-    [switchNodeRegex,          switchNode],
     [disableSwitchRegex,       disableSwitch],
     [enableSwitchRegex,        enableSwitch],
     [simulateSwitchPressRegex, simulateSwitchPress],
@@ -52,19 +48,6 @@ function RedisCommandParser() {
     const index        = match[3];
 
     eventEmitter.emit('nodeValueRequested', nodeId, commandClass, index);
-  }
-
-  function dimNode(match) {
-    const nodeId       = match[1];
-    const value        = match[2];
-
-    eventEmitter.emit('dimNode', nodeId, value);
-  }
-  function switchNode(match) {
-    const nodeId       = match[1];
-    const value        = match[2] == "on";
-
-    eventEmitter.emit('switchNode', nodeId, value);
   }
 
   function programmeChosen(match) {
