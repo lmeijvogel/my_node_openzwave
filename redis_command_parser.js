@@ -5,7 +5,6 @@ const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
   const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
-  const programmeRegex           = /programme (.*)/;
   const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
   const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
@@ -18,7 +17,6 @@ function RedisCommandParser() {
 
   const handlers = [
     [nodeValueRegex,           nodeValueRequested],
-    [programmeRegex,           programmeChosen],
     [getNeighborsRegex,        neighborsRequested],
     [healNetworkRegex,         healNetworkRequested],
     [setVacationModeRegex,     setVacationModeRequested],
@@ -48,12 +46,6 @@ function RedisCommandParser() {
     const index        = match[3];
 
     eventEmitter.emit('nodeValueRequested', nodeId, commandClass, index);
-  }
-
-  function programmeChosen(match) {
-    const programmeName = match[1];
-
-    eventEmitter.emit('programmeChosen', programmeName);
   }
 
   function neighborsRequested(match) {
