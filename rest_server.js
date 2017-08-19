@@ -18,6 +18,8 @@ module.exports = function (options) {
   let switchStateFinderCallback = function() {};
 
   let onHealNetworkRequestedCallback = function() {};
+  let onRefreshNodeRequestedCallback = function() {};
+
   let programmes = {};
 
   const vacationMode = options.vacationMode;
@@ -98,6 +100,11 @@ module.exports = function (options) {
     res.send({status: "sent"});
   });
 
+  app.post('/debug/refresh_node/:node_id(\\d+)', (req, res) => {
+    onRefreshNodeRequestedCallback(parseInt(req.params.node_id));
+    res.send({status: "sent"});
+  });
+
   const start = () => {
     server = app.listen(port);
     Logger.info("REST interface listening on port", port);
@@ -118,6 +125,10 @@ module.exports = function (options) {
 
   const onHealNetworkRequested = (callback) => {
     onHealNetworkRequestedCallback = callback;
+  };
+
+  const onRefreshNodeRequested = (callback) => {
+    onRefreshNodeRequestedCallback = callback;
   };
 
   const setMainSwitchStateFinder = (callback) => {
@@ -147,6 +158,7 @@ module.exports = function (options) {
     onSwitchStateChangeRequested: onSwitchStateChangeRequested,
 
     onHealNetworkRequested: onHealNetworkRequested,
+    onRefreshNodeRequested: onRefreshNodeRequested,
 
     setMainSwitchStateFinder: setMainSwitchStateFinder,
     setProgrammesListFinder: setProgrammesListFinder,

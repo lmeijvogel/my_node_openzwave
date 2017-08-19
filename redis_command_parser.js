@@ -5,13 +5,11 @@ const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
-  const refreshNodeRegex         = /refreshNode (\d+)/;
 
   const eventEmitter = new EventEmitter();
 
   const handlers = [
     [simulateSwitchPressRegex, simulateSwitchPress],
-    [refreshNodeRegex,         refreshNodeRequested]
   ];
 
   function parse(command) {
@@ -32,12 +30,6 @@ function RedisCommandParser() {
     const event = parseInt(match[1], 10);
 
     eventEmitter.emit('simulateSwitchPress', event);
-  }
-
-  function refreshNodeRequested(match) {
-    const nodeId = parseInt(match[1], 10);
-
-    eventEmitter.emit('refreshNodeRequested', nodeId);
   }
 
   function on(eventName, handler) {
