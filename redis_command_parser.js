@@ -4,14 +4,12 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
-  const healNetworkRegex         = /healNetwork/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
   const refreshNodeRegex         = /refreshNode (\d+)/;
 
   const eventEmitter = new EventEmitter();
 
   const handlers = [
-    [healNetworkRegex,         healNetworkRequested],
     [simulateSwitchPressRegex, simulateSwitchPress],
     [refreshNodeRegex,         refreshNodeRequested]
   ];
@@ -28,10 +26,6 @@ function RedisCommandParser() {
         return;
       }
     });
-  }
-
-  function healNetworkRequested() {
-    eventEmitter.emit('healNetworkRequested');
   }
 
   function simulateSwitchPress(match) {
