@@ -12,7 +12,6 @@ const TimeService = require('./time_service');
 const NextProgrammeChooser = require('./next_programme_chooser');
 
 const EventProcessor = require('./event_processor');
-const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
@@ -58,9 +57,7 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
-const redisInterface = RedisInterface('MyZWave');
-
-const redisCommandParser = RedisCommandParser();
+const redisInterface = RedisInterface();
 
 redisInterface.start();
 // TODO: Remove Promise.resolve()
@@ -117,12 +114,6 @@ Promise.resolve().then(function () {
 
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
-  });
-
-  redisInterface.on('commandReceived', function (command) {
-    Logger.debug('Received command via Redis: ', command);
-
-    redisCommandParser.parse(command);
   });
 
   myZWave.onNodeEvent(function (node, event) {
