@@ -13,13 +13,13 @@ module.exports = function (options) {
   let switchStateChangeRequestedCallbacks = [];
 
   let programmesListFinderCallback = function () {};
-  let lightsListFinderCallback = function() {};
-  let currentProgrammeFinderCallback = function() {};
-  let switchStateFinderCallback = function() {};
+  let lightsListFinderCallback = function () {};
+  let currentProgrammeFinderCallback = function () {};
+  let switchStateFinderCallback = function () {};
 
-  let onHealNetworkRequestedCallback = function() {};
-  let onRefreshNodeRequestedCallback = function() {};
-  let onSimulateSwitchPressRequestedCallback = function() {};
+  let onHealNetworkRequestedCallback = function () {};
+  let onRefreshNodeRequestedCallback = function () {};
+  let onSimulateSwitchPressRequestedCallback = function () {};
 
   let programmes = {};
 
@@ -35,9 +35,9 @@ module.exports = function (options) {
   });
 
   app.post('/programmes/:name/start', (req, res) => {
-    programmeChosenCallbacks.forEach( (callback) => { callback.call(null, req.params.name) });
+    programmeChosenCallbacks.forEach((callback) => { callback.call(null, req.params.name); });
 
-    res.send({ currentProgramme: req.params.name });
+    res.send({currentProgramme: req.params.name});
   });
 
   app.get('/vacation_mode', (req, res) => {
@@ -52,10 +52,12 @@ module.exports = function (options) {
   });
 
   app.post('/vacation_mode/on/:mean_start_time(\\d\\d:\\d\\d)/:mean_end_time(\\d\\d:\\d\\d)', (req, res) => {
-      vacationMode.start(req.params.mean_start_time, req.params.mean_end_time);
-      Logger.info('Started Vacation mode. Mean start time:', req.params.mean_start_time, 'mean end time:', req.params.mean_end_time);
+    vacationMode.start(req.params.mean_start_time, req.params.mean_end_time);
+    Logger.info('Started Vacation mode. Mean start time:',
+                req.params.mean_start_time, 'mean end time:',
+                req.params.mean_end_time);
 
-      res.send({state: true});
+    res.send({state: true});
   });
 
   app.get('/nodes', (req, res) => {
@@ -75,7 +77,7 @@ module.exports = function (options) {
   app.post('/nodes/:node_id(\\d+)/switch/:state(on|off)', (req, res) => {
     const nodeId = req.params.node_id;
 
-    if (req.params.state == "on") {
+    if (req.params.state === 'on') {
       myZWave.switchOn(nodeId);
       Logger.info('Switching node', nodeId, '=> on');
     } else {
@@ -83,7 +85,7 @@ module.exports = function (options) {
       Logger.info('Switching node', nodeId, '=> off');
     }
 
-    res.send({node: nodeId, state: req.params.state == "on"});
+    res.send({node: nodeId, state: req.params.state === 'on'});
   });
 
   app.get('/main_switch/enabled', (req, res) => {
@@ -91,36 +93,37 @@ module.exports = function (options) {
   });
 
   app.post('/main_switch/enabled/:state', (req, res) => {
-    const newState = req.params.state == "on";
-    switchStateChangeRequestedCallbacks.forEach( callback => callback(newState));
+    const newState = req.params.state === 'on';
+
+    switchStateChangeRequestedCallbacks.forEach(callback => callback(newState));
     res.send({state: newState});
   });
 
   app.post('/debug/heal_network', (req, res) => {
     onHealNetworkRequestedCallback();
-    res.send({status: "sent"});
+    res.send({status: 'sent'});
   });
 
   app.post('/debug/refresh_node/:node_id(\\d+)', (req, res) => {
     onRefreshNodeRequestedCallback(parseInt(req.params.node_id));
-    res.send({status: "sent"});
+    res.send({status: 'sent'});
   });
 
   app.post('/debug/simulate_switch_press/:signal(0|255)', (req, res) => {
     onSimulateSwitchPressRequestedCallback(parseInt(req.params.signal));
 
-    res.send({status: "sent"});
+    res.send({status: 'sent'});
   });
 
   const start = () => {
     // Only bind to localhost, so I don't have to implement API tokens just yet :)
     server = app.listen(port, 'localhost');
-    Logger.info("REST interface listening on port", port);
+    Logger.info('REST interface listening on port', port);
   };
 
   const stop = () => {
     server.close();
-    Logger.info("Stopped REST interface");
+    Logger.info('Stopped REST interface');
   };
 
   const onProgrammeChosen = (callback) => {
@@ -154,7 +157,7 @@ module.exports = function (options) {
 
   const setCurrentProgrammeFinder = (callback) => {
     currentProgrammeFinderCallback = callback;
-  }
+  };
 
   const setLightsListFinder = (callback) => {
     lightsListFinderCallback = callback;
@@ -179,5 +182,5 @@ module.exports = function (options) {
     setCurrentProgrammeFinder: setCurrentProgrammeFinder,
 
     setLightsListFinder: setLightsListFinder
-  }
-}
+  };
+};

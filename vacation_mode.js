@@ -83,7 +83,7 @@ module.exports = function (options) {
       state: _meanStartTime !== null,
       meanStartTime: _meanStartTime,
       meanEndTime: _meanEndTime
-    }
+    };
   }
 
   return {
