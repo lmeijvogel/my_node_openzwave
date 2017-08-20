@@ -85,23 +85,11 @@ redisInterface.start();
 
   const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
-  const vacationMode = new VacationMode({
-    timeService: TimeService(config.periodStarts),
-    onFunction: function () { eventProcessor.programmeSelected('evening'); },
-    offFunction: function () { eventProcessor.programmeSelected('off'); }
-  });
+  const vacationMode = initVacationMode(TimeService, eventProcessor, redisInterface);
 
   api = restServer({vacationMode: vacationMode, myZWave: myZWave});
 
   api.start();
-
-  vacationMode.onStart(function (meanStartTime, meanEndTime) {
-    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
-  });
-
-  vacationMode.onStop(function () {
-    redisInterface.vacationModeStopped();
-  });
 
   api.setProgrammesListFinder(function () {
     return programmes;
@@ -210,5 +198,23 @@ redisInterface.start();
     });
 
     return myZWave;
+  }
+
+  function initVacationMode(TimeService, eventProcessor, redisInterface) {
+    const vacationMode = new VacationMode({
+      timeService: TimeService(config.periodStarts),
+      onFunction: function () { eventProcessor.programmeSelected('evening'); },
+      offFunction: function () { eventProcessor.programmeSelected('off'); }
+    });
+
+    vacationMode.onStart(function (meanStartTime, meanEndTime) {
+      redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+    });
+
+    vacationMode.onStop(function () {
+      redisInterface.vacationModeStopped();
+    });
+
+    return vacationMode;
   }
 })();
