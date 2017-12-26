@@ -177,6 +177,13 @@ redisInterface.start();
         return light.id === node.nodeId;
       });
 
+      if (!lightName) {
+        Logger.error('Unknown light with nodeId', node.nodeId);
+      }
+      if (!lights[lightName]) {
+        Logger.error('Unknown light with name', lightName, '(id: ', node.nodeId ,')');
+      }
+
       if (!lights[lightName].values) {
         lights[lightName].values = {};
       }
