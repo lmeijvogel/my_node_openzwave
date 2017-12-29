@@ -178,10 +178,9 @@ redisInterface.start();
       });
 
       if (!lightName) {
-        Logger.error('Unknown light with nodeId', node.nodeId);
-      }
-      if (!lights[lightName]) {
-        Logger.error('Unknown light with name', lightName, '(id: ', node.nodeId ,')');
+        Logger.error('Unknown light with nodeId %d. Command class: %d, value: %d', node.nodeId, commandClass, value);
+      } else if (!lights[lightName]) {
+        Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: %d', lightName, node.nodeId, commandClass, value);
       }
 
       if (!lights[lightName].values) {
@@ -194,11 +193,11 @@ redisInterface.start();
     });
 
     myZWave.onNodeEvent(function (node, event) {
-      Logger.debug('Event from node ', node.nodeId);
+      Logger.debug('Event from node %d', node.nodeId);
       if (node.nodeId === 3) {
         switchPressed(event);
       } else {
-        Logger.warn('Event from unexpected node ', node.nodeId, ', event: ', event);
+        Logger.warn('Event from unexpected node %d, event: %d', node.nodeId, event);
       }
 
     });
