@@ -198,8 +198,7 @@ redisInterface.start();
       if (node.nodeId === 3) {
         switchPressed(event);
       } else {
-        Logger.warn('Event from unexpected node ', node);
-        Logger.verbose('.. event: ', event);
+        Logger.warn('Event from unexpected node ', node.nodeId, ', event: ', event);
       }
 
     });
