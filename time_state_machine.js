@@ -3,18 +3,20 @@
 const _ = require('lodash');
 const Logger = require('./logger');
 
-function TimeStateMachine(transitions) {
-  transitions = _.defaults({}, transitions, {
-    off: {
-      default: 'off'
-    }
-  });
+class TimeStateMachine {
+  constructor(transitions) {
+    this.transitions = _.defaults({}, transitions, {
+      off: {
+        default: 'off'
+      }
+    });
+  }
 
-  function handle(event, currentState) {
+  handle(event, currentState) {
     Logger.debug('TimeStateMachine.handle: Handling event: ', event);
     Logger.debug('TimeStateMachine.handle: Current state: ', currentState);
 
-    const currentTransitions = transitions[event];
+    const currentTransitions = this.transitions[event];
 
     Logger.debug('TimeStateMachine.handle: Transition table: ', currentTransitions);
 
@@ -38,14 +40,9 @@ function TimeStateMachine(transitions) {
     }
   }
 
-  function getTransitions() {
-    return transitions;
+  _getTransitions() {
+    return this.transitions;
   }
-
-  return {
-    handle: handle,
-    _getTransitions: getTransitions
-  };
 }
 
 module.exports = TimeStateMachine;

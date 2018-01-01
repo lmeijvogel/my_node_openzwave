@@ -28,7 +28,7 @@ describe('integration', function () {
   };
 
   const stateMachines = {
-    evening: TimeStateMachine({
+    evening: new TimeStateMachine({
       on: {
         evening: 'dimmed',
         default: 'evening'
@@ -92,7 +92,7 @@ describe('integration', function () {
 
   context('when there are multiple "off" steps', function () {
     const stateMachines = {
-      evening: TimeStateMachine({
+      evening: new TimeStateMachine({
         on: {
           default: 'evening'
         },
