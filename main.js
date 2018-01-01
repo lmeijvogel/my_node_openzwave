@@ -81,7 +81,7 @@ redisInterface.start();
 
   const stateMachines = new StateMachineBuilder(config.transitions, programmes).call();
 
-  const nextProgrammeChooser = new NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
+  const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config.periodStarts), stateMachines);
 
   const eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
@@ -223,7 +223,7 @@ redisInterface.start();
 
   function initVacationMode(TimeService, eventProcessor, redisInterface) {
     const vacationMode = new VacationMode({
-      timeService: TimeService(config.periodStarts),
+      timeService: new TimeService(config.periodStarts),
       onFunction: function () { eventProcessor.programmeSelected('evening'); },
       offFunction: function () { eventProcessor.programmeSelected('off'); }
     });
