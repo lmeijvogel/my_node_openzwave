@@ -79,7 +79,7 @@ redisInterface.start();
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
-  const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
+  const stateMachines = new StateMachineBuilder(config.transitions, programmes).call();
 
   const nextProgrammeChooser = new NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
 

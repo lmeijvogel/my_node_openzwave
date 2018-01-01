@@ -3,24 +3,29 @@
 const _ = require('lodash');
 const TimeStateMachine = require('./time_state_machine');
 
-function StateMachineBuilder(transitionsConfiguration, existingProgrammes) {
-  function call() {
-    checkConfiguration(transitionsConfiguration, existingProgrammes);
+class StateMachineBuilder {
+  constructor(transitionsConfiguration, existingProgrammes) {
+    this.transitionsConfiguration = transitionsConfiguration;
+    this.existingProgrammes = existingProgrammes;
+  }
 
-    return _(transitionsConfiguration).keys().reduce(function (acc, period) {
-      acc[period] = new TimeStateMachine(transitionsConfiguration[period]);
+  call() {
+    this.checkConfiguration(this.transitionsConfiguration, this.existingProgrammes);
+
+    return _(this.transitionsConfiguration).keys().reduce((acc, period) => {
+      acc[period] = new TimeStateMachine(this.transitionsConfiguration[period]);
       return acc;
     }, {});
   }
 
-  function checkConfiguration(transitionsConfiguration, existingProgrammes) {
+  checkConfiguration(transitionsConfiguration, existingProgrammes) {
     if (!existingProgrammes.off) {
       throw 'A programme named \'off\' should be defined!';
     }
 
-    _.forIn(transitionsConfiguration, function (transitionsPerSwitch, period) {
-      _.forIn(transitionsPerSwitch, function (transitions, onOrOff) {
-        _.forIn(transitions, function (to, from) {
+    _.forIn(transitionsConfiguration, (transitionsPerSwitch, period) => {
+      _.forIn(transitionsPerSwitch, (transitions, onOrOff) => {
+        _.forIn(transitions, (to, from) => {
           if (!existingProgrammes[to]) {
             throw 'Error creating transition \'' + period + '\':' +
             '\'' + onOrOff + '\', end programme \'' + to + '\' not found.';
@@ -33,10 +38,6 @@ function StateMachineBuilder(transitionsConfiguration, existingProgrammes) {
       });
     });
   }
-
-  return {
-    call: call
-  };
 }
 
 module.exports = StateMachineBuilder;
