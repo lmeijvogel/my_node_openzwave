@@ -20,11 +20,11 @@ describe('integration', function () {
   };
 
   const switchOff = function () {
-    handler.call(myZWave, Node(3), 0);
+    handler.call(myZWave, new Node(3), 0);
   };
 
   const switchOn  = function () {
-    handler.call(myZWave, Node(3), 255);
+    handler.call(myZWave, new Node(3), 255);
   };
 
   const stateMachines = {
