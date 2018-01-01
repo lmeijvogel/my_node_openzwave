@@ -57,7 +57,7 @@ describe('integration', function () {
   before(function () {
     nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-    eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+    eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
     myZWave.onNodeEvent(function (node, event) {
       eventProcessor.mainSwitchPressed(event, programme);
@@ -107,7 +107,7 @@ describe('integration', function () {
     before(function () {
       nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-      eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+      eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
       myZWave.onNodeEvent(function (node, event) {
         eventProcessor.mainSwitchPressed(event, programme);

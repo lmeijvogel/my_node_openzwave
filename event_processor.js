@@ -3,20 +3,26 @@
 const Logger = require('./logger');
 const EventEmitter = require('events').EventEmitter;
 
-function EventProcessor(zwave, programmes, nextProgrammeChooser) {
-  const eventEmitter = new EventEmitter();
+class EventProcessor {
+  constructor (zwave, programmes, nextProgrammeChooser) {
+    this.zwave = zwave;
+    this.programmes = programmes;
+    this.nextProgrammeChooser = nextProgrammeChooser;
 
-  function on(eventName, callback) {
-    eventEmitter.on(eventName, callback);
+    this.eventEmitter = new EventEmitter();
   }
 
-  function programmeSelected(programmeName) {
-    const programme = programmes[programmeName];
+  on(eventName, callback) {
+    this.eventEmitter.on(eventName, callback);
+  }
+
+  programmeSelected(programmeName) {
+    const programme = this.programmes[programmeName];
 
     if (programme) {
-      programme.apply(zwave);
+      programme.apply(this.zwave);
 
-      eventEmitter.emit('programmeSelected', programmeName);
+      this.eventEmitter.emit('programmeSelected', programmeName);
 
       Logger.info('Programme selected: %s', programmeName);
     } else {
@@ -24,30 +30,24 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
     }
   }
 
-  function mainSwitchPressed(value, currentProgramme) {
+  mainSwitchPressed(value, currentProgramme) {
     const onOff = value === 255 ? 'on' : 'off';
 
     Logger.info('Switch pressed: ' + onOff);
 
-    const nextProgrammeName = nextProgrammeChooser.handle(onOff, currentProgramme);
-    const nextProgramme = programmes[nextProgrammeName];
+    const nextProgrammeName = this.nextProgrammeChooser.handle(onOff, currentProgramme);
+    const nextProgramme = this.programmes[nextProgrammeName];
 
     if (!nextProgramme) {
       return;
     }
 
     try {
-      programmeSelected(nextProgrammeName);
+      this.programmeSelected(nextProgrammeName);
     } catch(e) {
       Logger.error('After switch pressed: Could not start "%s"', nextProgrammeName);
       Logger.error(e);
     }
   }
-
-  return {
-    on: on,
-    mainSwitchPressed: mainSwitchPressed,
-    programmeSelected: programmeSelected
-  };
 }
 module.exports = EventProcessor;

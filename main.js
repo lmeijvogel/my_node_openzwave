@@ -83,7 +83,7 @@ redisInterface.start();
 
   const nextProgrammeChooser = NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
 
-  const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+  const eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
   const vacationMode = initVacationMode(TimeService, eventProcessor, redisInterface);
 
