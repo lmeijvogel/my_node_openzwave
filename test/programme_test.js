@@ -47,7 +47,7 @@ describe('Programme', function () {
     data[lightName3] = true;
 
     programme = new Programme('name', 'displayName', data, lights);
-    zwave = MyZWave();
+    zwave = new MyZWave();
     zwaveMock = sinon.mock(zwave);
   });
 
