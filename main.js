@@ -22,7 +22,7 @@ const VacationMode = require('./vacation_mode');
 const argv = minimist(process.argv.slice(2));
 
 const configFile = argv['config'] || './config.json';
-const config = ConfigReader().read(configFile);
+const config = new ConfigReader().read(configFile);
 
 const logFile = argv['logfile'] || config['log']['file'] || './log/openzwave.log';
 
