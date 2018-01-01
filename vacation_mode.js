@@ -4,93 +4,89 @@ const AutomaticRunner = require('./automatic_runner');
 
 const _ = require('lodash');
 
-module.exports = function (options) {
-  const timeService = options.timeService;
-  const onFunction  = options.onFunction;
-  const offFunction = options.offFunction;
+class VacationMode {
+  constructor(options) {
+    this.timeService = options.timeService;
+    this.onFunction  = options.onFunction;
+    this.offFunction = options.offFunction;
 
-  let startCallbacks = [];
-  let stopCallbacks  = [];
+    this.startCallbacks = [];
+    this.stopCallbacks  = [];
 
-  let onTicker  = null;
-  let offTicker = null;
+    this.onTicker  = null;
+    this.offTicker = null;
 
-  let _meanStartTime = null;
-  let _meanEndTime = null;
+    this._meanStartTime = null;
+    this._meanEndTime = null;
+  }
 
-  function start(meanStartTime, meanEndTime) {
+  start(meanStartTime, meanEndTime) {
     const offsetProvider = () => 15 - Math.round(Math.random() * 30);
 
-    _meanStartTime = meanStartTime;
-    _meanEndTime = meanEndTime;
+    this._meanStartTime = meanStartTime;
+    this._meanEndTime = meanEndTime;
 
-    onTicker = new Ticker('startProgramme');
-    onTicker.start(AutomaticRunner(onFunction, {
+    this.onTicker = new Ticker('startProgramme');
+    this.onTicker.start(AutomaticRunner(this.onFunction, {
       periodStart: meanStartTime,
       periodEnd: meanEndTime,
-      timeService: timeService,
+      timeService: this.timeService,
       offsetProvider: offsetProvider
     }), 15000);
 
-    offTicker = new Ticker('endProgramme');
-    offTicker.start(AutomaticRunner(offFunction, {
+    this.offTicker = new Ticker('endProgramme');
+    this.offTicker.start(AutomaticRunner(this.offFunction, {
       periodStart: meanEndTime,
       periodEnd: '23:59',
-      timeService: timeService,
+      timeService: this.timeService,
       offsetProvider: offsetProvider
     }), 15000);
 
-    triggerStarted(meanStartTime, meanEndTime);
+    this.triggerStarted(meanStartTime, meanEndTime);
   }
 
-  function stop() {
-    _meanStartTime = null;
-    _meanEndTime = null;
+  stop() {
+    this._meanStartTime = null;
+    this._meanEndTime = null;
 
-    triggerStopped();
+    this.triggerStopped();
 
-    if (onTicker) {
-      onTicker.stop();
+    if (this.onTicker) {
+      this.onTicker.stop();
     }
 
-    if (offTicker) {
-      offTicker.stop();
+    if (this.offTicker) {
+      this.offTicker.stop();
     }
   }
 
-  function onStart(callback) {
-    startCallbacks.push(callback);
+  onStart(callback) {
+    this.startCallbacks.push(callback);
   }
 
-  function onStop(callback) {
-    stopCallbacks.push(callback);
+  onStop(callback) {
+    this.stopCallbacks.push(callback);
   }
 
-  function triggerStarted(startTime, endTime) {
-    _.each(startCallbacks, function (callback) {
+  triggerStarted(startTime, endTime) {
+    _.each(this.startCallbacks, (callback) => {
       callback(startTime, endTime);
     });
   }
 
-  function triggerStopped(startTime, endTime) {
-    _.each(stopCallbacks, function (callback) {
+  triggerStopped(startTime, endTime) {
+    _.each(this.stopCallbacks, (callback) => {
       callback();
     });
   }
 
-  function getState() {
+  getState() {
     return {
-      state: _meanStartTime !== null,
-      meanStartTime: _meanStartTime,
-      meanEndTime: _meanEndTime
+      state: this._meanStartTime !== null,
+      meanStartTime: this._meanStartTime,
+      meanEndTime: this._meanEndTime
     };
   }
-
-  return {
-    start: start,
-    stop: stop,
-    getState: getState,
-    onStart: onStart,
-    onStop: onStop
-  };
 };
+
+module.exports = VacationMode;
