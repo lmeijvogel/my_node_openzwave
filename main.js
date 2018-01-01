@@ -75,7 +75,7 @@ redisInterface.start();
 
   const myZWave = initMyZWave(zwave, config.lights);
 
-  const programmeFactory = ProgrammeFactory();
+  const programmeFactory = new ProgrammeFactory();
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
