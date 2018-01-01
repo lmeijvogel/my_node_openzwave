@@ -15,43 +15,46 @@
 const _      = require('lodash');
 const Logger = require('./logger');
 
-function FakeZWave() {
-  let callbacks = {};
-  let nodes = {};
-  const SWITCH_BINARY = 37;
-  const SWITCH_MULTILEVEL = 38;
+const SWITCH_BINARY = 37;
+const SWITCH_MULTILEVEL = 38;
 
-  function on(eventName, callback) {
-    if (!callbacks[eventName]) {
-      callbacks[eventName] = [];
+class FakeZWave {
+  constructor() {
+    this.callbacks = {};
+    this.nodes = {};
+  }
+
+  on(eventName, callback) {
+    if (!this.callbacks[eventName]) {
+      this.callbacks[eventName] = [];
     }
 
-    callbacks[eventName].push(callback);
+    this.callbacks[eventName].push(callback);
   }
 
-  function connect() {
+  connect() {
     const homeId = '128';
 
-    emitEvent('driver ready', [homeId]);
+    this.emitEvent('driver ready', [homeId]);
 
-    initializeDevices();
+    this.initializeDevices();
 
-    emitEvent('scan complete');
-    setLevel(2, 99);
+    this.emitEvent('scan complete');
+    this.setLevel(2, 99);
 
-    setLevel(5, 99);
-    switchOn(7);
-    setLevel(8, 99);
-    setLevel(2, 0);
-    setLevel(5, 0);
-    switchOff(7);
-    setLevel(8, 0);
+    this.setLevel(5, 99);
+    this.switchOn(7);
+    this.setLevel(8, 99);
+    this.setLevel(2, 0);
+    this.setLevel(5, 0);
+    this.switchOff(7);
+    this.setLevel(8, 0);
   }
 
-  function disconnect() {
+  disconnect() {
   }
 
-  function logValue(nodeId, commandClass) {
+  logValue(nodeId, commandClass) {
     const value = {label: 'TestLabel', value: 12};
 
     Logger.info('Node value requested: node %d: %d:%s: %s',
@@ -62,9 +65,9 @@ function FakeZWave() {
     );
   }
 
-  function setLevel(nodeId, level) {
-    nodes[nodeId]['level'] = level;
-    emitEvent('value changed', [
+  setLevel(nodeId, level) {
+    this.nodes[nodeId]['level'] = level;
+    this.emitEvent('value changed', [
       nodeId,
       38,
       {
@@ -75,9 +78,9 @@ function FakeZWave() {
     ]);
   }
 
-  function switchOn(nodeId) {
-    nodes[nodeId]['value'] = true;
-    emitEvent('value changed', [
+  switchOn(nodeId) {
+    this.nodes[nodeId]['value'] = true;
+    this.emitEvent('value changed', [
       nodeId,
       37,
       {
@@ -88,9 +91,9 @@ function FakeZWave() {
     ]);
   }
 
-  function switchOff(nodeId) {
-    nodes[nodeId]['value'] = false;
-    emitEvent('value changed', [
+  switchOff(nodeId) {
+    this.nodes[nodeId]['value'] = false;
+    this.emitEvent('value changed', [
       nodeId,
       37,
       {
@@ -101,9 +104,9 @@ function FakeZWave() {
     ]);
   }
 
-  function setValue(nodeId, commandClass, instance, index, value) {
-    nodes[nodeId]['value'] = value;
-    emitEvent('value changed', [
+  setValue(nodeId, commandClass, instance, index, value) {
+    this.nodes[nodeId]['value'] = value;
+    this.emitEvent('value changed', [
       nodeId,
       commandClass,
       {
@@ -114,25 +117,25 @@ function FakeZWave() {
     ]);
   }
 
-  function refreshNodeInfo(nodeid) {
+  refreshNodeInfo(nodeid) {
     Logger.info('FAKE: RefreshNodeInfo', nodeid);
   }
 
-  function healNetwork() {
+  healNetwork() {
     Logger.info('FAKE: HealNetwork');
   }
 
-  function enablePoll(nodeid, commandClass) {
+  enablePoll(nodeid, commandClass) {
     Logger.info('FAKE: EnablePoll', nodeid, commandClass);
   }
 
-  function initializeDevices() {
-    nodes[2] = {level: 0};
-    nodes[3] = {};
-    nodes[5] = {level: 0};
-    nodes[7] = {value: false};
-    nodes[8] = {level: 0};
-    nodes[9] = {level: 0};
+  initializeDevices() {
+    this.nodes[2] = {level: 0};
+    this.nodes[3] = {};
+    this.nodes[5] = {level: 0};
+    this.nodes[7] = {value: false};
+    this.nodes[8] = {level: 0};
+    this.nodes[9] = {level: 0};
 
     const node2NodeInfo = {
       manufacturer: 'Aeon Labs',
@@ -191,12 +194,12 @@ function FakeZWave() {
       loc: ''
     };
 
-    emitEvent('node added', [2]);
-    emitEvent('node added', [3]);
-    emitEvent('node added', [5]);
-    emitEvent('node added', [7]);
-    emitEvent('node added', [8]);
-    emitEvent('node added', [9]);
+    this.emitEvent('node added', [2]);
+    this.emitEvent('node added', [3]);
+    this.emitEvent('node added', [5]);
+    this.emitEvent('node added', [7]);
+    this.emitEvent('node added', [8]);
+    this.emitEvent('node added', [9]);
     const dimValue = {
       type: 'byte',
       genre: 'user',
@@ -239,82 +242,71 @@ function FakeZWave() {
       value: 0
     };
 
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       2,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       3,
       32,
       standaloneSwitchValue
     ]);
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       5,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       7,
       SWITCH_BINARY,
       switchValue
     ]);
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       8,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emitEvent('value added', [
+    this.emitEvent('value added', [
       9,
       SWITCH_MULTILEVEL,
       dimValue
     ]);
-    emitEvent('node ready', [
+    this.emitEvent('node ready', [
       2,
       node2NodeInfo
     ]);
-    emitEvent('node ready', [
+    this.emitEvent('node ready', [
       5,
       node5NodeInfo
     ]);
-    emitEvent('node ready', [
+    this.emitEvent('node ready', [
       7,
       node7NodeInfo
     ]);
-    emitEvent('node ready', [
+    this.emitEvent('node ready', [
       8,
       node8NodeInfo
     ]);
-    emitEvent('node ready', [
+    this.emitEvent('node ready', [
       9,
       node9NodeInfo
     ]);
-    emitEvent('node event', [
+    this.emitEvent('node event', [
       3,
       255
     ]);
-    emitEvent('node event', [
+    this.emitEvent('node event', [
       3,
       0
     ]);
   }
 
-  function emitEvent(eventName, params) {
-    _.each(callbacks[eventName], function (callback) {
+  emitEvent(eventName, params) {
+    _.each(this.callbacks[eventName], function (callback) {
       callback.apply(null, params);
     });
   }
-
-  return {
-    on: on,
-    connect: connect,
-    disconnect: disconnect,
-    enablePoll: enablePoll,
-    setValue: setValue,
-    refreshNodeInfo: refreshNodeInfo,
-    healNetwork: healNetwork,
-    logValue: logValue
-  };
 }
 
 module.exports = FakeZWave;
