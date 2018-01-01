@@ -3,21 +3,27 @@
 const _ = require('lodash');
 const Logger = require('./logger');
 
-function Programme(name, displayName, data, lights) {
-  const actions = _(data).map(function (value, key) {
-    if (!lights[key]) {
-      throw 'Error creating Programme "' + name + '": node "' + key + '" does not exist';
-    }
+class Programme {
+  constructor(name, displayName, data, lights) {
+    this.name = name;
+    this.displayName = displayName;
 
-    return {
-      nodeName: key,
-      nodeid: lights[key].id,
-      value: value
-    };
-  }).value();
+    this.actions = _(data).map((value, key) => {
+      if (!lights[key]) {
+        throw 'Error creating Programme "' + this.name + '": node "' + key + '" does not exist';
+      }
 
-  function apply(zwave) {
-    _.each(actions, function (action) {
+      return {
+        nodeName: key,
+        nodeid: lights[key].id,
+        value: value
+      };
+    }).value();
+
+  }
+
+  apply(zwave) {
+    _.each(this.actions, (action) => {
       try {
         if (action.value === true) {
           Logger.verbose('Send command "switch on" to node %d', action.nodeid);
@@ -30,17 +36,11 @@ function Programme(name, displayName, data, lights) {
           zwave.setLevel(action.nodeid, action.value);
         }
       } catch(e) {
-        Logger.error('ERROR in programme "' + name + '": Could not switch node "' + action.nodeName + '"');
+        Logger.error('ERROR in programme "' + this.name + '": Could not switch node "' + action.nodeName + '"');
         Logger.error(e.toString());
       }
     });
   }
-
-  return {
-    name: name,
-    apply: apply,
-    displayName: displayName
-  };
 }
 
 module.exports = Programme;
