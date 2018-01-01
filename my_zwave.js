@@ -4,55 +4,59 @@ const Node = require('./node');
 const _ = require('lodash');
 const Logger = require('./logger');
 
-function MyZWave(zwave) {
-  let nodes = [];
-  let eventListeners = {};
+class MyZWave {
+  constructor(zwave) {
+    this.zwave = zwave;
+    this.nodes = [];
 
-  let scanComplete = false;
+    this.eventListeners = {};
 
-  function registerEvents() {
-    zwave.on('driver ready', function (homeid) {
+    this.scanComplete = false;
+  }
+
+  registerEvents() {
+    this.zwave.on('driver ready', (homeid) => {
       Logger.verbose('Scanning homeid=0x%s...', homeid.toString(16));
     });
 
-    zwave.on('driver failed', function () {
+    this.zwave.on('driver failed', () => {
       Logger.fatal('Failed to start driver');
-      zwave.disconnect();
+      this.zwave.disconnect();
       process.exit();
     });
 
-    zwave.on('node added', function (nodeid) {
-      addNode(nodeid);
+    this.zwave.on('node added', (nodeid) => {
+      this.addNode(nodeid);
       Logger.verbose('Added node %d', nodeid);
     });
 
-    zwave.on('value added', function (nodeid, comclass, value) {
+    this.zwave.on('value added', (nodeid, comclass, value) => {
       const node = Node.find(nodeid);
 
       node.addValue(comclass, value);
     });
 
-    zwave.on('value changed', function (nodeid, comclass, value) {
+    this.zwave.on('value changed', (nodeid, comclass, value) => {
       const node = Node.find(nodeid);
 
       node.setValue(comclass, value);
 
-      _.each(eventListeners['valueChange'], function (handler) {
+      _.each(this.eventListeners['valueChange'], (handler) => {
         handler.call(null, node, comclass, value);
       });
     });
 
-    zwave.on('value removed', function (nodeid, comclass, index) {
+    this.zwave.on('value removed', (nodeid, comclass, index) => {
       const node = Node.find(nodeid);
 
       node.removeValue(comclass, index);
     });
 
-    zwave.on('node ready', function (nodeid, nodeinfo) {
-      nodeReady(nodeid, nodeinfo);
+    this.zwave.on('node ready', (nodeid, nodeinfo) => {
+      this.nodeReady(nodeid, nodeinfo);
     });
 
-    zwave.on('notification', function (nodeid, notif) {
+    this.zwave.on('notification', (nodeid, notif) => {
       switch(notif) {
       case 0:
         Logger.info('node%d: message complete', nodeid);
@@ -81,51 +85,51 @@ function MyZWave(zwave) {
       }
     });
 
-    zwave.on('node event', function (nodeid, event) {
+    this.zwave.on('node event', (nodeid, event) => {
       Logger.verbose('node%d: event: %s', nodeid, event);
 
       const node = Node.find(nodeid);
 
-      _(eventListeners['node event']).each(function (handler) {
+      _(this.eventListeners['node event']).each((handler) => {
         handler.call(null, node, event);
       });
     });
 
-    zwave.on('neighbors', function (nodeid, neighbors) {
+    this.zwave.on('neighbors', (nodeid, neighbors) => {
       const formattedNeighbors = neighbors.join(', ');
 
       Logger.info('node%d: neighbors: [ %s ]', nodeid, formattedNeighbors);
     });
 
-    zwave.on('scan complete', function () {
-      scanComplete = true;
+    this.zwave.on('scan complete', () => {
+      this.scanComplete = true;
 
       Logger.info('Scan complete, hit ^C to end program.');
     });
   }
 
-  function connect() {
-    registerEvents();
-    zwave.connect('/dev/ttyUSB0');
+  connect() {
+    this.registerEvents();
+    this.zwave.connect('/dev/ttyUSB0');
   }
 
-  function onNodeEvent(handler) {
-    if (!eventListeners['node event']) {
-      eventListeners['node event'] = [];
+  onNodeEvent(handler) {
+    if (!this.eventListeners['node event']) {
+      this.eventListeners['node event'] = [];
     }
-    eventListeners['node event'].push(handler);
+    this.eventListeners['node event'].push(handler);
   }
 
-  function onValueChange(handler) {
-    if (!eventListeners['valueChange']) {
-      eventListeners['valueChange'] = [];
+  onValueChange(handler) {
+    if (!this.eventListeners['valueChange']) {
+      this.eventListeners['valueChange'] = [];
     }
-    eventListeners['valueChange'].push(handler);
+    this.eventListeners['valueChange'].push(handler);
   }
 
-  function addNode(nodeid) {
+  addNode(nodeid) {
     Node.add(nodeid);
-    nodes[nodeid] = {
+    this.nodes[nodeid] = {
       manufacturer: '',
       manufacturerid: '',
       product: '',
@@ -139,7 +143,7 @@ function MyZWave(zwave) {
     };
   }
 
-  function nodeReady(nodeid, nodeinfo) {
+  nodeReady(nodeid, nodeinfo) {
     const node = Node.find(nodeid);
 
     node.setNodeInfo(nodeinfo);
@@ -147,54 +151,43 @@ function MyZWave(zwave) {
     Logger.debug('Node ready, node: %s', node);
     if (node.isPollable()) {
       Logger.debug('.. enabling poll');
-      enablePoll(node);
+      this.enablePoll(node);
     }
   }
 
-  function enablePoll(node) {
-    _(node.pollableClasses()).each(function (commandClass) {
-      zwave.enablePoll(node.nodeId, commandClass);
+  enablePoll(node) {
+    _(node.pollableClasses()).each((commandClass) => {
+      this.zwave.enablePoll(node.nodeId, commandClass);
     });
   }
 
-  function setLevel(nodeid, level) {
-    if (scanComplete) {
-      zwave.setValue(nodeid, 38, 1, 0, level);
+  setLevel(nodeid, level) {
+    if (this.scanComplete) {
+      this.zwave.setValue(nodeid, 38, 1, 0, level);
     } else {
       Logger.info('Not setting level: Initial scan not yet completed.');
     }
   }
 
-  function switchOn(nodeid) {
-    if (scanComplete) {
-      zwave.setValue(nodeid, 37, 1, 0, true);
+  switchOn(nodeid) {
+    if (this.scanComplete) {
+      this.zwave.setValue(nodeid, 37, 1, 0, true);
     } else {
       Logger.info('Not switching on: Initial scan not yet completed.');
     }
   }
 
-  function switchOff(nodeid) {
-    if (scanComplete) {
-      zwave.setValue(nodeid, 37, 1, 0, false);
+  switchOff(nodeid) {
+    if (this.scanComplete) {
+      this.zwave.setValue(nodeid, 37, 1, 0, false);
     } else {
       Logger.info('Not switching off: Initial scan not yet completed.');
     }
   }
 
-  function healNetwork() {
-    zwave.healNetwork();
+  healNetwork() {
+    this.zwave.healNetwork();
   }
-
-  return {
-    connect:       connect,
-    onNodeEvent:   onNodeEvent,
-    onValueChange: onValueChange,
-    enablePoll:    enablePoll,
-    setLevel:      setLevel,
-    switchOn:      switchOn,
-    switchOff:     switchOff,
-    healNetwork:   healNetwork
-  };
 }
 
 module.exports = MyZWave;

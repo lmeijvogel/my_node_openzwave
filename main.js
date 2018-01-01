@@ -170,7 +170,7 @@ redisInterface.start();
   }
 
   function initMyZWave(zwave, lights) {
-    const myZWave = MyZWave(zwave);
+    const myZWave = new MyZWave(zwave);
 
     myZWave.onValueChange(function (node, commandClass, value) {
       if (node.nodeId === 3) {
