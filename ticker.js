@@ -2,37 +2,35 @@
 
 const Logger = require('./logger');
 
-function Ticker(name) {
-  let ticker = null;
+class Ticker {
+  constructor(name) {
+    this.ticker = null;
+    this.name = name;
+  }
 
-  const start = function (callable, interval) {
-    Logger.debug('Ticker.start: Entered for "', name, '", interval:', interval);
+  start(callable, interval) {
+    Logger.debug('Ticker.start: Entered for "', this.name, '", interval:', interval);
     if (!interval) {
       throw 'No interval defined!';
     }
 
-    if (!ticker) {
+    if (!this.ticker) {
       Logger.debug('Ticker.start: No ticker yet, starting');
-      ticker = setInterval(function () {
+      this.ticker = setInterval(function () {
         callable.tick();
       }, interval);
 
-      Logger.debug('Ticker.start: Ticker "', name, '" started', ticker);
+      Logger.debug('Ticker.start: Ticker "', this.name, '" started', this.ticker);
     }
   };
 
-  const stop = function () {
-    Logger.debug('Ticker.stop: Entered for "', name, '"', ticker);
-    if (ticker) {
+  stop() {
+    Logger.debug('Ticker.stop: Entered for "', this.name, '"', this.ticker);
+    if (this.ticker) {
       Logger.debug('Ticker.stop: Ticker exists, stopping');
-      clearInterval(ticker);
-      ticker = null;
+      clearInterval(this.ticker);
+      this.ticker = null;
     }
-  };
-
-  return {
-    start: start,
-    stop: stop
   };
 }
 
