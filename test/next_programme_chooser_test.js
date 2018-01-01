@@ -20,7 +20,7 @@ describe('NextProgrammeChooser', function () {
 
     timeService = {};
 
-    subject = NextProgrammeChooser(timeService, stateMachines);
+    subject = new NextProgrammeChooser(timeService, stateMachines);
   });
 
   describe('chooseStateMachine', function () {
@@ -62,7 +62,7 @@ describe('NextProgrammeChooser', function () {
           handle: function () { return 'dimmed'; }
         };
 
-        subject = NextProgrammeChooser(timeService, stateMachines);
+        subject = new NextProgrammeChooser(timeService, stateMachines);
 
         const result = subject.handle('on');
 

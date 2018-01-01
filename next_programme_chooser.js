@@ -2,11 +2,16 @@
 
 const Logger = require('./logger');
 
-function NextProgrammeChooser(timeService, stateMachines) {
-  function handle(event, currentState) {
+class NextProgrammeChooser {
+  constructor(timeService, stateMachines) {
+    this.timeService = timeService;
+    this.stateMachines = stateMachines;
+  }
+
+  handle(event, currentState) {
     Logger.debug('NextProgrammeChooser.handle: currentState: ', currentState);
 
-    const currentStateMachine = chooseStateMachine();
+    const currentStateMachine = this.chooseStateMachine();
 
     const newState = currentStateMachine.handle(event, currentState);
 
@@ -15,28 +20,23 @@ function NextProgrammeChooser(timeService, stateMachines) {
     return newState;
   }
 
-  function chooseStateMachine() {
+  chooseStateMachine() {
     const now = new Date();
 
-    const currentPeriod = timeService.getPeriod(now);
+    const currentPeriod = this.timeService.getPeriod(now);
 
     Logger.debug('NextProgrammeChooser.chooseStateMachine: Time is ', now);
     Logger.debug('NextProgrammeChooser.chooseStateMachine: currentPeriod is ', currentPeriod);
 
-    const stateMachine = stateMachines[currentPeriod];
+    const stateMachine = this.stateMachines[currentPeriod];
 
     if (stateMachine) {
       return stateMachine;
     } else {
       Logger.error('NextProgrammeChooser.chooseStateMachine: Unknown time');
-      return stateMachines.morning;
+      return this.stateMachines.morning;
     }
   }
-
-  return {
-    handle: handle,
-    chooseStateMachine: chooseStateMachine
-  };
 }
 
 module.exports = NextProgrammeChooser;
