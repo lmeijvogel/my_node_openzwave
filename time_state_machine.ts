@@ -4,8 +4,9 @@ import { defaults } from 'lodash';
 import Logger from './logger';
 
 class TimeStateMachine {
-  transitions : any;
-  constructor(transitions) {
+  transitions : Map<string, string>;
+
+  constructor(transitions : Map<string, string>) {
     this.transitions = defaults({}, transitions, {
       off: {
         default: 'off'
@@ -13,7 +14,7 @@ class TimeStateMachine {
     });
   }
 
-  handle(event, currentState) {
+  handle(event, currentState : string) {
     Logger.debug('TimeStateMachine.handle: Handling event: ', event);
     Logger.debug('TimeStateMachine.handle: Current state: ', currentState);
 

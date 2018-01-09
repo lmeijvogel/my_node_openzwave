@@ -1,12 +1,26 @@
 import { each, map } from 'lodash';
 import Logger from './logger';
+import Light from './light';
+
+class Action {
+  public readonly nodeName : string;
+  public readonly nodeid : number;
+  public readonly value : any;
+
+  constructor(nodeName, nodeId, value) {
+    this.nodeName = nodeName;
+    this.nodeid = nodeId;
+    this.value = value;
+  }
+}
 
 class Programme {
-  private readonly name : String;
-  private readonly displayName : String;
-  private readonly actions: any[];
+  public readonly name : String;
 
-  constructor(name, displayName, data, lights) {
+  private readonly displayName : String;
+  private readonly actions: Action[];
+
+  constructor(name, displayName, data, lights : Map<string, Light>) {
     this.name = name;
     this.displayName = displayName;
 
@@ -15,16 +29,12 @@ class Programme {
         throw 'Error creating Programme "' + this.name + '": node "' + key + '" does not exist';
       }
 
-      return {
-        nodeName: key,
-        nodeid: lights[key].id,
-        value: value
-      };
+      return new Action(key, lights[key].id, value);
     });
 
   }
 
-  apply(zwave) {
+  apply(zwave) : void {
     each(this.actions, (action) => {
       try {
         if (action.value === true) {

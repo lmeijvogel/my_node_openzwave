@@ -34,7 +34,7 @@ class VacationMode {
     this._meanEndTime = null;
   }
 
-  start(meanStartTime, meanEndTime) {
+  start(meanStartTime : string, meanEndTime : string) {
     const offsetProvider = () => 15 - Math.round(Math.random() * 30);
 
     this._meanStartTime = meanStartTime;
@@ -82,7 +82,7 @@ class VacationMode {
     this.stopCallbacks.push(callback);
   }
 
-  triggerStarted(startTime, endTime) {
+  triggerStarted(startTime : string, endTime : string) {
     each(this.startCallbacks, (callback) => {
       callback(startTime, endTime);
     });

@@ -2,9 +2,10 @@
 
 import restServer from './rest_server';
 import * as minimist from 'minimist';
-import { findKey } from 'lodash';
+import { findKey, forIn } from 'lodash';
 
 import MyZWave from './my_zwave';
+import Light from './light';
 import ProgrammeFactory from './programme_factory';
 import StateMachineBuilder from './state_machine_builder';
 
@@ -76,6 +77,12 @@ redisInterface.start();
   const myZWave = initMyZWave(zwave, config.lights);
 
   const programmeFactory = new ProgrammeFactory();
+
+  const lights = new Map<string, Light>();
+
+  forIn(config.lights, (light, name) => {
+    lights.set(name, new Light(light.id, light.displayName));
+  });
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
