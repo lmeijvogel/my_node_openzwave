@@ -1,7 +1,7 @@
 'use strict';
 
-const assert = require('assert');
-const TimeStateMachine = require('../time_state_machine');
+import assert from 'assert';
+import TimeStateMachine from '../time_state_machine';
 
 let subject = null;
 

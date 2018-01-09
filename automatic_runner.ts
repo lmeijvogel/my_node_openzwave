@@ -1,7 +1,6 @@
 'use strict';
 
-const _ = require('lodash');
-const Logger = require('./logger');
+import Logger from './logger';
 
 function AutomaticRunner(fn, options) {
   const timeService = options.timeService;
@@ -81,4 +80,4 @@ function AutomaticRunner(fn, options) {
   };
 };
 
-module.exports = AutomaticRunner;
+export default AutomaticRunner;

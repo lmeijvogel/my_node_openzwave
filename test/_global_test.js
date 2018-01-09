@@ -1,6 +1,6 @@
 'use strict';
 
-const Logger = require('../logger');
+import Logger from '../logger';
 
 before(function () {
   Logger.setSilent(true);

@@ -1,9 +1,9 @@
-'use strict';
-
-const Redis = require('redis');
-const _ = require('lodash');
+import { RedisClient, createClient } from 'redis';
+import { extend } from 'lodash';
 
 class EventLogger {
+  private redis : RedisClient;
+
   constructor() {
     this.redis = null;
   }
@@ -11,11 +11,11 @@ class EventLogger {
   start() {
     const redisHost = process.env.REDIS_HOST || 'localhost';
 
-    this.redis = Redis.createClient(6379, redisHost);
+    this.redis = createClient(6379, redisHost);
   }
 
   store(event) {
-    const datedEvent = _.extend({}, event, {time: new Date()});
+    const datedEvent = extend({}, event, {time: new Date()});
 
     this.redis.lpush('zwave_recent_events', JSON.stringify(datedEvent));
     this.redis.ltrim('zwave_recent_events', 0, 50);
@@ -26,4 +26,4 @@ class EventLogger {
   }
 };
 
-module.exports = EventLogger;
+export default EventLogger;

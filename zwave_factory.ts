@@ -1,12 +1,14 @@
 'use strict';
 
-const Logger    = require('./logger');
-const OpenZWave = require('openzwave-shared');
-const FakeZWave = require('./fake_zwave');
+import Logger from './logger';
+import * as OpenZWave from 'openzwave-shared';
+import FakeZWave from './fake_zwave';
 
 const LOGLEVEL_INFO = 6;
 
 class ZWaveFactory {
+  private testMode : boolean;
+
   constructor(testMode) {
     this.testMode = testMode;
   }
@@ -36,4 +38,4 @@ class ZWaveFactory {
   }
 }
 
-module.exports = ZWaveFactory;
+export default ZWaveFactory;

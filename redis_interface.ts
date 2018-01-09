@@ -1,20 +1,19 @@
-'use strict';
-
-const Redis = require('redis');
+import { RedisClient, createClient } from 'redis';
 
 class RedisInterface {
-  constructor(commandChannel) {
-    this.commandChannel = commandChannel;
+  private redis : RedisClient;
+
+  constructor() {
     this.redis = null;
   }
 
   start() {
     const redisHost = process.env.REDIS_HOST || 'localhost';
 
-    this.redis = Redis.createClient(6379, redisHost);
+    this.redis = createClient(6379, redisHost);
   }
 
-  getVacationMode() {
+  getVacationMode() : Promise<any> {
     return new Promise((resolve, reject) => {
       this.redis.hgetall('zwave_vacation_mode', (err, values) => {
         resolve(values || {state: 'off'});
@@ -39,4 +38,4 @@ class RedisInterface {
   }
 }
 
-module.exports = RedisInterface;
+export default RedisInterface;

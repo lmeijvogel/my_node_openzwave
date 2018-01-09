@@ -1,14 +1,28 @@
 'use strict';
-const Ticker = require('./ticker');
-const AutomaticRunner = require('./automatic_runner');
+import Ticker from './ticker';
+import AutomaticRunner from './automatic_runner';
+import TimeService from './time_service';
 
-const _ = require('lodash');
+import { each } from 'lodash';
 
 class VacationMode {
-  constructor(options) {
-    this.timeService = options.timeService;
-    this.onFunction  = options.onFunction;
-    this.offFunction = options.offFunction;
+  private readonly timeService : TimeService;
+  private readonly onFunction : Function;
+  private readonly offFunction : Function;
+
+  private readonly startCallbacks : Function[];
+  private readonly stopCallbacks : Function[];
+
+  private onTicker : Ticker;
+  private offTicker : Ticker;
+
+  private _meanStartTime : String;
+  private _meanEndTime : String;
+
+  constructor(timeService : TimeService, onFunction : Function, offFunction : Function) {
+    this.timeService = timeService;
+    this.onFunction  = onFunction;
+    this.offFunction = offFunction;
 
     this.startCallbacks = [];
     this.stopCallbacks  = [];
@@ -69,13 +83,13 @@ class VacationMode {
   }
 
   triggerStarted(startTime, endTime) {
-    _.each(this.startCallbacks, (callback) => {
+    each(this.startCallbacks, (callback) => {
       callback(startTime, endTime);
     });
   }
 
-  triggerStopped(startTime, endTime) {
-    _.each(this.stopCallbacks, (callback) => {
+  triggerStopped() {
+    each(this.stopCallbacks, (callback) => {
       callback();
     });
   }
@@ -89,4 +103,4 @@ class VacationMode {
   }
 };
 
-module.exports = VacationMode;
+export default VacationMode;

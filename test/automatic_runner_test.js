@@ -1,8 +1,8 @@
 'use strict';
 
-const AutomaticRunner = require('../automatic_runner');
-const TimeService = require('../time_service');
-const assert = require('assert');
+import AutomaticRunner from '../automatic_runner';
+import TimeService from '../time_service';
+import assert from 'assert';
 
 let called = false;
 

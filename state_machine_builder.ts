@@ -1,9 +1,11 @@
-'use strict';
-
-const _ = require('lodash');
-const TimeStateMachine = require('./time_state_machine');
+import { chain, forIn } from 'lodash';
+import TimeStateMachine from './time_state_machine';
+import Programme from './programme';
 
 class StateMachineBuilder {
+  transitionsConfiguration: any;
+  existingProgrammes: Programme[];
+
   constructor(transitionsConfiguration, existingProgrammes) {
     this.transitionsConfiguration = transitionsConfiguration;
     this.existingProgrammes = existingProgrammes;
@@ -12,10 +14,10 @@ class StateMachineBuilder {
   call() {
     this.checkConfiguration(this.transitionsConfiguration, this.existingProgrammes);
 
-    return _(this.transitionsConfiguration).keys().reduce((acc, period) => {
+    return chain(this.transitionsConfiguration).keys().reduce((acc, period) => {
       acc[period] = new TimeStateMachine(this.transitionsConfiguration[period]);
       return acc;
-    }, {});
+    }, {}).value();
   }
 
   checkConfiguration(transitionsConfiguration, existingProgrammes) {
@@ -23,9 +25,9 @@ class StateMachineBuilder {
       throw 'A programme named \'off\' should be defined!';
     }
 
-    _.forIn(transitionsConfiguration, (transitionsPerSwitch, period) => {
-      _.forIn(transitionsPerSwitch, (transitions, onOrOff) => {
-        _.forIn(transitions, (to, from) => {
+    forIn(transitionsConfiguration, (transitionsPerSwitch, period) => {
+      forIn(transitionsPerSwitch, (transitions, onOrOff) => {
+        forIn(transitions, (to, from) => {
           if (!existingProgrammes[to]) {
             throw 'Error creating transition \'' + period + '\':' +
             '\'' + onOrOff + '\', end programme \'' + to + '\' not found.';
@@ -40,4 +42,4 @@ class StateMachineBuilder {
   }
 }
 
-module.exports = StateMachineBuilder;
+export default StateMachineBuilder;

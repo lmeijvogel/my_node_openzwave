@@ -12,13 +12,16 @@
  * switch, reporting as little as possible.
  */
 
-const _      = require('lodash');
-const Logger = require('./logger');
+import { each } from 'lodash';
+import Logger from './logger';
 
 const SWITCH_BINARY = 37;
 const SWITCH_MULTILEVEL = 38;
 
 class FakeZWave {
+  callbacks: Object;
+  nodes : Object;
+
   constructor() {
     this.callbacks = {};
     this.nodes = {};
@@ -302,11 +305,11 @@ class FakeZWave {
     ]);
   }
 
-  emitEvent(eventName, params) {
-    _.each(this.callbacks[eventName], function (callback) {
+  emitEvent(eventName, params = {}) {
+    each(this.callbacks[eventName], function (callback) {
       callback.apply(null, params);
     });
   }
 }
 
-module.exports = FakeZWave;
+export default FakeZWave;

@@ -1,9 +1,17 @@
 'use strict';
 
-const Logger = require('./logger');
-const EventEmitter = require('events').EventEmitter;
+import Logger from './logger';
+import { EventEmitter } from 'events';
+
+import Programme from './programme';
+import NextProgrammeChooser from './next_programme_chooser';
 
 class EventProcessor {
+  zwave: any;
+  programmes : Programme[];
+  nextProgrammeChooser : NextProgrammeChooser;
+  eventEmitter : EventEmitter;
+
   constructor (zwave, programmes, nextProgrammeChooser) {
     this.zwave = zwave;
     this.programmes = programmes;
@@ -50,4 +58,4 @@ class EventProcessor {
     }
   }
 }
-module.exports = EventProcessor;
+export default EventProcessor;

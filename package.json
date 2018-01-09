@@ -12,13 +12,18 @@
     "minimist": "~1.1.0",
     "openzwave-shared": "git+https://github.com/OpenZWave/node-openzwave-shared",
     "redis": "~2.8.0",
+    "typescript": "^2.6.2",
     "winston": "~0.8.0"
   },
   "devDependencies": {
-    "sinon": "~1.10.3",
-    "mocha": "~1.21.4",
+    "@types/es6-promise": "^3.3.0",
+    "@types/express": "^4.11.0",
+    "@types/lodash": "^4.14.91",
+    "@types/redis": "^2.8.4",
     "eslint": "~1.10.3",
-    "eslint-config-defaults": "~7.1.1"
+    "eslint-config-defaults": "~7.1.1",
+    "mocha": "~1.21.4",
+    "sinon": "~1.10.3"
   },
   "scripts": {
     "test": "mocha",
