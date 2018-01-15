@@ -1,19 +1,18 @@
 'use strict';
 
-import assert from 'assert';
+import * as assert from 'assert';
 
+import objectToNestedMap from './objectToNestedMap';
+
+import Programme from '../programme';
+import Light from '../light';
 import StateMachineBuilder from '../state_machine_builder';
 import TimeStateMachine from '../time_state_machine';
+import { TimePeriod } from '../time_service';
 
 describe('StateMachineBuilder', function () {
   describe('call', function () {
-    let existingProgrammes = {
-      off: {},
-      evening: {},
-      morning: {},
-      dimmed: {},
-      tree: {}
-    };
+    let existingProgrammes = ['off', 'evening', 'morning', 'dimmed', 'tree'].map(name => buildProgramme(name));
 
     it('builds the expected TimeStateMachines', function () {
       const transitions = {
@@ -38,7 +37,7 @@ describe('StateMachineBuilder', function () {
 
       const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
-      const eveningTSMachine = new TimeStateMachine({
+      const eveningTSMachine = new TimeStateMachine(objectToNestedMap({
         on: {
           default: 'evening',
           evening: 'dimmed'
@@ -47,9 +46,15 @@ describe('StateMachineBuilder', function () {
           default: 'tree',
           tree: 'off'
         }
-      });
+      }));
 
-      assert.deepEqual(eveningTSMachine._getTransitions(), result.evening._getTransitions());
+      const eveningResult = result.get('evening');
+      if (eveningResult === undefined ) {
+        assert.fail("eveningResult is null/undefined");
+        return;
+      }
+
+      assert.deepEqual(eveningTSMachine._getTransitions(), eveningResult._getTransitions());
     });
 
     it('sets a default "off" transition if it is not specified', function () {
@@ -69,29 +74,41 @@ describe('StateMachineBuilder', function () {
 
       const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
-      const eveningTSMachine = new TimeStateMachine({
+      const eveningTSMachine = new TimeStateMachine(objectToNestedMap({
         on: {
           default: 'evening'
         },
         off: {
           default: 'off'
         }
-      });
+      }));
 
-      const morningTSMachine = new TimeStateMachine({
+      const morningTSMachine = new TimeStateMachine(objectToNestedMap({
         on: {
           default: 'morning'
         },
         off: {
           default: 'off'
         }
-      });
+      }));
 
-      assert.deepEqual(morningTSMachine._getTransitions(), result.morning._getTransitions());
-      assert.deepEqual(eveningTSMachine._getTransitions(), result.evening._getTransitions());
+      const morningResult = result.get('morning');
+      if (morningResult === undefined ) {
+        assert.fail("morningResult is null/undefined");
+        return;
+      }
+
+      const eveningResult = result.get('evening');
+      if (eveningResult === undefined ) {
+        assert.fail("eveningResult is null/undefined");
+        return;
+      }
+
+      assert.deepEqual(morningTSMachine._getTransitions(), morningResult._getTransitions());
+      assert.deepEqual(eveningTSMachine._getTransitions(), eveningResult._getTransitions());
     });
 
-    context('when there is no "off" programme', function () {
+    describe('when there is no "off" programme', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
@@ -107,13 +124,15 @@ describe('StateMachineBuilder', function () {
           }
         };
 
+        const programmes = ['morning', 'evening'].map(name => buildProgramme(name));
+
         assert.throws(function () {
-          new StateMachineBuilder(transitions, {morning: {}, evening: {}}).call();
+          new StateMachineBuilder(transitions, programmes).call();
         }, /programme named 'off' should be defined/);
       });
     });
 
-    context('when an unknown source programme name is specified', function () {
+    describe('when an unknown source programme name is specified', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
@@ -135,7 +154,7 @@ describe('StateMachineBuilder', function () {
       });
     });
 
-    context('when an unknown target programme name is specified', function () {
+    describe('when an unknown target programme name is specified', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
@@ -158,3 +177,7 @@ describe('StateMachineBuilder', function () {
     });
   });
 });
+
+function buildProgramme(name) {
+  return new Programme(name, name, new Map<string, any>(), new Map<string, Light>());
+}

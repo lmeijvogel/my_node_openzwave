@@ -1,25 +1,29 @@
 'use strict';
 
-import assert from 'assert';
+import * as assert from 'assert';
 import TimeStateMachine from '../time_state_machine';
+import * as jest from 'ts-jest';
 
-let subject = null;
+let subject = new TimeStateMachine(new Map<string, Map<string, string>>());
+
+let onTransitions = new Map<string, string>();
+onTransitions.set('morning', 'afternoon');
+onTransitions.set('default', 'evening');
+
+let offTransitions = new Map<string, string>();
+offTransitions.set('default', 'mostlyOff');
+offTransitions.set('mostlyOff', 'off');
+
+let transitions : Map<string, Map<string, string>> = new Map()
+transitions.set('on', onTransitions);
+transitions.set('off', offTransitions);
 
 describe('TimeStateMachine', function () {
   beforeEach(function () {
-    subject = new TimeStateMachine({
-      on: {
-        morning: 'afternoon',
-        default: 'evening'
-      },
-      off: {
-        default: 'mostlyOff',
-        mostlyOff: 'off'
-      }
-    });
+    subject = new TimeStateMachine(transitions);
   });
 
-  context('when the transition is configured', function () {
+  describe('when the transition is configured', function () {
     it('follows it', function () {
       const state = subject.handle('on', 'morning');
 
@@ -37,7 +41,7 @@ describe('TimeStateMachine', function () {
     });
   });
 
-  context('when the transition is not configured', function () {
+  describe('when the transition is not configured', function () {
     it('follows the default', function () {
       const state = subject.handle('on', 'something');
 
@@ -45,7 +49,7 @@ describe('TimeStateMachine', function () {
     });
   });
 
-  context('when the event is not configured', function () {
+  describe('when the event is not configured', function () {
     it('does not do anything', function () {
       const state = subject.handle('something', 'afternoon');
 

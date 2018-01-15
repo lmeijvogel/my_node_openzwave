@@ -30,7 +30,7 @@ class Node {
     this.nodeId = nodeId;
     this.values = {};
     this.info = {};
-    this.ready = null;
+    this.ready = false;
   }
 
   addValue(commandClass, value) {

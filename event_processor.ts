@@ -3,16 +3,19 @@
 import Logger from './logger';
 import { EventEmitter } from 'events';
 
-import Programme from './programme';
+import { IProgramme } from './programme';
 import NextProgrammeChooser from './next_programme_chooser';
 
+import { OpenZWave } from 'openzwave-shared';
+import FakeZWave from './fake_zwave';
+
 class EventProcessor {
-  zwave: any;
-  programmes : Programme[];
+  zwave: FakeZWave | OpenZWave;
+  programmes : IProgramme[];
   nextProgrammeChooser : NextProgrammeChooser;
   eventEmitter : EventEmitter;
 
-  constructor (zwave, programmes, nextProgrammeChooser) {
+  constructor(zwave : FakeZWave | OpenZWave, programmes : IProgramme[], nextProgrammeChooser) {
     this.zwave = zwave;
     this.programmes = programmes;
     this.nextProgrammeChooser = nextProgrammeChooser;
@@ -25,7 +28,7 @@ class EventProcessor {
   }
 
   programmeSelected(programmeName) {
-    const programme = this.programmes[programmeName];
+    const programme = this.programmes.find(programme => programme.name === programmeName);
 
     if (programme) {
       programme.apply(this.zwave);
@@ -44,9 +47,10 @@ class EventProcessor {
     Logger.info('Switch pressed: ' + onOff);
 
     const nextProgrammeName = this.nextProgrammeChooser.handle(onOff, currentProgramme);
-    const nextProgramme = this.programmes[nextProgrammeName];
+    const nextProgramme = this.programmes.filter(programme => programme.name === nextProgrammeName)[0];
 
     if (!nextProgramme) {
+      Logger.error('EventProcessor.mainSwitchPressed: No next programme found for switch press', onOff, ', currentProgramme:', currentProgramme, '!');
       return;
     }
 

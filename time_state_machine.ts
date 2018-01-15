@@ -1,42 +1,52 @@
-'use strict';
-
-import { defaults } from 'lodash';
 import Logger from './logger';
 
-class TimeStateMachine {
-  transitions : Map<string, string>;
+interface ITimeStateMachine {
+  handle(event, currentState) : string;
+}
 
-  constructor(transitions : Map<string, string>) {
-    this.transitions = defaults({}, transitions, {
-      off: {
-        default: 'off'
-      }
-    });
+class TimeStateMachine implements ITimeStateMachine {
+  transitions : Map<string, Map<string, string>>;
+
+  constructor(transitions : Map<string, Map<string, string>>) {
+    Logger.debug("TimeStateMachine.constructor: Building TimeStateMachine with transitions:", JSON.stringify([...transitions]));
+    this.transitions = transitions;
+
+    if (!this.transitions.has('off')) {
+      Logger.info('TimeStateMachine.constructor: Adding default "off" constructor');
+      this.transitions.set('off', new Map<string, string>([['default', 'off']]));
+    }
   }
 
-  handle(event, currentState : string) {
-    Logger.debug('TimeStateMachine.handle: Handling event: ', event);
-    Logger.debug('TimeStateMachine.handle: Current state: ', currentState);
+  // event: 'on' | 'off'
+  handle(event : string, currentState : string) : string {
+    Logger.debug('TimeStateMachine.handle: Handling event:', event);
+    Logger.debug('TimeStateMachine.handle: Current state:', JSON.stringify(currentState));
 
-    const currentTransitions = this.transitions[event];
-
-    Logger.debug('TimeStateMachine.handle: Transition table: ', currentTransitions);
+    const currentTransitions : Map<string, string>|undefined = this.transitions.get(event);
 
     if (!currentTransitions) {
       Logger.warn('No transition from "', currentState, '" for event "', event, '"');
       return currentState;
     }
 
-    const transitionFromTable = currentTransitions[currentState];
+    Logger.debug('TimeStateMachine.handle: Transition table:', JSON.stringify([...currentTransitions]));
+
+    const transitionFromTable = currentTransitions.get(currentState);
 
     if (transitionFromTable) {
       Logger.info('TimeStateMachine.handle: Found transition:', transitionFromTable);
 
       return transitionFromTable;
     } else {
-      const defaultTransition = currentTransitions['default'];
+      const defaultTransition = currentTransitions.get('default');
 
-      Logger.info('TimeStateMachine.handle: No transition found, using default: ', defaultTransition);
+      if (!defaultTransition) {
+        Logger.error('TimeStateMachine.handle: No default transition found!');
+
+        throw "No default transition exists!";
+      }
+
+      Logger.info('TimeStateMachine.handle: No transition found, using default:', defaultTransition);
 
       return defaultTransition;
     }
@@ -48,3 +58,4 @@ class TimeStateMachine {
 }
 
 export default TimeStateMachine;
+export { ITimeStateMachine };

@@ -1,19 +1,36 @@
 'use strict';
 
-import { each } from 'lodash';
+import { forOwn } from 'lodash';
+
+import Logger from './logger';
 import Programme from './programme';
+import { IProgramme } from './programme';
 import Light from './light';
 
 class ProgrammeFactory {
-  build(programmesConfiguration, lights : Map<string, Light>) {
-    let programmes = {};
+  build(programmesConfiguration : Map<string, object>, lights : Map<string, Light>) : IProgramme[] {
+    let programmes : IProgramme[] = [];
 
-    each(programmesConfiguration, function (programme, name) {
-      const newProgramme = new Programme(name, programme.displayName, programme.values, lights);
+    Logger.debug('ProgrammeFactory.build: Received', JSON.stringify([...programmesConfiguration]));
 
-      programmes[name] = newProgramme;
+    programmesConfiguration.forEach((programme, name) => {
+      const values : Map<string, any> = new Map<string, any>();
+
+      forOwn(programme['values'], (value, key) => {
+        values.set(key, value);
+      });
+
+      const newProgramme = new Programme(
+        name,
+        programme['displayName'],
+        values,
+        lights
+      );
+
+      programmes.push(newProgramme);
     });
 
+    Logger.debug('ProgrammeFactory.build: Returning', JSON.stringify(programmes));
     return programmes;
   }
 }

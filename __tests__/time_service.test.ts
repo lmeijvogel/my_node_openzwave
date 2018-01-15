@@ -1,11 +1,11 @@
 'use strict';
 
-import _ from 'lodash';
-import assert from 'assert';
+import * as _ from 'lodash';
+import * as assert from 'assert';
 
 import TimeService from '../time_service';
 
-let timeService = null;
+let timeService = new TimeService({});
 
 describe('TimeServiceTest', function () {
   beforeEach(function () {
@@ -36,7 +36,7 @@ describe('TimeServiceTest', function () {
     const minute   = data[1];
     const expected = data[2];
 
-    context('when the time is ' + hour + ':' + minute, function () {
+    describe('when the time is ' + hour + ':' + minute, function () {
       it('should return ' + expected, function () {
         const date = createDate(hour, minute);
 
