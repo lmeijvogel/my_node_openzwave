@@ -7,11 +7,11 @@ import { each } from 'lodash';
 
 class VacationMode {
   private readonly timeService : TimeService;
-  private readonly onFunction : Function;
-  private readonly offFunction : Function;
+  private readonly onFunction : () => void;
+  private readonly offFunction : () => void;
 
-  private readonly startCallbacks : Function[];
-  private readonly stopCallbacks : Function[];
+  private readonly startCallbacks : ((startTime: string, endTime: string) => void)[];
+  private readonly stopCallbacks : (() => void)[];
 
   private onTicker : Ticker | null;
   private offTicker : Ticker | null;
@@ -19,7 +19,7 @@ class VacationMode {
   private _meanStartTime : String | null;
   private _meanEndTime : String | null;
 
-  constructor(timeService : TimeService, onFunction : Function, offFunction : Function) {
+  constructor(timeService : TimeService, onFunction : () => void, offFunction : () => void) {
     this.timeService = timeService;
     this.onFunction  = onFunction;
     this.offFunction = offFunction;
@@ -74,11 +74,11 @@ class VacationMode {
     }
   }
 
-  onStart(callback) {
+  onStart(callback : (startTime: string, endTime: string) => void) {
     this.startCallbacks.push(callback);
   }
 
-  onStop(callback) {
+  onStop(callback : () => void) {
     this.stopCallbacks.push(callback);
   }
 

@@ -107,9 +107,7 @@ redisInterface.start();
     return programmes;
   });
 
-  api.setLightsListFinder(function () {
-    return config.lights;
-  });
+  api.setLightsListFinder(() => config.lights);
 
   api.setCurrentProgrammeFinder(function () {
     return currentProgramme;
@@ -148,6 +146,7 @@ redisInterface.start();
 
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
+      Logger.debug('Storing new currentProgramme', programmeName);
       currentProgramme = programmeName;
 
       eventLogger.store({
