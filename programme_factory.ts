@@ -2,10 +2,10 @@
 
 import { forOwn } from 'lodash';
 
-import Logger from './logger';
-import Programme from './programme';
+import { Logger } from './logger';
+import { Programme } from './programme';
 import { IProgramme } from './programme';
-import Light from './light';
+import { Light } from './light';
 
 class ProgrammeFactory {
   build(programmesConfiguration : Map<string, object>, lights : Map<string, Light>) : IProgramme[] {
@@ -35,4 +35,4 @@ class ProgrammeFactory {
   }
 }
 
-export default ProgrammeFactory;
+export { ProgrammeFactory };

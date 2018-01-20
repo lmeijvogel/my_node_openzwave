@@ -1,8 +1,8 @@
 'use strict';
 
-import Logger from './logger';
+import { Logger } from './logger';
 import * as OpenZWave from 'openzwave-shared';
-import FakeZWave from './fake_zwave';
+import { FakeZWave } from './fake_zwave';
 
 const LOGLEVEL_INFO = 6;
 
@@ -38,4 +38,4 @@ class ZWaveFactory {
   }
 }
 
-export default ZWaveFactory;
+export { ZWaveFactory };

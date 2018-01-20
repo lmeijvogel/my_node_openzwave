@@ -37,4 +37,4 @@ class RedisInterface {
   }
 }
 
-export default RedisInterface;
+export { RedisInterface };

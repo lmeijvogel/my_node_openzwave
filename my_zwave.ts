@@ -1,6 +1,6 @@
-import Node from './node';
+import { Node } from './node';
 import { each } from 'lodash';
-import Logger from './logger';
+import { Logger } from './logger';
 
 class MyZWave {
   private readonly zwave: any;
@@ -199,4 +199,4 @@ class MyZWave {
   }
 }
 
-export default MyZWave;
+export { MyZWave };

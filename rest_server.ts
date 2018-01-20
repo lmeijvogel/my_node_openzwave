@@ -1,10 +1,10 @@
-import Logger from './logger';
+import { Logger } from './logger';
 
-import Light from './light';
+import { Light } from './light';
 import { IProgramme } from './programme';
 import * as express from 'express';
 
-export default function (options) {
+const RestServer = function (options) {
   const app = express();
   const port = 3000;
 
@@ -185,3 +185,5 @@ export default function (options) {
     setLightsListFinder: setLightsListFinder
   };
 };
+
+export { RestServer };

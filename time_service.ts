@@ -1,5 +1,5 @@
 import { chain, forOwn, keys, last, map } from 'lodash';
-import Logger from './logger';
+import { Logger } from './logger';
 
 export type TimePeriod = string;
 
@@ -77,5 +77,5 @@ class TimeService implements ITimeService {
   }
 }
 
-export default TimeService;
+export { TimeService };
 export { ITimeService };

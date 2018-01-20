@@ -1,4 +1,4 @@
-import Logger from './logger';
+import { Logger } from './logger';
 
 interface ITimeStateMachine {
   handle(event, currentState) : string;
@@ -57,5 +57,5 @@ class TimeStateMachine implements ITimeStateMachine {
   }
 }
 
-export default TimeStateMachine;
+export { TimeStateMachine };
 export { ITimeStateMachine };

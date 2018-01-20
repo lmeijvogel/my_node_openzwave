@@ -25,4 +25,4 @@ class EventLogger {
   }
 };
 
-export default EventLogger;
+export { EventLogger };

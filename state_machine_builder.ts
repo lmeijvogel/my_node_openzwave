@@ -1,6 +1,6 @@
 import { keys, find, forOwn, toPairs } from 'lodash';
-import Logger from './logger';
-import TimeStateMachine from './time_state_machine';
+import { Logger } from './logger';
+import { TimeStateMachine } from './time_state_machine';
 import { IProgramme } from './programme';
 
 import { TimePeriod } from './time_service';
@@ -75,4 +75,4 @@ class StateMachineBuilder {
   }
 }
 
-export default StateMachineBuilder;
+export { StateMachineBuilder };

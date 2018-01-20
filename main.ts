@@ -1,28 +1,28 @@
 'use strict';
 
-import restServer from './rest_server';
+import { RestServer } from './rest_server';
 import * as minimist from 'minimist';
 import { findKey, forOwn } from 'lodash';
 
-import MyZWave from './my_zwave';
-import Light from './light';
+import { MyZWave } from './my_zwave';
+import { Light } from './light';
 import { IProgramme } from './programme';
-import ProgrammeFactory from './programme_factory';
-import TimeStateMachine from './time_state_machine';
-import StateMachineBuilder from './state_machine_builder';
+import { ProgrammeFactory } from './programme_factory';
+import { TimeStateMachine } from './time_state_machine';
+import { StateMachineBuilder } from './state_machine_builder';
 
-import TimeService from './time_service';
+import { TimeService } from './time_service';
 import { TimePeriod } from './time_service';
 
-import NextProgrammeChooser from './next_programme_chooser';
+import { NextProgrammeChooser } from './next_programme_chooser';
 
-import EventProcessor from './event_processor';
-import RedisInterface from './redis_interface';
-import ConfigReader from './config_reader';
-import Logger from './logger';
-import EventLogger from './event_logger';
+import { EventProcessor } from './event_processor';
+import { RedisInterface } from './redis_interface';
+import { ConfigReader } from './config_reader';
+import { Logger } from './logger';
+import { EventLogger } from './event_logger';
 
-import VacationMode from './vacation_mode';
+import { VacationMode } from './vacation_mode';
 
 const argv = minimist(process.argv.slice(2));
 
@@ -37,7 +37,7 @@ Logger.info('Starting server');
 
 const testMode = !argv['live'];
 
-import ZWaveFactory from './zwave_factory';
+import { ZWaveFactory } from './zwave_factory';
 const zwave = new ZWaveFactory(testMode).create();
 
 let api;
@@ -99,7 +99,7 @@ redisInterface.start();
 
   const vacationMode = initVacationMode(TimeService, eventProcessor, redisInterface);
 
-  api = restServer({vacationMode: vacationMode, myZWave: myZWave});
+  api = RestServer({vacationMode: vacationMode, myZWave: myZWave});
 
   api.start();
 
@@ -154,6 +154,8 @@ redisInterface.start();
         event: 'programme selected',
         data: programmeName
       });
+    } else {
+      Logger.error('Invalid programmeName (null/undefined) received from eventProcessor');
     }
   });
 

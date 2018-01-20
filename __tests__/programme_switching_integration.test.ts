@@ -1,12 +1,12 @@
 import * as assert from 'assert';
-import Node from '../node';
+import { Node } from '../node';
 
-import objectToNestedMap from './objectToNestedMap';
+import { objectToNestedMap } from './objectToNestedMap';
 import { objectToMap } from './objectToNestedMap';
-import NextProgrammeChooser from '../next_programme_chooser';
-import TimeStateMachine from '../time_state_machine';
-import MockTimeService from './mock_time_service';
-import EventProcessor from '../event_processor';
+import { NextProgrammeChooser } from '../next_programme_chooser';
+import { TimeStateMachine } from '../time_state_machine';
+import { MockTimeService } from './mock_time_service';
+import { EventProcessor } from '../event_processor';
 import { IProgramme } from '../programme';
 
 class MockProgramme implements IProgramme {

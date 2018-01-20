@@ -1,7 +1,7 @@
 'use strict';
 
-import Logger from './logger';
-import TimeService from './time_service';
+import { Logger } from './logger';
+import { TimeService } from './time_service';
 import { ITimeService } from './time_service';
 import { ITimeStateMachine } from './time_state_machine';
 import { TimePeriod } from './time_service';
@@ -54,4 +54,4 @@ class NextProgrammeChooser {
   }
 }
 
-export default NextProgrammeChooser;
+export { NextProgrammeChooser };

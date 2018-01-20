@@ -8,4 +8,4 @@ class Light {
   }
 }
 
-export default Light;
+export { Light };

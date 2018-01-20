@@ -2,12 +2,12 @@
 
 import * as assert from 'assert';
 
-import objectToNestedMap from './objectToNestedMap';
+import { objectToNestedMap } from './objectToNestedMap';
 
-import Programme from '../programme';
-import Light from '../light';
-import StateMachineBuilder from '../state_machine_builder';
-import TimeStateMachine from '../time_state_machine';
+import { Programme } from '../programme';
+import { Light } from '../light';
+import { StateMachineBuilder } from '../state_machine_builder';
+import { TimeStateMachine } from '../time_state_machine';
 import { TimePeriod } from '../time_service';
 
 describe('StateMachineBuilder', function () {

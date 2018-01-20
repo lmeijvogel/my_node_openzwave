@@ -2,7 +2,7 @@
 
 import * as util from 'util';
 import { extend, filter, forIn, includes, keys as _keys, some } from 'lodash';
-import Logger from './logger';
+import { Logger } from './logger';
 
 const nodes = {};
 
@@ -131,4 +131,4 @@ class Node {
   }
 }
 
-export default Node;
+export { Node };

@@ -1,7 +1,7 @@
 'use strict';
-import Ticker from './ticker';
-import AutomaticRunner from './automatic_runner';
-import TimeService from './time_service';
+import { Ticker } from './ticker';
+import { AutomaticRunner } from './automatic_runner';
+import { TimeService } from './time_service';
 
 import { each } from 'lodash';
 
@@ -103,4 +103,4 @@ class VacationMode {
   }
 };
 
-export default VacationMode;
+export { VacationMode };

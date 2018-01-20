@@ -1,5 +1,5 @@
-import Logger from './logger';
-import TimeService from './time_service';
+import { Logger } from './logger';
+import { TimeService } from './time_service';
 
 class AutomaticRunner {
   private readonly fn : () => void;
@@ -96,4 +96,4 @@ class SingleDayRunner {
   }
 }
 
-export default AutomaticRunner;
+export { AutomaticRunner };

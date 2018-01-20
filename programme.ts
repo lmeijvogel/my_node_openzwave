@@ -1,7 +1,7 @@
 import { each, map } from 'lodash';
-import Logger from './logger';
+import { Logger } from './logger';
 import { mapToString } from './logger';
-import Light from './light';
+import { Light } from './light';
 
 class Action {
   public readonly nodeName : string;
@@ -65,5 +65,5 @@ class Programme implements IProgramme {
   }
 }
 
-export default Programme;
+export { Programme };
 export { IProgramme };

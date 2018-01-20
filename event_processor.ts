@@ -1,13 +1,13 @@
 'use strict';
 
-import Logger from './logger';
+import { Logger } from './logger';
 import { EventEmitter } from 'events';
 
 import { IProgramme } from './programme';
-import NextProgrammeChooser from './next_programme_chooser';
+import { NextProgrammeChooser } from './next_programme_chooser';
 
 import { OpenZWave } from 'openzwave-shared';
-import FakeZWave from './fake_zwave';
+import { FakeZWave } from './fake_zwave';
 
 class EventProcessor {
   zwave: FakeZWave | OpenZWave;
@@ -62,4 +62,4 @@ class EventProcessor {
     }
   }
 }
-export default EventProcessor;
+export { EventProcessor };
