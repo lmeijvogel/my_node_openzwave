@@ -1,12 +1,12 @@
 import { forOwn } from 'lodash';
 
 import { Logger } from './logger';
-import { IProgramme, Programme } from './programme';
+import { Programme } from './programme';
 import { Light } from './light';
 
 class ProgrammeFactory {
-  build(programmesConfiguration : Map<string, object>, lights : Map<string, Light>) : IProgramme[] {
-    let programmes : IProgramme[] = [];
+  build(programmesConfiguration : Map<string, object>, lights : Map<string, Light>) : Programme[] {
+    let programmes : Programme[] = [];
 
     Logger.debug('ProgrammeFactory.build: Received', JSON.stringify([...programmesConfiguration]));
 
