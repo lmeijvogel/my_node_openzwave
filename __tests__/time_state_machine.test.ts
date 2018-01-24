@@ -1,5 +1,3 @@
-'use strict';
-
 import * as assert from 'assert';
 import { TimeStateMachine } from '../time_state_machine';
 import * as jest from 'ts-jest';

@@ -1,5 +1,3 @@
-'use strict';
-
 import { Logger } from './logger';
 import * as OpenZWave from 'openzwave-shared';
 import { FakeZWave } from './fake_zwave';

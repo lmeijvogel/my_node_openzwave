@@ -1,5 +1,3 @@
-'use strict';
-
 import { RestServer } from './rest_server';
 import * as minimist from 'minimist';
 import { findKey, forOwn } from 'lodash';
