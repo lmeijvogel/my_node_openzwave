@@ -1,6 +1,5 @@
 import { each, map } from 'lodash';
-import { Logger } from './logger';
-import { mapToString } from './logger';
+import { Logger, mapToString } from './logger';
 import { Light } from './light';
 
 class Action {
