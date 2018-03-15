@@ -7,7 +7,9 @@ module.exports = function () {
   let redis = null;
 
   function start() {
-    redis = Redis.createClient();
+    const redisHost = process.env.REDIS_HOST || 'localhost';
+
+    redis = Redis.createClient(6379, redisHost);
   }
 
   function store(event) {
