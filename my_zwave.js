@@ -152,6 +152,10 @@ function MyZWave(zwave) {
   }
 
   function enablePoll(node) {
+    Logger.info('Not enabling polling: I don\'t know what instance/index should be polled.');
+
+    return;
+
     _(node.pollableClasses()).each(function (commandClass) {
       zwave.enablePoll(node.nodeId, commandClass);
     });
