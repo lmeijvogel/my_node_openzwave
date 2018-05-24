@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "outDir": "./out/",
+        "sourceMap": false,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "target": "es2018",
+        "strict": false
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
