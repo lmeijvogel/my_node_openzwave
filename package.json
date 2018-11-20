@@ -8,13 +8,13 @@
     },
     "dependencies": {
         "express": "^4.15.4",
-        "lodash": "~4.0.0",
+        "lodash": "~4.17.0",
         "minimist": "~1.1.0",
         "openzwave-shared": "git+https://github.com/OpenZWave/node-openzwave-shared",
         "redis": "~2.8.0",
         "ts-node": "^4.1.0",
         "typescript": "^2.8.0",
-        "winston": "~0.8.0"
+        "winston": "~3.1.0"
     },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
