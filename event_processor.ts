@@ -1,20 +1,19 @@
-import { Logger } from './logger';
-import { EventEmitter } from 'events';
+import { Logger } from "./logger";
+import { EventEmitter } from "events";
 
-import { IProgramme } from './programme';
-import { NextProgrammeChooser } from './next_programme_chooser';
+import { IProgramme } from "./programme";
+import { NextProgrammeChooser } from "./next_programme_chooser";
 
-import { OpenZWave } from 'openzwave-shared';
-import { FakeZWave } from './fake_zwave';
+import { IMyZWave } from "./imy_zwave";
 
 class EventProcessor {
-  zwave: FakeZWave | OpenZWave;
-  programmes : IProgramme[];
-  nextProgrammeChooser : NextProgrammeChooser;
-  eventEmitter : EventEmitter;
+  private readonly eventEmitter: EventEmitter;
 
-  constructor(zwave : FakeZWave | OpenZWave, programmes : IProgramme[], nextProgrammeChooser) {
-    this.zwave = zwave;
+  constructor(
+    private readonly zwave: IMyZWave,
+    private readonly programmes: IProgramme[],
+    private readonly nextProgrammeChooser
+  ) {
     this.programmes = programmes;
     this.nextProgrammeChooser = nextProgrammeChooser;
 
@@ -31,31 +30,33 @@ class EventProcessor {
     if (programme) {
       programme.apply(this.zwave);
 
-      this.eventEmitter.emit('programmeSelected', programmeName);
+      this.eventEmitter.emit("programmeSelected", programmeName);
 
-      Logger.info('Programme selected: %s', programmeName);
+      Logger.info(`Programme selected: ${programmeName}`);
     } else {
-      Logger.error('Programme "%s" not found.', programmeName);
+      Logger.error(`Programme "${programmeName}" not found.`);
     }
   }
 
   mainSwitchPressed(value, currentProgramme) {
-    const onOff = value === 255 ? 'on' : 'off';
+    const onOff = value === 255 ? "on" : "off";
 
-    Logger.info('Switch pressed: ' + onOff);
+    Logger.info("Switch pressed: " + onOff);
 
     const nextProgrammeName = this.nextProgrammeChooser.handle(onOff, currentProgramme);
     const nextProgramme = this.programmes.filter(programme => programme.name === nextProgrammeName)[0];
 
     if (!nextProgramme) {
-      Logger.error('EventProcessor.mainSwitchPressed: No next programme found for switch press', onOff, ', currentProgramme:', currentProgramme, '!');
+      Logger.error(
+        `EventProcessor.mainSwitchPressed: No next programme found for switch press ${onOff}, currentProgramme: ${currentProgramme}!`
+      );
       return;
     }
 
     try {
       this.programmeSelected(nextProgrammeName);
-    } catch(e) {
-      Logger.error('After switch pressed: Could not start "%s"', nextProgrammeName);
+    } catch (e) {
+      Logger.error(`After switch pressed: Could not start "${nextProgrammeName}"`);
       Logger.error(e);
     }
   }
