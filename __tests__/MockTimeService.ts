@@ -1,4 +1,4 @@
-import { ITimeService } from '../time_service';
+import { ITimeService } from '../TimeService';
 
 class MockTimeService implements ITimeService {
   private period : string;

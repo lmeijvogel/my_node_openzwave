@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { TimeStateMachine } from '../time_state_machine';
+import { TimeStateMachine } from '../TimeStateMachine';
 import * as jest from 'ts-jest';
 
 let subject = new TimeStateMachine(new Map<string, Map<string, string>>());

@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 import { IProgramme } from "./Programme";
 import { NextProgrammeChooser } from "./NextProgrammeChooser";
 
-import { IMyZWave } from "./ImyZWave";
+import { IMyZWave } from "./IMyZWave";
 
 class EventProcessor {
   private readonly eventEmitter: EventEmitter;
