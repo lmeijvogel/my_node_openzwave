@@ -1,6 +1,6 @@
 import { each } from "lodash";
 import { IZWave } from "./IZWave";
-import { IMyZWave } from "./ImyZWave";
+import { IMyZWave } from "./IMyZWave";
 import { Node, ValueId } from "./Node";
 import { Logger } from "./Logger";
 
