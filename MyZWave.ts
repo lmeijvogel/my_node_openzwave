@@ -50,7 +50,7 @@ class MyZWave implements IMyZWave {
 
       node.setValue(comclass, value);
 
-      each(this.eventListeners["valueChange"], handler => {
+      each(this.eventListeners.get("valueChange"), handler => {
         handler.call(null, node, comclass, value);
       });
     });
@@ -99,7 +99,7 @@ class MyZWave implements IMyZWave {
 
       const node = Node.find(nodeid);
 
-      each(this.eventListeners["node event"], handler => {
+      each(this.eventListeners.get("node event"), handler => {
         handler.call(null, node, event);
       });
     });
