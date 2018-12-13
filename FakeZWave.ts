@@ -94,19 +94,6 @@ class FakeZWave implements IZWave {
     ]);
   }
 
-  setValue(nodeId, commandClass, instance, index, value) {
-    this.nodes[nodeId]["value"] = value;
-    this.emitEvent("value changed", [
-      nodeId,
-      commandClass,
-      {
-        label: "Switch",
-        index: index,
-        value: value
-      }
-    ]);
-  }
-
   refreshNodeInfo(nodeid) {
     Logger.info(`FAKE: RefreshNodeInfo ${nodeid}`);
   }
