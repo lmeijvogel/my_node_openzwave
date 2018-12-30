@@ -61,14 +61,14 @@ class Node {
         } else {
           Logger.verbose(
             `Received node change: ${this.nodeId}: ${commandClass}:${value["label"]}:${
-              this.getValue(commandClass, value.index)["value"]
+            this.getValue(commandClass, value.index)["value"]
             } => ${value["value"]}`
           );
         }
       } else {
         Logger.debug(
           `Received node change: ${this.nodeId}: ${commandClass}:${value["label"]}:${
-            this.getValue(commandClass, value.index)["value"]
+          this.getValue(commandClass, value.index)["value"]
           } => ${value["value"]} (before nodeReady event)`
         );
       }
@@ -120,9 +120,17 @@ class Node {
     forIn(this.values, (commandClass, commandClassIdx) => {
       result += util.format("node%d: class %d\n", this.nodeId, commandClassIdx);
 
-      forIn(commandClass, command => {
-        result += util.format("node%d:   %s=%s", this.nodeId, command["label"], command["value"]);
-      });
+      if (commandClass) {
+        forIn(commandClass, command => {
+          if (command) {
+            result += util.format("node%d:   %s=%s", this.nodeId, command["label"], command["value"]);
+          } else {
+            Logger.error(`Unexpected null value in 'command' for Node '${this.nodeId}', commandClassIndex ${commandClassIdx}.`);
+          }
+        });
+      } else {
+        Logger.error(`Unexpected null value in 'commandClass' for Node '${this.nodeId}', commandClassIndex ${commandClassIdx}.`);
+      }
     });
 
     return result;
