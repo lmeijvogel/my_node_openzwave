@@ -181,7 +181,7 @@ class MyZWave implements IMyZWave {
 
   setLevel(nodeid: number, level: number) {
     if (this.scanComplete) {
-      this.zwave.setNodeLevel(nodeid, level);
+      this.zwave.setValue(nodeid, 38, 1, 0, level);
     } else {
       Logger.info("Not setting level: Initial scan not yet completed.");
     }
@@ -189,7 +189,7 @@ class MyZWave implements IMyZWave {
 
   switchOn(nodeid: number) {
     if (this.scanComplete) {
-      this.zwave.setNodeOn(nodeid);
+      this.zwave.setValue(nodeid, 37, 1, 0, true);
     } else {
       Logger.info("Not switching on: Initial scan not yet completed.");
     }
@@ -197,7 +197,7 @@ class MyZWave implements IMyZWave {
 
   switchOff(nodeid: number) {
     if (this.scanComplete) {
-      this.zwave.setNodeOff(nodeid);
+      this.zwave.setValue(nodeid, 37, 1, 0, false);
     } else {
       Logger.info("Not switching off: Initial scan not yet completed.");
     }
