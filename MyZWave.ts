@@ -165,9 +165,11 @@ class MyZWave implements IMyZWave {
   }
 
   enablePoll(node: Node) {
-    each(node.pollableClasses(), commandClass => {
+    const pollableClasses = node.pollableClasses();
+
+    pollableClasses.forEach(commandClass => {
       const valueId = {
-        nodeid: node.nodeId,
+        node_id: node.nodeId,
         class_id: commandClass,
         instance: 1,
         index: 0
