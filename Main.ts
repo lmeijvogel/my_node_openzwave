@@ -186,6 +186,11 @@ redisInterface.start();
     }
 
     const switchPressName = mainSceneIdToSwitchPressName(sceneId);
+
+    if (switchPressName === SwitchPressName.SceneReturn) {
+        return;
+    }
+
     eventProcessor.mainSwitchPressed(switchPressName, currentProgramme);
 
     eventLogger.store({
@@ -197,6 +202,8 @@ redisInterface.start();
 
   function mainSceneIdToSwitchPressName(sceneId: number): SwitchPressName {
     switch (sceneId) {
+      case 0:
+        return SwitchPressName.SceneReturn;
       case 10:
         return SwitchPressName.SingleOn;
       case 11:

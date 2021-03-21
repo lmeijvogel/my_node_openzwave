@@ -63,10 +63,10 @@ class Node {
           Logger.info(`Received node change: node ${this.nodeId}: ${value["label"]} => ${value["value"]}`);
         } else if (commandClass === 43) {
             const previousScene = this.getValue(commandClass, value.index)["value"];
-            const newScene = value["value"];
+            const newScene = value.value;
 
             if (newScene === 0) {
-                Logger.debug(`Skip scene return by ${this.nodeId} from ${previousScene} to ${newScene}`);
+                // Do not log scene return to 0 since this adds no value at the moment
                 return;
             }
             Logger.info(`Received scene change: node ${this.nodeId}: Scene: ${previousScene} => ${newScene}`);
