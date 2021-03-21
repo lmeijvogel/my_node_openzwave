@@ -9,9 +9,11 @@ import { IProgramme } from "./Programme";
 import { ProgrammeFactory } from "./ProgrammeFactory";
 import { TimeStateMachine } from "./TimeStateMachine";
 import { StateMachineBuilder } from "./StateMachineBuilder";
+import { SwitchPressName } from "./SwitchPressName";
 
 import { TimeService, TimePeriod } from "./TimeService";
 
+import { Node } from "./Node";
 import { NextProgrammeChooser } from "./NextProgrammeChooser";
 
 import { EventProcessor } from "./EventProcessor";
@@ -21,6 +23,12 @@ import { Logger } from "./Logger";
 import { EventLogger } from "./EventLogger";
 
 import { VacationMode } from "./VacationMode";
+
+type ConfigLight = {
+    id: number;
+    displayName: string;
+    values: { [commandClass: string]: any }
+};
 
 const argv = minimist(process.argv.slice(2));
 
@@ -85,7 +93,7 @@ redisInterface.start();
 
   const lights = new Map<string, Light>();
 
-  forOwn(config.lights, (light, name) => {
+  forOwn(config.lights, (light: ConfigLight, name: string) => {
     lights.set(name, new Light(light.id, light.displayName));
   });
 
@@ -115,15 +123,13 @@ redisInterface.start();
     return currentProgramme;
   });
 
-  api.onProgrammeChosen(function(programmeName) {
+  api.onProgrammeChosen((programmeName: string) => {
     eventProcessor.programmeSelected(programmeName);
   });
 
-  api.setMainSwitchStateFinder(function() {
-    return switchEnabled;
-  });
+  api.setMainSwitchStateFinder(() => switchEnabled );
 
-  api.onSwitchStateChangeRequested(function(enabled) {
+  api.onSwitchStateChangeRequested((enabled: boolean) => {
     if (enabled) {
       Logger.info("Enabling switch");
     } else {
@@ -138,12 +144,12 @@ redisInterface.start();
     zwave.healNetwork();
   });
 
-  api.onRefreshNodeRequested(function(nodeId) {
+  api.onRefreshNodeRequested((nodeId: number) => {
     zwave.refreshNodeInfo(nodeId);
   });
 
-  api.onSimulateSwitchPressRequested(function(signal) {
-    switchPressed(signal);
+  api.onSimulateSwitchPressRequested(function(signal: number) {
+    mainSwitchPressed(signal);
   });
 
   api.start();
@@ -173,23 +179,43 @@ redisInterface.start();
 
   myZWave.connect();
 
-  function switchPressed(event) {
-    if (switchEnabled) {
-      eventProcessor.mainSwitchPressed(event, currentProgramme);
-      eventLogger.store({
-        initiator: "wall switch",
-        event: "switch pressed",
-        data: event === 255 ? "on" : "off"
-      });
-    } else {
+  function mainSwitchPressed(sceneId: number) {
+    if (!switchEnabled) {
       Logger.warn("Switch pressed but temporarily disabled.");
+      return;
+    }
+
+    const switchPressName = mainSceneIdToSwitchPressName(sceneId);
+    eventProcessor.mainSwitchPressed(switchPressName, currentProgramme);
+
+    eventLogger.store({
+      initiator: "main switch",
+      event: "switch pressed",
+      data: switchPressName
+    });
+  }
+
+  function mainSceneIdToSwitchPressName(sceneId: number): SwitchPressName {
+    switch (sceneId) {
+      case 10:
+        return SwitchPressName.SingleOn;
+      case 11:
+        return SwitchPressName.SingleOff;
+      case 14:
+        return SwitchPressName.Double; // This is the same for up and down
+      case 17:
+        return SwitchPressName.HoldOn;
+      case 18:
+        return SwitchPressName.HoldOff;
+      default:
+        return SwitchPressName.Unknown;
     }
   }
 
-  function initMyZWave(zwave: IZWave, lights): MyZWave {
+  function initMyZWave(zwave: IZWave, lights: ConfigLight[]): MyZWave {
     const myZWave = new MyZWave(zwave);
 
-    myZWave.onValueChange(function(node, commandClass, value) {
+    myZWave.onValueChange(function(node: Node, commandClass, value) {
       if (node.nodeId === 3) {
         Logger.error(
           "ERROR: Main switch is now probably ignored by OpenZWave. Exiting process so it can be restarted."
@@ -198,22 +224,37 @@ redisInterface.start();
         throw "Main switch erroneously ignored. Exiting!";
       }
 
-      const lightName = findKey(lights, function(light) {
+      const lightName = findKey(lights, (light: ConfigLight) => {
         return light.id === node.nodeId;
       });
 
       if (!lightName) {
-        Logger.error(`Unknown light with nodeId ${node.nodeId}. Command class: ${commandClass}, value: "${value}"`);
+        Logger.error(`Unknown light with nodeId ${node.nodeId}. Command class: ${commandClass}, value: "${JSON.stringify(value)}"`);
 
         return;
-      } else if (!lights[lightName]) {
+      }
+
+      if (!lights[lightName]) {
         Logger.error(
           `Unknown light with name "${lightName}" (id: ${
             node.nodeId
-          }). Command class: ${commandClass}, value: "${value}"`
+          }). Command class: ${commandClass}, value: "${JSON.stringify(value)}"`
         );
 
         return;
+      }
+
+      if (isSceneEvent(parseInt(commandClass, 10))) {
+          const sceneId = parseInt(value.value, 10);
+          Logger.debug(`Received scene event from ${lightName}: sceneId: ${sceneId}`);
+
+          if (node.nodeId === config.switches["main"]) {
+            mainSwitchPressed(sceneId);
+          } else if (node.nodeId === config.switches["aux"]) {
+            Logger.warn(`Event from unexpected node ${node.nodeId}, sceneId: ${sceneId}`);
+          }
+
+          return;
       }
 
       if (!lights[lightName].values) {
@@ -221,25 +262,24 @@ redisInterface.start();
       }
       lights[lightName].values[commandClass] = value;
 
-      Logger.debug(`Received value change from ${node.nodeId}`);
+      Logger.debug(`Received value change from ${node.nodeId}. Raw value: ${JSON.stringify(value)}`);
 
       const valueToString = `${value.value_id}, ${value.label}`;
       Logger.debug(`New value for node ${node.nodeId}: ${valueToString}`);
     });
 
-    myZWave.onNodeEvent(function(node, event) {
-      Logger.debug(`Event from node ${node.nodeId}`);
-      if (node.nodeId === 3) {
-        switchPressed(event);
-      } else {
-        Logger.warn(`Event from unexpected node ${node.nodeId}, event: ${event}`);
-      }
+    myZWave.onNodeEvent((node: Node, event: number) => {
+      Logger.debug(`Event from node ${node.nodeId}: ${event}. No longer processed.`);
     });
 
     return myZWave;
   }
 
-  function initVacationMode(TimeService, eventProcessor, redisInterface) {
+  function isSceneEvent(commandClass: number): boolean {
+      return commandClass === 43;
+  }
+
+  function initVacationMode(TimeService, eventProcessor: EventProcessor, redisInterface: RedisInterface) {
     const vacationMode = new VacationMode(
       new TimeService(config.periodStarts),
       () => {
@@ -262,10 +302,10 @@ redisInterface.start();
   }
 })();
 
-function objectToMap(input: object): Map<string, object> {
-  const result = new Map<string, object>();
+function objectToMap<T>(input: object): Map<string, T> {
+  const result = new Map<string, T>();
 
-  forOwn(input, (value, key) => {
+  forOwn(input, (value: T, key: string) => {
     result.set(key, value);
   });
 

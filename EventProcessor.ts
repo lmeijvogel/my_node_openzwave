@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 
 import { IProgramme } from "./Programme";
 import { NextProgrammeChooser } from "./NextProgrammeChooser";
+import { SwitchPressName } from "./SwitchPressName";
 
 import { IMyZWave } from "./IMyZWave";
 
@@ -12,7 +13,7 @@ class EventProcessor {
   constructor(
     private readonly zwave: IMyZWave,
     private readonly programmes: IProgramme[],
-    private readonly nextProgrammeChooser
+    private readonly nextProgrammeChooser: NextProgrammeChooser
   ) {
     this.programmes = programmes;
     this.nextProgrammeChooser = nextProgrammeChooser;
@@ -20,11 +21,11 @@ class EventProcessor {
     this.eventEmitter = new EventEmitter();
   }
 
-  on(eventName, callback) {
+  on(eventName: string, callback: (...args: any[]) => void) {
     this.eventEmitter.on(eventName, callback);
   }
 
-  programmeSelected(programmeName) {
+  programmeSelected(programmeName: string) {
     const programme = this.programmes.find(programme => programme.name === programmeName);
 
     if (programme) {
@@ -38,17 +39,21 @@ class EventProcessor {
     }
   }
 
-  mainSwitchPressed(value, currentProgramme) {
-    const onOff = value === 255 ? "on" : "off";
+  mainSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
+    this.handleSwitchPressed(switchPressName, currentProgramme);
+  }
 
-    Logger.info("Switch pressed: " + onOff);
+  auxSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
+    this.handleSwitchPressed(switchPressName, currentProgramme);
+  }
 
-    const nextProgrammeName = this.nextProgrammeChooser.handle(onOff, currentProgramme);
+  private handleSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
+    const nextProgrammeName = this.nextProgrammeChooser.handle(switchPressName, currentProgramme);
     const nextProgramme = this.programmes.filter(programme => programme.name === nextProgrammeName)[0];
 
     if (!nextProgramme) {
       Logger.error(
-        `EventProcessor.mainSwitchPressed: No next programme found for switch press ${onOff}, currentProgramme: ${currentProgramme}!`
+        `EventProcessor.mainSwitchPressed: No next programme found for switch press ${switchPressName}, currentProgramme: ${currentProgramme}!`
       );
       return;
     }

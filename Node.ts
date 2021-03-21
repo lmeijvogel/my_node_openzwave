@@ -61,6 +61,16 @@ class Node {
       if (this.isReady()) {
         if (commandClass === 38 || commandClass === 37) {
           Logger.info(`Received node change: node ${this.nodeId}: ${value["label"]} => ${value["value"]}`);
+        } else if (commandClass === 43) {
+            const previousScene = this.getValue(commandClass, value.index)["value"];
+            const newScene = value["value"];
+
+            if (newScene === 0) {
+                Logger.debug(`Skip scene return by ${this.nodeId} from ${previousScene} to ${newScene}`);
+                return;
+            }
+            Logger.info(`Received scene change: node ${this.nodeId}: Scene: ${previousScene} => ${newScene}`);
+
         } else {
           Logger.verbose(
             `Received node change: ${this.nodeId}: ${commandClass}:${value["label"]}:${

@@ -3,12 +3,13 @@ import { Logger } from "./Logger";
 import { Light } from "./Light";
 import { IProgramme } from "./Programme";
 import * as express from "express";
+import {Server} from "http";
 
-const RestServer = function(options) {
+const RestServer = function(options : { vacationMode : any, myZWave: any }) {
   const app = express();
   const port = 3000;
 
-  let server;
+  let server: Server;
 
   let programmeChosenCallbacks: ((name: string) => void)[] = [];
   let switchStateChangeRequestedCallbacks: ((newState: boolean) => void)[] = [];
@@ -27,11 +28,11 @@ const RestServer = function(options) {
   const vacationMode = options.vacationMode;
   const myZWave = options.myZWave;
 
-  app.get("/programmes", (req, res) => {
+  app.get("/programmes", (_req, res) => {
     res.send({ programmes: programmesListFinderCallback() });
   });
 
-  app.get("/programmes/current", (req, res) => {
+  app.get("/programmes/current", (_req, res) => {
     res.send({ programme: currentProgrammeFinderCallback() });
   });
 
@@ -43,11 +44,11 @@ const RestServer = function(options) {
     res.send({ currentProgramme: req.params.name });
   });
 
-  app.get("/vacation_mode", (req, res) => {
+  app.get("/vacation_mode", (_req, res) => {
     res.send(vacationMode.getState());
   });
 
-  app.post("/vacation_mode/off", (req, res) => {
+  app.post("/vacation_mode/off", (_req, res) => {
     vacationMode.stop();
     Logger.info("Stopped vacation mode");
 
@@ -65,7 +66,7 @@ const RestServer = function(options) {
     res.send({ state: true });
   });
 
-  app.get("/nodes", (req, res) => {
+  app.get("/nodes", (_req, res) => {
     res.send({ lights: lightsListFinderCallback() });
   });
 
@@ -93,7 +94,7 @@ const RestServer = function(options) {
     res.send({ node: nodeId, state: req.params.state === "on" });
   });
 
-  app.get("/main_switch/enabled", (req, res) => {
+  app.get("/main_switch/enabled", (_req, res) => {
     res.send({ state: switchStateFinderCallback() });
   });
 
@@ -104,7 +105,7 @@ const RestServer = function(options) {
     res.send({ state: newState });
   });
 
-  app.post("/debug/heal_network", (req, res) => {
+  app.post("/debug/heal_network", (_req, res) => {
     onHealNetworkRequestedCallback();
     res.send({ status: "sent" });
   });
@@ -130,7 +131,7 @@ const RestServer = function(options) {
     Logger.info("Stopped REST interface");
   };
 
-  const onProgrammeChosen = (callback: (name) => void) => {
+  const onProgrammeChosen = (callback: (name: string) => void) => {
     programmeChosenCallbacks.push(callback);
   };
 
@@ -138,11 +139,11 @@ const RestServer = function(options) {
     switchStateChangeRequestedCallbacks.push(callback);
   };
 
-  const onHealNetworkRequested = callback => {
+  const onHealNetworkRequested = (callback: () => void) => {
     onHealNetworkRequestedCallback = callback;
   };
 
-  const onRefreshNodeRequested = callback => {
+  const onRefreshNodeRequested = (callback: (nodeid: number) => number) => {
     onRefreshNodeRequestedCallback = callback;
   };
 

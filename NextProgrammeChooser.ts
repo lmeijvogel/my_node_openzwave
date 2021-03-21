@@ -1,5 +1,6 @@
 import { Logger } from "./Logger";
 import { ITimeService, TimePeriod } from "./TimeService";
+import { SwitchPressName } from "./SwitchPressName";
 import { ITimeStateMachine } from "./TimeStateMachine";
 
 class NextProgrammeChooser {
@@ -16,12 +17,12 @@ class NextProgrammeChooser {
     this.stateMachines = stateMachines;
   }
 
-  handle(event, currentState: string): string {
+  handle(switchPressName: SwitchPressName, currentState: string): string {
     Logger.debug(`NextProgrammeChooser.handle: currentState: ${JSON.stringify(currentState)}`);
 
     const currentStateMachine = this.chooseStateMachine();
 
-    const newState = currentStateMachine.handle(event, currentState);
+    const newState = currentStateMachine.handle(switchPressName, currentState);
 
     Logger.verbose(`NextProgrammeChooser.handle: new currentState: ${newState}`);
 
