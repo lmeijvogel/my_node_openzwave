@@ -3,6 +3,7 @@ import { SwitchPressName } from "./SwitchPressName";
 
 interface ITimeStateMachine {
   handle(switchPressName: SwitchPressName, currentState): string;
+  defaultState(): string;
 }
 
 class TimeStateMachine implements ITimeStateMachine {
@@ -52,6 +53,18 @@ class TimeStateMachine implements ITimeStateMachine {
 
       return defaultTransition;
     }
+  }
+
+  defaultState(): string | null {
+    const currentTransitions: Map<string, string> | undefined = this.transitions.get(SwitchPressName.SingleOn);
+
+    if (!currentTransitions) {
+      Logger.warn("No default transition found");
+      return null;
+    }
+
+    return currentTransitions.get("default");
+
   }
 
   _getTransitions() {

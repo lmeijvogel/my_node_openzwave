@@ -1,13 +1,16 @@
-import { Node } from "./Node";
+import { Node, ValueId } from "./Node";
+
+export type ValueChangeEventHandler = (node: Node, commandClass: string, value: ValueId) => void;
+export type NodeEventHandler = (node: Node, event: number) => void;
 
 export interface IMyZWave {
     registerEvents(): void;
 
     connect(): void;
 
-    onNodeEvent(handler): void;
+    onNodeEvent(handler: NodeEventHandler): void;
 
-    onValueChange(handler): void;
+    onValueChange(handler: ValueChangeEventHandler): void;
 
     addNode(nodeid: number): void;
 

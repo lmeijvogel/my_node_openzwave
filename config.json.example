@@ -6,6 +6,11 @@
     "stdout_level": "info"
   },
 
+  "switches: {
+    "main": 7,
+    "aux": 3
+  },
+
   "lights": {
     "uplight": {
       "id": 2,

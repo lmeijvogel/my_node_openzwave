@@ -1,12 +1,12 @@
 import { keys } from 'lodash';
 
-function objectToNestedMap(input : object) : Map<string, Map<string, string>> {
-  let result = new Map<string, Map<string, string>>();
+function objectToNestedMap<T>(input : object) : Map<T, Map<string, string>> {
+  let result = new Map<T, Map<string, string>>();
 
   keys(input).forEach((key) => {
     const transitions = input[key];
 
-    result.set(key, objectToMap<string>(transitions));
+    result.set(key as any, objectToMap<string>(transitions));
   });
 
   return result;

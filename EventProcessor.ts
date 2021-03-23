@@ -43,8 +43,15 @@ class EventProcessor {
     this.handleSwitchPressed(switchPressName, currentProgramme);
   }
 
-  auxSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
-    this.handleSwitchPressed(switchPressName, currentProgramme);
+  auxSwitchPressed(currentProgramme: string) {
+    const nextProgrammeName = this.nextProgrammeChooser.handleAuxPress(currentProgramme);
+
+    try {
+      this.programmeSelected(nextProgrammeName);
+    } catch (e) {
+      Logger.error(`After switch pressed: Could not start "${nextProgrammeName}"`);
+      Logger.error(e);
+    }
   }
 
   private handleSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {

@@ -219,6 +219,30 @@ redisInterface.start();
     }
   }
 
+  function auxSwitchPressed(_node: Node, sceneId: number) {
+    if (!switchEnabled) {
+      Logger.warn("Switch pressed but temporarily disabled.");
+      return;
+    }
+
+    Logger.warn("Aux switch pressed: Not implemented yet");
+
+    const switchPressName = mainSceneIdToSwitchPressName(sceneId);
+
+    if (switchPressName === SwitchPressName.SceneReturn) {
+        return;
+    }
+
+    eventProcessor.auxSwitchPressed(currentProgramme);
+
+    eventLogger.store({
+      initiator: "aux switch",
+      event: "switch pressed",
+      data: switchPressName
+    });
+  }
+
+
   function initMyZWave(zwave: IZWave, lights: ConfigLight[]): MyZWave {
     const myZWave = new MyZWave(zwave);
 
@@ -257,8 +281,8 @@ redisInterface.start();
 
           if (node.nodeId === config.switches["main"]) {
             mainSwitchPressed(sceneId);
-          } else if (node.nodeId === config.switches["aux"]) {
-            Logger.warn(`Event from unexpected node ${node.nodeId}, sceneId: ${sceneId}`);
+          } else {
+            auxSwitchPressed(node, sceneId);
           }
 
           return;

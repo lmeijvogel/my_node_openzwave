@@ -29,6 +29,25 @@ class NextProgrammeChooser {
     return newState;
   }
 
+  /* The aux switches (i.e. all switches that generate scenes, except the
+   * main one) only switch to the most likely programme and to the off programme.
+   *
+   * I envision these swithes to be used when entering the house or exiting the house only.
+   */
+  handleAuxPress(currentState: string): string {
+    Logger.debug("NextProgrammeChooser.defaultState");
+
+    const currentStateMachine = this.chooseStateMachine();
+
+    const defaultState = currentStateMachine.defaultState();
+
+    if (currentState !== defaultState) {
+        return defaultState;
+    } else  {
+        return "off";
+    }
+  }
+
   chooseStateMachine(): ITimeStateMachine {
     const now = this.timeService.currentTime();
 
