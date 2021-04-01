@@ -27,7 +27,7 @@ RUN cd /root \
 
 RUN mkdir /driver
 
-COPY package.json /driver
+COPY package.json yarn.lock /driver/
 
 WORKDIR /driver
 
