@@ -8,7 +8,11 @@ RUN apk add --no-cache \
       eudev-dev \
       make \
       python-dev \
-      libstdc++6
+      libstdc++6 \
+      tzdata
+
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV OPENZWAVE_VERSION=e7b1705403fced2c2d2bc8aa92b559f6351f5542
 
