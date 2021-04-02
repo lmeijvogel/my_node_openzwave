@@ -105,7 +105,7 @@ redisInterface.start();
 
   const eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
-  const vacationMode = initVacationMode(TimeService, eventProcessor, redisInterface);
+  const vacationMode = initVacationMode(eventProcessor, redisInterface);
 
   api = RestServer({ vacationMode: vacationMode, myZWave: myZWave });
 
@@ -255,7 +255,7 @@ redisInterface.start();
     return myZWave;
   }
 
-  function initVacationMode(TimeService, eventProcessor: EventProcessor, redisInterface: RedisInterface) {
+  function initVacationMode(eventProcessor: EventProcessor, redisInterface: RedisInterface) {
     const vacationMode = new VacationMode(
       new TimeService(config.periodStarts),
       () => {
