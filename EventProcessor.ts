@@ -1,7 +1,7 @@
 import { Logger } from "./Logger";
 import { EventEmitter } from "events";
 
-import { IProgramme } from "./Programme";
+import { Configuration } from "./Configuration";
 import { NextProgrammeChooser } from "./NextProgrammeChooser";
 import { SwitchPressName } from "./SwitchPressName";
 
@@ -12,12 +12,9 @@ class EventProcessor {
 
   constructor(
     private readonly zwave: IMyZWave,
-    private readonly programmes: IProgramme[],
+    private readonly config: Configuration,
     private readonly nextProgrammeChooser: NextProgrammeChooser
   ) {
-    this.programmes = programmes;
-    this.nextProgrammeChooser = nextProgrammeChooser;
-
     this.eventEmitter = new EventEmitter();
   }
 
@@ -26,7 +23,7 @@ class EventProcessor {
   }
 
   programmeSelected(programmeName: string) {
-    const programme = this.programmes.find(programme => programme.name === programmeName);
+    const programme = this.config.programmes.find(programme => programme.name === programmeName);
 
     if (programme) {
       programme.apply(this.zwave);
@@ -39,12 +36,12 @@ class EventProcessor {
     }
   }
 
-  mainSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
-    this.handleSwitchPressed(switchPressName, currentProgramme);
+  mainSwitchPressed(switchPressName: SwitchPressName, currentProgrammeName: string | null) {
+    this.handleSwitchPressed(switchPressName, currentProgrammeName);
   }
 
-  auxSwitchPressed(currentProgramme: string) {
-    const nextProgrammeName = this.nextProgrammeChooser.handleAuxPress(currentProgramme);
+  auxSwitchPressed(currentProgrammeName: string | null) {
+    const nextProgrammeName = this.nextProgrammeChooser.handleAuxPress(currentProgrammeName);
 
     try {
       this.programmeSelected(nextProgrammeName);
@@ -54,13 +51,21 @@ class EventProcessor {
     }
   }
 
-  private handleSwitchPressed(switchPressName: SwitchPressName, currentProgramme: string) {
-    const nextProgrammeName = this.nextProgrammeChooser.handle(switchPressName, currentProgramme);
-    const nextProgramme = this.programmes.filter(programme => programme.name === nextProgrammeName)[0];
+  private handleSwitchPressed(switchPressName: SwitchPressName, currentProgrammeName: string | null) {
+    const nextProgrammeName = this.nextProgrammeChooser.handle(switchPressName, currentProgrammeName);
+
+    if (!nextProgrammeName) {
+      Logger.error(
+        `EventProcessor.mainSwitchPressed: No next programmeName found for switch press ${switchPressName}, currentProgrammeName: ${currentProgrammeName}!`
+      );
+      return;
+    }
+
+    const nextProgramme = this.config.programmes.find(programme => programme.name === nextProgrammeName);
 
     if (!nextProgramme) {
       Logger.error(
-        `EventProcessor.mainSwitchPressed: No next programme found for switch press ${switchPressName}, currentProgramme: ${currentProgramme}!`
+        `EventProcessor.mainSwitchPressed: No corresponding programme found nextProgrammeName = ${nextProgrammeName}!`
       );
       return;
     }

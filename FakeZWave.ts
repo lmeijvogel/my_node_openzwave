@@ -51,6 +51,8 @@ class FakeZWave implements IZWave {
     this.setLevel(5, 38, 1, 0, 0);
     this.setSwitch(7, 37, 1, 0, false);
     this.setLevel(8, 38, 1, 0, 0);
+    this.setLevel(10, 38, 1, 0, 0);
+    this.setLevel(12, 38, 1, 0, 0);
   }
 
   disconnect() { }
@@ -109,7 +111,8 @@ class FakeZWave implements IZWave {
     this.nodes[5] = { level: 0 };
     this.nodes[7] = { value: false };
     this.nodes[8] = { level: 0 };
-    this.nodes[9] = { level: 0 };
+    this.nodes[10] = { level: 0 };
+    this.nodes[12] = { level: 0 };
 
     const node2NodeInfo = {
       manufacturer: "Aeon Labs",
@@ -167,6 +170,26 @@ class FakeZWave implements IZWave {
       name: "",
       loc: ""
     };
+    const node10NodeInfo = {
+      manufacturer: "FIBARO System",
+      manufacturerid: "010f",
+      product: "",
+      producttype: "0100",
+      productid: "100a",
+      type: "Multilevel Power Switch",
+      name: "",
+      loc: ""
+    };
+    const node12NodeInfo = {
+      manufacturer: "FIBARO System",
+      manufacturerid: "010f",
+      product: "",
+      producttype: "0100",
+      productid: "100a",
+      type: "Multilevel Power Switch",
+      name: "",
+      loc: ""
+    };
 
     this.emitEvent("node added", [2]);
     this.emitEvent("node added", [3]);
@@ -174,6 +197,8 @@ class FakeZWave implements IZWave {
     this.emitEvent("node added", [7]);
     this.emitEvent("node added", [8]);
     this.emitEvent("node added", [9]);
+    this.emitEvent("node added", [10]);
+    this.emitEvent("node added", [12]);
     const dimValue = {
       type: "byte",
       genre: "user",
@@ -222,11 +247,15 @@ class FakeZWave implements IZWave {
     this.emitEvent("value added", [7, SWITCH_BINARY, switchValue]);
     this.emitEvent("value added", [8, SWITCH_MULTILEVEL, dimValue]);
     this.emitEvent("value added", [9, SWITCH_MULTILEVEL, dimValue]);
+    this.emitEvent("value added", [10, SWITCH_MULTILEVEL, dimValue]);
+    this.emitEvent("value added", [12, SWITCH_MULTILEVEL, dimValue]);
     this.emitEvent("node ready", [2, node2NodeInfo]);
     this.emitEvent("node ready", [5, node5NodeInfo]);
     this.emitEvent("node ready", [7, node7NodeInfo]);
     this.emitEvent("node ready", [8, node8NodeInfo]);
     this.emitEvent("node ready", [9, node9NodeInfo]);
+    this.emitEvent("node ready", [10, node10NodeInfo]);
+    this.emitEvent("node ready", [12, node12NodeInfo]);
     this.emitEvent("node event", [3, 255]);
     this.emitEvent("node event", [3, 0]);
   }

@@ -1,5 +1,12 @@
-export type ConfigLight = {
-    id: number;
-    displayName: string;
-    values: { [commandClass: string]: any }
-};
+export class ConfigLight {
+    readonly values: { [commandClass: string]: any }
+
+    constructor(
+        readonly id: number,
+        readonly name: string,
+        readonly displayName: string,
+        values: { [commandClass: string]: any }
+    ) {
+        this.values = values || {};
+    }
+}

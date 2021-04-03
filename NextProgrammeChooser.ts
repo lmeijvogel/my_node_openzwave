@@ -17,7 +17,7 @@ class NextProgrammeChooser {
     this.stateMachines = stateMachines;
   }
 
-  handle(switchPressName: SwitchPressName, currentState: string): string {
+  handle(switchPressName: SwitchPressName, currentState: string | null): string | null{
     Logger.debug(`NextProgrammeChooser.handle: currentState: ${JSON.stringify(currentState)}`);
 
     const currentStateMachine = this.chooseStateMachine();
@@ -34,12 +34,12 @@ class NextProgrammeChooser {
    *
    * I envision these swithes to be used when entering the house or exiting the house only.
    */
-  handleAuxPress(currentState: string): string {
+  handleAuxPress(currentState: string | null): string {
     Logger.debug("NextProgrammeChooser.defaultState");
 
     const currentStateMachine = this.chooseStateMachine();
 
-    const defaultState = currentStateMachine.defaultState();
+    const defaultState = currentStateMachine.defaultState() || "off";
 
     if (currentState !== defaultState) {
         return defaultState;

@@ -1,5 +1,7 @@
 import { extend, map, without } from "lodash";
 import { Logger } from "./Logger";
+import { NodeInfo } from "./NodeInfo";
+import { ValueId } from "./ValueId";
 
 const nodes = new Map<number, Node>();
 
@@ -8,36 +10,26 @@ const COMMAND_CLASS_SWITCH_MULTILEVEL = 0x26;
 
 const POLLABLE_CLASSES = [COMMAND_CLASS_SWITCH_BINARY, COMMAND_CLASS_SWITCH_MULTILEVEL];
 
-// Copied from openzwave-shared.d.ts, since I can't seem to import it correctly.
-interface ValueId {
-  value_id?: number;
-  value?: string;
-  node_id: number;
-  class_id: number;
-  instance: number;
-  index: number;
-  label?: string;
-}
-
-class Node {
+export class Node {
   nodeId: number;
   values: Map<number, ValueId[]>;
-  info: Object;
+  info: any;
   ready: boolean;
 
-  static find(nodeid): Node {
-    return nodes.get(parseInt(nodeid, 10));
+  static find(nodeId: number): Node {
+    // TODO: Exclamation point?
+    return nodes.get(nodeId)!;
   }
 
   static all(): {} {
-    return extend({}, nodes);
+    return [...nodes];
   }
 
-  static add(nodeid) {
-    nodes.set(nodeid, new Node(nodeid));
+  static add(nodeId: number) {
+    nodes.set(nodeId, new Node(nodeId));
   }
 
-  constructor(nodeId) {
+  constructor(nodeId: number) {
     this.nodeId = nodeId;
     this.values = new Map<number, ValueId[]>();
     this.info = {};
@@ -52,7 +44,7 @@ class Node {
     this.values.get(commandClass)[value.index] = value;
   }
 
-  setValue(commandClass: number, value) {
+  setValue(commandClass: number, value: ValueId) {
     if (!this.commandClassExists(commandClass)) {
       throw 'Command class "' + commandClass + '" was never added to this node (' + this.nodeId + ")";
     }
@@ -65,7 +57,7 @@ class Node {
             const previousScene = this.getValue(commandClass, value.index)["value"];
             const newScene = value.value;
 
-            if (newScene === 0) {
+            if (newScene === "0") {
                 // Do not log scene return to 0 since this adds no value at the moment
                 return;
             }
@@ -102,7 +94,7 @@ class Node {
     return this.values.has(commandClass);
   }
 
-  removeValue(commandClass: number, index) {
+  removeValue(commandClass: number, index: number) {
     if (this.commandClassExists(commandClass)) {
       const filteredCommandClass = without(this.values[commandClass], index);
 
@@ -118,7 +110,7 @@ class Node {
     return this.ready;
   }
 
-  setNodeInfo(nodeInfo) {
+  setNodeInfo(nodeInfo: NodeInfo) {
     this.info["manufacturer"] = nodeInfo.manufacturer;
     this.info["manufacturerid"] = nodeInfo.manufacturerid;
     this.info["product"] = nodeInfo.product;
@@ -163,5 +155,3 @@ class Node {
     return numericKeys.filter(commandClass => POLLABLE_CLASSES.includes(commandClass));
   }
 }
-
-export { Node, ValueId };

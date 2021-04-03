@@ -2,10 +2,26 @@ import { Logger } from "./Logger";
 
 import { Light } from "./Light";
 import { IProgramme } from "./Programme";
+import { MyZWave } from "./MyZWave";
+import { VacationMode } from "./VacationMode";
 import * as express from "express";
 import {Server} from "http";
 
-const RestServer = function(options : { vacationMode : any, myZWave: any }) {
+export type IRestServer = {
+    start: () => void;
+    stop: () => void;
+    onProgrammeChosen: (callback: (name: string) => void) => void;
+    onSwitchStateChangeRequested: (callback: (newState: boolean) => void) => void;
+    onHealNetworkRequested: (callback: () => void) => void;
+    onRefreshNodeRequested: (callback: (nodeid: number) => void) => void;
+    onSimulateSwitchPressRequested: (callback: (signal: number) => void) => void;
+    setMainSwitchStateFinder: (callback: () => boolean) => void;
+    setProgrammesListFinder: (callback: () => IProgramme[]) => void;
+    setCurrentProgrammeFinder: (callback: () => string | null) => void;
+    setLightsListFinder: (callback: () => Light[]) => void;
+};
+
+const RestServer = function(options : { vacationMode : VacationMode, myZWave: MyZWave }): IRestServer {
   const app = express();
   const port = 3000;
 
@@ -16,14 +32,12 @@ const RestServer = function(options : { vacationMode : any, myZWave: any }) {
 
   let programmesListFinderCallback: () => IProgramme[];
   let lightsListFinderCallback: () => Light[];
-  let currentProgrammeFinderCallback: () => IProgramme;
+  let currentProgrammeFinderCallback: () => string | null;
   let switchStateFinderCallback: () => boolean;
 
   let onHealNetworkRequestedCallback: () => void;
   let onRefreshNodeRequestedCallback: (nodeid: number) => void;
   let onSimulateSwitchPressRequestedCallback: (signal: number) => void;
-
-  let programmes = {};
 
   const vacationMode = options.vacationMode;
   const myZWave = options.myZWave;
@@ -71,8 +85,8 @@ const RestServer = function(options : { vacationMode : any, myZWave: any }) {
   });
 
   app.post("/nodes/:node_id(\\d+)/dim/:value(\\d+)", (req, res) => {
-    const nodeId = req.params.node_id;
-    const value = req.params.value;
+    const nodeId = parseInt(req.params.node_id);
+    const value = parseInt(req.params.value);
 
     myZWave.setLevel(nodeId, value);
     Logger.info(`Dimming node ${nodeId} => ${value}`);
@@ -81,7 +95,7 @@ const RestServer = function(options : { vacationMode : any, myZWave: any }) {
   });
 
   app.post("/nodes/:node_id(\\d+)/switch/:state(on|off)", (req, res) => {
-    const nodeId = req.params.node_id;
+    const nodeId = parseInt(req.params.node_id);
 
     if (req.params.state === "on") {
       myZWave.switchOn(nodeId);
@@ -143,7 +157,7 @@ const RestServer = function(options : { vacationMode : any, myZWave: any }) {
     onHealNetworkRequestedCallback = callback;
   };
 
-  const onRefreshNodeRequested = (callback: (nodeid: number) => number) => {
+  const onRefreshNodeRequested = (callback: (nodeid: number) => void) => {
     onRefreshNodeRequestedCallback = callback;
   };
 
@@ -159,16 +173,12 @@ const RestServer = function(options : { vacationMode : any, myZWave: any }) {
     programmesListFinderCallback = callback;
   };
 
-  const setCurrentProgrammeFinder = (callback: () => IProgramme) => {
+  const setCurrentProgrammeFinder = (callback: () => string | null) => {
     currentProgrammeFinderCallback = callback;
   };
 
   const setLightsListFinder = (callback: () => Light[]) => {
     lightsListFinderCallback = callback;
-  };
-
-  const setProgrammes = newProgrammes => {
-    programmes = newProgrammes;
   };
 
   return {
