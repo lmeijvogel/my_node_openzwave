@@ -48,13 +48,13 @@ describe('ProgrammeFactory', function () {
     const offDimmerAction = offProgramme.actions[0];
 
     assert.equal('lightDimmer', offDimmerAction.nodeName);
-    assert.equal(12, offDimmerAction.nodeid);
+    assert.equal(12, offDimmerAction.nodeId);
     assert.equal(0, offDimmerAction.value);
 
     const offSwitchAction = offProgramme.actions[1];
 
     assert.equal('lightSwitch', offSwitchAction.nodeName);
-    assert.equal(13, offSwitchAction.nodeid);
+    assert.equal(13, offSwitchAction.nodeId);
     assert.equal(false, offSwitchAction.value);
 
     const morningProgramme = <Programme>result[1];
@@ -65,13 +65,13 @@ describe('ProgrammeFactory', function () {
     const morningDimmerAction = morningProgramme.actions[0];
 
     assert.equal('lightDimmer', morningDimmerAction.nodeName);
-    assert.equal(12, morningDimmerAction.nodeid);
+    assert.equal(12, morningDimmerAction.nodeId);
     assert.equal(42, morningDimmerAction.value);
 
     const morningSwitchAction = morningProgramme.actions[1];
 
     assert.equal('lightSwitch', morningSwitchAction.nodeName);
-    assert.equal(13, morningSwitchAction.nodeid);
+    assert.equal(13, morningSwitchAction.nodeId);
     assert.equal(true, morningSwitchAction.value);
 
   });
