@@ -12,7 +12,7 @@ class EventProcessor {
 
   constructor(
     private readonly zwave: IMyZWave,
-    private readonly config: Configuration,
+    private readonly config: Pick<Configuration, "programmes">,
     private readonly nextProgrammeChooser: NextProgrammeChooser
   ) {
     this.eventEmitter = new EventEmitter();
