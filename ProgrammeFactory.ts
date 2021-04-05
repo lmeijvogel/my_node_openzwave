@@ -4,7 +4,7 @@ import { ConfigLight } from "./ConfigLight";
 import { Logger } from "./Logger";
 import { Programme } from "./Programme";
 
-type ConfigProgramme = {
+export type ConfigProgramme = {
     displayName: string;
     values: { [name: string]: number | boolean }
 }

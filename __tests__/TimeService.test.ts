@@ -14,7 +14,7 @@ describe('TimeServiceTest', function () {
       '22:30': 'night'
     };
 
-    timeService = new TimeService(periodStarts);
+    timeService = new TimeService({ periodStarts });
   });
 
   // Primarily, test the behaviour at boundaries (and some more)

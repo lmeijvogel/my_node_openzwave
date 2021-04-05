@@ -7,19 +7,20 @@ import { IProgramme } from "./Programme";
 
 import { TimePeriod } from "./TimeService";
 
+type TransitionsConfig = {[key: string]: string};
+
 type Transitions = Map<string, string>;
 
 class StateMachineBuilder {
-  private readonly transitionsConfiguration: object;
-  private readonly programmes: IProgramme[];
-
-  constructor(config: Configuration) {
-    this.transitionsConfiguration = config.transitions;
+  constructor(private config: Pick<Configuration, "programmes" | "transitions">) {
     Logger.debug(
-      `StateMachineBuilder.constructor: transitionsConfiguration: ${JSON.stringify(transitionsConfiguration)}`
+      `StateMachineBuilder.constructor: transitionsConfiguration: ${JSON.stringify(config.transitions)}`
     );
-    this.programmes = config.programmes;
-    Logger.debug(`StateMachineBuilder.constructor: programmes: ${this.programmes}`);
+    Logger.debug(`StateMachineBuilder.constructor: programmes: ${config.programmes}`);
+  }
+
+  recheckConfiguration() {
+      this.checkConfiguration();
   }
 
   call(): Map<TimePeriod, TimeStateMachine> {
@@ -27,8 +28,8 @@ class StateMachineBuilder {
 
     const result = new Map<TimePeriod, TimeStateMachine>();
 
-    keys(this.transitionsConfiguration).forEach(period => {
-      const value: object = this.transitionsConfiguration[period];
+    keys(this.config.transitions).forEach(period => {
+      const value: object = this.config.transitions[period];
 
       result.set(period, new TimeStateMachine(this.toNestedMap(value)));
     });
@@ -41,7 +42,7 @@ class StateMachineBuilder {
       throw new Error("A programme named 'off' should be defined!");
     }
 
-    forOwn(this.transitionsConfiguration, (transitionsPerSwitch, period) => {
+    forOwn(this.config.transitions, (transitionsPerSwitch, period) => {
       forOwn(transitionsPerSwitch, (transitions, onOrOff) => {
         forOwn(transitions, (to, from) => {
           Logger.debug(`Checking transition "${from}" => "${to}"`);
@@ -61,21 +62,21 @@ class StateMachineBuilder {
     });
   }
 
-  private toNestedMap(input): Map<SwitchPressName, Transitions> {
+  private toNestedMap(input: any): Map<SwitchPressName, Transitions> {
     let result = new Map<SwitchPressName, Transitions>();
 
-    forOwn(input, (transitionsInput, switchPressName: SwitchPressName) => {
+    forOwn(input, (transitionsInput: TransitionsConfig, switchPressName: string) => {
       let transitions: Transitions = new Map(toPairs(transitionsInput));
 
-      result.set(switchPressName, transitions);
+      result.set(switchPressName as SwitchPressName, transitions);
     });
 
     return result;
   }
 
   private programmeWithName(name: String): IProgramme | undefined {
-    Logger.debug(`StateMachineBuilder.programmeWithName: Finding programme ${name} in ${this.programmes}`);
-    const result = find(this.programmes, programme => programme.name === name);
+    Logger.debug(`StateMachineBuilder.programmeWithName: Finding programme ${name} in ${this.config.programmes}`);
+    const result = find(this.config.programmes, programme => programme.name === name);
 
     return result;
   }

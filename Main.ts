@@ -3,12 +3,10 @@ import * as minimist from "minimist";
 import { IZWave } from "./IZWave";
 
 import { Configuration } from "./Configuration";
-import { IProgramme } from "./Programme";
 
 import { MyZWave } from "./MyZWave";
 import { TimeStateMachine } from "./TimeStateMachine";
 import { StateMachineBuilder } from "./StateMachineBuilder";
-import { SwitchPressName } from "./SwitchPressName";
 import { mainSceneIdToSwitchPressName, SwitchPressName } from "./SwitchPressName";
 import { ZWaveValueChangeListener } from "./ZWaveValueChangeListener";
 
@@ -44,6 +42,8 @@ import { ZWaveFactory } from "./ZWaveFactory";
 const zwave: IZWave = new ZWaveFactory(testMode).create();
 
 let api: IRestServer | null = null;
+
+const stateMachineBuilder = new StateMachineBuilder(config);
 
 function stopProgramme() {
     Logger.info("disconnecting...");
@@ -97,7 +97,7 @@ redisInterface.start();
 
     Logger.debug(`main: configuration: ${JSON.stringify(config)}`);
 
-    const stateMachines: Map<TimePeriod, TimeStateMachine> = new StateMachineBuilder(config).call();
+    const stateMachines: Map<TimePeriod, TimeStateMachine> = stateMachineBuilder.call();
 
     const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config), stateMachines);
 

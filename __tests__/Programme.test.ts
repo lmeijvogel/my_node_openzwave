@@ -3,64 +3,63 @@ import * as sinon from 'sinon';
 import { Programme } from '../Programme';
 import { MyZWave } from '../MyZWave';
 import { FakeZWave } from '../FakeZWave';
-import { Light } from '../Light';
+import { ConfigLight } from '../ConfigLight';
 
 const lightId1 = 12;
 const lightId2 = 13;
 const lightId3 = 14;
 
-const lightName1 = 'lightDimmer';
-const lightName2 = 'lightSwitch1';
-const lightName3 = 'lightSwitch2';
+const lightDimmerName = 'lightDimmer';
+const lightSwitchName1 = 'lightSwitch1';
+const lightSwitchName2 = 'lightSwitch2';
 
 let intensity1 = 99;
-
-let lights = new Map<string, Light>();
-
-let programme = new Programme('name', 'displayName', new Map<string, any>(), lights);
 
 let zwave = new MyZWave(new FakeZWave());
 
 let zwaveMock = sinon.mock(zwave);
 
-describe('Programme', function () {
-  beforeEach(function () {
+let programme: IProgramme | null = null;
 
+describe('Programme', () => {
+  beforeEach(() => {
     intensity1 = 99;
 
-    lights = new Map<string, Light>();
+    const lights = [
+      {id: lightId1, name: lightDimmerName, displayName: 'lightDimmer', values: []},
+      {id: lightId2, name: lightSwitchName1, displayName: 'lightSwitch1', values: []},
+      {id: lightId3, name: lightSwitchName2, displayName: 'lightSwitch2', values: []}
+    ];
 
-    lights.set(lightName1, {id: lightId1, displayName: 'light'});
-    lights.set(lightName2, {id: lightId2, displayName: 'light'});
-    lights.set(lightName3, {id: lightId3, displayName: 'light'});
+    programme = new Programme('someProgramme', 'Some Programme', new Map<string, object>(), lights);
 
     const data = new Map<string, any>();
 
-    data.set(lightName1, intensity1);
-    data.set(lightName2, false);
-    data.set(lightName3, true);
+    data.set(lightDimmerName, intensity1);
+    data.set(lightSwitchName1, false);
+    data.set(lightSwitchName2, true);
 
     programme = new Programme('name', 'displayName', data, lights);
     zwave = new MyZWave(new FakeZWave());
     zwaveMock = sinon.mock(zwave);
   });
 
-  describe('when it is built', function () {
-    it('fails if any light name does not exist', function () {
+  describe('when it is built', () => {
+    it('fails if any light name does not exist', () => {
       const lightValues = new Map<string, any>();
 
       lightValues.set('nonexistent', 12);
 
-      const lights = new Map<string, Light>();
+      const lights: ConfigLight[] = [];
 
-      assert.throws(function () {
+      assert.throws(() => {
         programme = new Programme('name', 'displayName', lightValues, lights);
       }, /node "nonexistent" does not exist/);
     });
   });
 
-  describe('when it is applied', function () {
-    it('applies all settings', function () {
+  describe('when it is applied', () => {
+    it('applies all settings', () => {
       zwaveMock.expects('setLevel').withArgs(lightId1, intensity1);
       zwaveMock.expects('switchOff').withArgs(lightId2);
       zwaveMock.expects('switchOn').withArgs(lightId3);

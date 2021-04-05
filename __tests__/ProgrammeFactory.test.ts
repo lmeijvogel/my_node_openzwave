@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { Programme } from '../Programme';
 import { IProgramme } from '../Programme';
-import { ProgrammeFactory } from '../ProgrammeFactory';
-import { Light } from '../Light';
+import { ConfigProgramme, ProgrammeFactory } from '../ProgrammeFactory';
+import { ConfigLight } from '../ConfigLight';
 
 const lightId1 = 12;
 const lightId2 = 13;
@@ -11,11 +11,12 @@ const lightId2 = 13;
 const lightName1 = 'lightDimmer';
 const lightName2 = 'lightSwitch';
 
-let lights = new Map<string, Light>();
-lights.set(lightName1, {id: lightId1, displayName: lightName1});
-lights.set(lightName2, {id: lightId2, displayName: lightName2});
+let lights = [
+    {id: lightId1, name: lightName1, displayName: lightName1, values: {}},
+    {id: lightId2, name: lightName2, displayName: lightName2, values: {}}
+];
 
-let input = new Map<string, object>();
+let input = new Map<string, ConfigProgramme>();
 
 input.set("off",{
   "displayName": "Uit",
