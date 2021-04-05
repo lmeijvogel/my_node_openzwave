@@ -63,8 +63,16 @@ function stopProgramme() {
     process.exit();
 }
 
+function reloadConfiguration() {
+    Logger.info("Receiving SIGHUP: Reloading configuration");
+    config.reloadFromFile(configFile);
+
+    stateMachineBuilder.recheckConfiguration();
+}
+
 process.on("SIGINT", stopProgramme);
 process.on("SIGTERM", stopProgramme);
+process.on("SIGHUP", reloadConfiguration);
 
 const eventLogger = new EventLogger();
 
