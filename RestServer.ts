@@ -1,11 +1,12 @@
+import * as express from "express";
 import { Logger } from "./Logger";
 
 import { Light } from "./Light";
 import { IProgramme } from "./Programme";
 import { MyZWave } from "./MyZWave";
 import { VacationMode } from "./VacationMode";
-import * as express from "express";
-import {Server} from "http";
+import { switchPressNameToSceneId } from "./SwitchPressName";
+import { Server } from "http";
 
 export type IRestServer = {
     start: () => void;
@@ -198,25 +199,5 @@ const RestServer = function(options : { vacationMode : VacationMode, myZWave: My
     setLightsListFinder: setLightsListFinder
   };
 };
-
-function switchPressNameToSceneId(switchPressName: string): number {
-    switch(switchPressName) {
-        case "SceneReturn":
-            return 0;
-        case "SingleOn":
-            return 10;
-        case "SingleOff":
-            return 11;
-        case "Double": // This is the same for up and down
-            return 14;
-        case "HoldOn":
-            return 17;
-        case "HoldOff":
-            return 18;
-        default:
-            return 0;
-    }
-
-}
 
 export { RestServer };
