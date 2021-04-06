@@ -1,4 +1,4 @@
-import { ValueId } from "./Node";
+import { ValueId } from "./ValueId";
 
 export interface IZWave {
   on(eventName: string, callback: any): void;
@@ -7,9 +7,9 @@ export interface IZWave {
 
   disconnect(path: string): void;
 
-  setValue(nodeid: number, commandClass: number, instance: number, index: number, value: number | boolean);
+  setValue(nodeid: number, commandClass: number, instance: number, index: number, value: number | boolean): void;
 
-  refreshNodeInfo(nodeid): void;
+  refreshNodeInfo(nodeid: number): void;
 
   healNetwork(): void;
 
