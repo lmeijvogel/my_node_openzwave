@@ -2,7 +2,6 @@ import * as assert from "assert";
 import { Node } from "../Node";
 import * as winston from "winston";
 
-import { Logger } from "../Logger";
 import { objectToNestedMap } from "./objectToNestedMap";
 import { objectToMap } from "./objectToNestedMap";
 import { NextProgrammeChooser } from "../NextProgrammeChooser";
@@ -50,14 +49,6 @@ describe("integration", function() {
 
   const timeService = new MockTimeService("evening", new Date());
 
-  const switchOff = function() {
-      myZWave.switchOff();
-  };
-
-  const switchOn = function() {
-      myZWave.switchOn();
-  };
-
   const stateMachines = objectToMap<TimeStateMachine>({
     evening: new TimeStateMachine(
       objectToNestedMap({
@@ -74,14 +65,10 @@ describe("integration", function() {
   });
 
   var programme = "unknown";
-  let programmes: IProgramme[] = [];
 
-  ["evening", "tree", "dimmed", "off"].forEach(function(name) {
-    const mockProgramme = new MockProgramme(name, (_zwave: IMyZWave) => {
-      programme = name;
-    });
-    programmes.push(mockProgramme);
-  });
+  const programmes = ["evening", "tree", "dimmed", "off"].map(name =>
+      new MockProgramme(name, (_zwave: IMyZWave) => { programme = name; })
+  );
 
   let nextProgrammeChooser: NextProgrammeChooser, eventProcessor: EventProcessor;
 
@@ -99,26 +86,26 @@ describe("integration", function() {
 
   describe("when switching the lights off and on", function() {
     it('ends up in "evening" state', function() {
-      switchOff();
+      myZWave.switchOff();
       assert.equal(programme, "off");
 
-      switchOn();
+      myZWave.switchOn();
       assert.equal(programme, "evening");
     });
   });
 
   describe("when alternating between programmes", function() {
     it("works", function() {
-      switchOff();
+      myZWave.switchOff();
       assert.equal(programme, "off");
 
-      switchOn();
+      myZWave.switchOn();
       assert.equal(programme, "evening");
 
-      switchOn();
+      myZWave.switchOn();
       assert.equal(programme, "dimmed");
 
-      switchOn();
+      myZWave.switchOn();
       assert.equal(programme, "evening");
     });
   });
@@ -152,13 +139,13 @@ describe("integration", function() {
     });
 
     it("traverses all steps", function() {
-      switchOn();
+      myZWave.switchOn();
       assert.equal(programme, "evening");
 
-      switchOff();
+      myZWave.switchOff();
       assert.equal(programme, "tree");
 
-      switchOff();
+      myZWave.switchOff();
       assert.equal(programme, "off");
     });
   });
