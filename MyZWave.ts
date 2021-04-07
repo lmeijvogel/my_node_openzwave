@@ -5,8 +5,6 @@ import { Logger } from "./Logger";
 import { NodeInfo } from "./NodeInfo";
 import { ValueId } from "./ValueId";
 
-const DEVICE_PATH = "/dev/ttyUSB0";
-
 export class MyZWave implements IMyZWave {
   private readonly nodes: object[];
 
@@ -15,7 +13,7 @@ export class MyZWave implements IMyZWave {
 
   private scanComplete: boolean;
 
-  constructor(private readonly zwave: IZWave) {
+  constructor(private readonly zwave: IZWave, private readonly devicePath: string) {
     this.nodes = [];
 
     this.scanComplete = false;
@@ -28,7 +26,7 @@ export class MyZWave implements IMyZWave {
 
     this.zwave.on("driver failed", () => {
       Logger.error("Failed to start driver");
-      this.zwave.disconnect(DEVICE_PATH);
+      this.disconnect();
       process.exit();
     });
 
@@ -113,7 +111,11 @@ export class MyZWave implements IMyZWave {
 
   connect() {
     this.registerEvents();
-    this.zwave.connect(DEVICE_PATH);
+    this.zwave.connect(this.devicePath);
+  }
+
+  disconnect() {
+      this.zwave.disconnect(this.devicePath);
   }
 
   onNodeEvent(handler: NodeEventHandler) {

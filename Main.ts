@@ -20,6 +20,8 @@ import { RedisInterface } from "./RedisInterface";
 import { Logger } from "./Logger";
 import { EventLogger } from "./EventLogger";
 
+import { IProgramme } from "./Programme";
+
 import { VacationMode } from "./VacationMode";
 
 const argv = minimist(process.argv.slice(2));
@@ -45,46 +47,16 @@ let api: IRestServer | null = null;
 
 const stateMachineBuilder = new StateMachineBuilder(config);
 
-function stopProgramme() {
-    Logger.info("disconnecting...");
-    eventLogger.store({
-        initiator: null,
-        event: "Daemon stopped",
-        data: null
-    });
-
-    if (api) {
-        api.stop();
-    }
-
-    zwave.disconnect("/dev/ttyUSB0");
-    redisInterface.cleanUp();
-    eventLogger.stop();
-
-    process.exit();
-}
-
-function reloadConfiguration() {
-    Logger.info("Receiving SIGHUP: Reloading configuration");
-    config.reloadFromFile(configFile);
-
-    stateMachineBuilder.recheckConfiguration();
-}
-
-process.on("SIGINT", stopProgramme);
-process.on("SIGTERM", stopProgramme);
-process.on("SIGHUP", reloadConfiguration);
-
 const eventLogger = new EventLogger();
 
 const redisInterface = new RedisInterface();
 
 redisInterface.start();
 
-(function() {
-    let currentProgrammeName: string | null = null;
-    let switchEnabled = true;
+let currentProgrammeName: string | null = null;
+let switchEnabled = true;
 
+(function() {
     eventLogger.start();
 
     eventLogger.store({
@@ -93,15 +65,15 @@ redisInterface.start();
         data: null
     });
 
-    const myZWave = initMyZWave(zwave, config);
-
     Logger.debug(`main: configuration: ${JSON.stringify(config)}`);
 
     const stateMachines: Map<TimePeriod, TimeStateMachine> = stateMachineBuilder.call();
 
     const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config), stateMachines);
 
-    const eventProcessor = new EventProcessor(myZWave, config, nextProgrammeChooser);
+    const eventProcessor = new EventProcessor(config, nextProgrammeChooser, (programme: IProgramme) => programme.apply(myZWave));
+
+    const myZWave = initMyZWave(zwave, config, eventProcessor);
 
     const vacationMode = initVacationMode(eventProcessor, redisInterface);
 
@@ -137,10 +109,40 @@ redisInterface.start();
     });
 
     api.onSimulateSwitchPressRequested((signal: number) => {
-        mainSwitchPressed(signal);
+        mainSwitchPressed(signal, eventProcessor);
     });
 
     api.start();
+
+    function stopProgramme() {
+        Logger.info("disconnecting...");
+        eventLogger.store({
+            initiator: null,
+            event: "Daemon stopped",
+            data: null
+        });
+
+        if (api) {
+            api.stop();
+        }
+
+        myZWave.disconnect();
+        redisInterface.cleanUp();
+        eventLogger.stop();
+
+        process.exit();
+    }
+
+    function reloadConfiguration() {
+        Logger.info("Receiving SIGHUP: Reloading configuration");
+        config.reloadFromFile(configFile);
+
+        stateMachineBuilder.recheckConfiguration();
+    }
+
+    process.on("SIGINT", stopProgramme);
+    process.on("SIGTERM", stopProgramme);
+    process.on("SIGHUP", reloadConfiguration);
 
     eventProcessor.on("programmeSelected", function(programmeName: string) {
         if (programmeName) {
@@ -166,87 +168,86 @@ redisInterface.start();
     });
 
     myZWave.connect();
-
-    function mainSwitchPressed(sceneId: number) {
-        if (!switchEnabled) {
-            Logger.warn("Switch pressed but temporarily disabled.");
-            return;
-        }
-
-        const switchPressName = mainSceneIdToSwitchPressName(sceneId);
-
-        if (switchPressName === SwitchPressName.SceneReturn) {
-            return;
-        }
-
-        eventProcessor.mainSwitchPressed(switchPressName, currentProgrammeName);
-
-        eventLogger.store({
-            initiator: "main switch",
-            event: "switch pressed",
-            data: switchPressName
-        });
-    }
-
-    function auxSwitchPressed(_node: Node, sceneId: number) {
-        if (!switchEnabled) {
-            Logger.warn("Switch pressed but temporarily disabled.");
-            return;
-        }
-
-        Logger.warn("Aux switch pressed: Not implemented yet");
-
-        const switchPressName = mainSceneIdToSwitchPressName(sceneId);
-
-        if (switchPressName === SwitchPressName.SceneReturn) {
-            return;
-        }
-
-        eventProcessor.auxSwitchPressed(currentProgrammeName);
-
-        eventLogger.store({
-            initiator: "aux switch",
-            event: "switch pressed",
-            data: switchPressName
-        });
-    }
-
-
-    function initMyZWave(zwave: IZWave, config: Configuration): MyZWave {
-        const myZWave = new MyZWave(zwave);
-
-        const listener = new ZWaveValueChangeListener(myZWave, config);
-
-        listener.switchPressed = (node: Node, sceneId: number) => {
-            if (node.nodeId === config.mainSwitchId) {
-                mainSwitchPressed(sceneId);
-            } else {
-                auxSwitchPressed(node, sceneId);
-            }
-        }
-
-        return myZWave;
-    }
-
-    function initVacationMode(eventProcessor: EventProcessor, redisInterface: RedisInterface) {
-        const vacationMode = new VacationMode(
-            new TimeService(config),
-            () => {
-                eventProcessor.programmeSelected("evening");
-            },
-            () => {
-                eventProcessor.programmeSelected("off");
-            }
-        );
-
-        vacationMode.onStart(function(meanStartTime, meanEndTime) {
-            redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
-        });
-
-        vacationMode.onStop(function() {
-            redisInterface.vacationModeStopped();
-        });
-
-        return vacationMode;
-    }
 })();
+
+function initVacationMode(eventProcessor: EventProcessor, redisInterface: RedisInterface) {
+    const vacationMode = new VacationMode(
+        new TimeService(config),
+        () => {
+            eventProcessor.programmeSelected("evening");
+        },
+        () => {
+            eventProcessor.programmeSelected("off");
+        }
+    );
+
+    vacationMode.onStart(function(meanStartTime, meanEndTime) {
+        redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+    });
+
+    vacationMode.onStop(function() {
+        redisInterface.vacationModeStopped();
+    });
+
+    return vacationMode;
+}
+
+function initMyZWave(zwave: IZWave, config: Configuration, eventProcessor: EventProcessor): MyZWave {
+    const myZWave = new MyZWave(zwave, config.zwaveDevicePath);
+
+    const listener = new ZWaveValueChangeListener(myZWave, config);
+
+    listener.switchPressed = (node: Node, sceneId: number) => {
+        if (node.nodeId === config.mainSwitchId) {
+            mainSwitchPressed(sceneId, eventProcessor);
+        } else {
+            auxSwitchPressed(node, sceneId, eventProcessor);
+        }
+    }
+
+    return myZWave;
+}
+
+function mainSwitchPressed(sceneId: number, eventProcessor: EventProcessor) {
+    if (!switchEnabled) {
+        Logger.warn("Switch pressed but temporarily disabled.");
+        return;
+    }
+
+    const switchPressName = mainSceneIdToSwitchPressName(sceneId);
+
+    if (switchPressName === SwitchPressName.SceneReturn) {
+        return;
+    }
+
+    eventProcessor.mainSwitchPressed(switchPressName, currentProgrammeName);
+
+    eventLogger.store({
+        initiator: "main switch",
+        event: "switch pressed",
+        data: switchPressName
+    });
+}
+
+function auxSwitchPressed(_node: Node, sceneId: number, eventProcessor: EventProcessor) {
+    if (!switchEnabled) {
+        Logger.warn("Switch pressed but temporarily disabled.");
+        return;
+    }
+
+    Logger.warn("Aux switch pressed: Not implemented yet");
+
+    const switchPressName = mainSceneIdToSwitchPressName(sceneId);
+
+    if (switchPressName === SwitchPressName.SceneReturn) {
+        return;
+    }
+
+    eventProcessor.auxSwitchPressed(currentProgrammeName);
+
+    eventLogger.store({
+        initiator: "aux switch",
+        event: "switch pressed",
+        data: switchPressName
+    });
+}
