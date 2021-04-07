@@ -196,6 +196,7 @@ function initMyZWave(zwave: IZWave, config: Configuration, eventProcessor: Event
     const myZWave = new MyZWave(zwave, config.zwaveDevicePath);
 
     const listener = new ZWaveValueChangeListener(myZWave, config);
+    listener.init();
 
     listener.switchPressed = (node: Node, sceneId: number) => {
         if (node.nodeId === config.mainSwitchId) {
