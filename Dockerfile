@@ -1,5 +1,10 @@
 FROM node:15.12.0-alpine3.10
 
+ENV TZ=Europe/Amsterdam
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN addgroup node dialout
+
 RUN apk add --no-cache \
       coreutils \
       g++ \
@@ -10,9 +15,6 @@ RUN apk add --no-cache \
       python-dev \
       libstdc++6 \
       tzdata
-
-ENV TZ=Europe/Amsterdam
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV OPENZWAVE_VERSION=e7b1705403fced2c2d2bc8aa92b559f6351f5542
 
@@ -34,8 +36,6 @@ COPY package.json yarn.lock /driver/
 RUN yarn install
 
 COPY . .
-
-RUN addgroup node dialout
 
 USER node
 
