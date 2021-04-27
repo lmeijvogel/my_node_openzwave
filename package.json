@@ -12,7 +12,7 @@
         "lodash": "~4.17.0",
         "minimist": "~1.1.0",
         "openzwave-shared": "~1.7.2",
-        "redis": "~2.8.0",
+        "redis": "~3.1.1",
         "ts-node": "^4.1.0",
         "typescript": "^2.8.0",
         "winston": "~3.1.0"
