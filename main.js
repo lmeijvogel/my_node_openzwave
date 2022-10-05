@@ -73,7 +73,8 @@ redisInterface.start();
     data: null
   });
 
-  const myZWave = MyZWave(zwave);
+  const myZWave = initMyZWave(zwave, config.lights);
+
   const programmeFactory = ProgrammeFactory();
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
@@ -100,31 +101,6 @@ redisInterface.start();
 
   vacationMode.onStop(function () {
     redisInterface.vacationModeStopped();
-  });
-
-  myZWave.onValueChange(function (node, commandClass, value) {
-    const lightName = _.findKey(config.lights, function (light) {
-      return light.id === node.nodeId;
-    });
-
-    if (!config.lights[lightName].values) {
-      config.lights[lightName].values = {};
-    }
-    config.lights[lightName].values[commandClass] = value;
-
-    Logger.debug('Received value change from ', node.nodeId);
-    Logger.debug('New value: ', commandClass, ': ', value);
-  });
-
-  myZWave.onNodeEvent(function (node, event) {
-    Logger.debug('Event from node ', node.nodeId);
-    if (node.nodeId === 3) {
-      switchPressed(event);
-    } else {
-      Logger.warn('Event from unexpected node ', node);
-      Logger.verbose('.. event: ', event);
-    }
-
   });
 
   api.setProgrammesListFinder(function () {
@@ -205,4 +181,34 @@ redisInterface.start();
     }
   }
 
+  function initMyZWave(zwave, lights) {
+    const myZWave = MyZWave(zwave);
+
+    myZWave.onValueChange(function (node, commandClass, value) {
+      const lightName = _.findKey(lights, function (light) {
+        return light.id === node.nodeId;
+      });
+
+      if (!lights[lightName].values) {
+        lights[lightName].values = {};
+      }
+      lights[lightName].values[commandClass] = value;
+
+      Logger.debug('Received value change from ', node.nodeId);
+      Logger.debug('New value: ', commandClass, ': ', value);
+    });
+
+    myZWave.onNodeEvent(function (node, event) {
+      Logger.debug('Event from node ', node.nodeId);
+      if (node.nodeId === 3) {
+        switchPressed(event);
+      } else {
+        Logger.warn('Event from unexpected node ', node);
+        Logger.verbose('.. event: ', event);
+      }
+
+    });
+
+    return myZWave;
+  }
 })();
