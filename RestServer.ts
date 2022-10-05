@@ -129,8 +129,8 @@ const RestServer = function(options : { vacationMode : VacationMode, myZWave: My
     res.send({ status: "sent" });
   });
 
-  app.post("/debug/simulate_switch_press/:signal(0|255)", (req, res) => {
-    onSimulateSwitchPressRequestedCallback(parseInt(req.params.signal));
+  app.post("/debug/simulate_switch_press/:signal(SingleOn|SingleOff|Double)", (req, res) => {
+    onSimulateSwitchPressRequestedCallback(switchPressNameToSceneId(req.params.signal));
 
     res.send({ status: "sent" });
   });
@@ -198,5 +198,25 @@ const RestServer = function(options : { vacationMode : VacationMode, myZWave: My
     setLightsListFinder: setLightsListFinder
   };
 };
+
+function switchPressNameToSceneId(switchPressName: string): number {
+    switch(switchPressName) {
+        case "SceneReturn":
+            return 0;
+        case "SingleOn":
+            return 10;
+        case "SingleOff":
+            return 11;
+        case "Double": // This is the same for up and down
+            return 14;
+        case "HoldOn":
+            return 17;
+        case "HoldOff":
+            return 18;
+        default:
+            return 0;
+    }
+
+}
 
 export { RestServer };
