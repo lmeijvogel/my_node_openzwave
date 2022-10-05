@@ -64,6 +64,9 @@ Promise.all([
   redisInterface.clearAvailableProgrammes()
 ]).then(function () {
   let currentProgramme = null;
+  let switchEnabled = true;
+
+  redisInterface.switchEnabled();
 
   eventLogger.start();
 
@@ -120,13 +123,7 @@ Promise.all([
   myZWave.onNodeEvent(function (node, event) {
     Logger.debug('Event from node ', node.nodeId);
     if (node.nodeId === 3) {
-      eventProcessor.mainSwitchPressed(event, currentProgramme);
-      eventLogger.store({
-        initiator: 'wall switch',
-        event: 'switch pressed',
-        data: event === 255 ? 'on' : 'off'
-      });
-
+      switchPressed(event);
     } else {
       Logger.warn('Event from unexpected node ', node);
       Logger.verbose('.. event: ', event);
@@ -177,6 +174,24 @@ Promise.all([
 
   });
 
+  redisCommandParser.on('temporarilyDisableSwitch', function () {
+    Logger.info('Temporarily disabling switch');
+    redisInterface.switchDisabled();
+    switchEnabled = false;
+
+    setTimeout(function () {
+      Logger.info('Automatically enabling switch');
+      redisInterface.switchEnabled();
+      switchEnabled = true;
+    }, 120000);
+  });
+
+  redisCommandParser.on('enableSwitch', function () {
+    Logger.info('Manually enabling switch');
+    redisInterface.switchEnabled();
+    switchEnabled = true;
+  });
+
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
@@ -190,6 +205,10 @@ Promise.all([
     }
   });
 
+  redisCommandParser.on('simulateSwitchPress', function (event) {
+    switchPressed(event);
+  });
+
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
       Logger.info('Vacation mode was still on. Enabling.');
@@ -199,4 +218,17 @@ Promise.all([
   });
 
   myZWave.connect();
+
+  function switchPressed(event) {
+    if (switchEnabled) {
+      eventProcessor.mainSwitchPressed(event, currentProgramme);
+      eventLogger.store({
+        initiator: 'wall switch',
+        event: 'switch pressed',
+        data: event === 255 ? 'on' : 'off'
+      });
+    } else {
+      Logger.warn('Switch pressed but temporarily disabled.');
+    }
+  }
 });

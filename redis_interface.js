@@ -87,6 +87,14 @@ function RedisInterface(commandChannel) {
     dataRedis.hdel('zwave_vacation_mode', 'end_time');
   }
 
+  function switchDisabled() {
+    dataRedis.set('zwave_switch_enabled', false);
+  }
+
+  function switchEnabled() {
+    dataRedis.set('zwave_switch_enabled', true);
+  }
+
   function cleanUp() {
     subscriptionRedis.unsubscribe();
     subscriptionRedis.end();
@@ -107,6 +115,8 @@ function RedisInterface(commandChannel) {
     clearCurrentLightLevels:  clearCurrentLightLevels,
     clearAvailableProgrammes: clearAvailableProgrammes,
     addAvailableProgramme:    addAvailableProgramme,
+    switchEnabled:            switchEnabled,
+    switchDisabled:           switchDisabled,
     on:                       on,
     cleanUp:                  cleanUp
   };
