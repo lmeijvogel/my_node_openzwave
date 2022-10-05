@@ -5,6 +5,7 @@ var MyZWave = require('./my_zwave');
 var ProgrammeFactory = require('./programme_factory');
 var EventProcessor = require('./event_processor');
 
+var RedisInterface = require('./redis_interface');
 var ConfigReader = require('./config_reader');
 var config = ConfigReader.read("config.json");
 
@@ -26,14 +27,19 @@ http.createServer(function (req, res) {
 
 console.log("Listening on 0.0.0.0:%d", port);
 
+var redisInterface = new RedisInterface();
+
 process.on('SIGINT', function() {
     console.log('disconnecting...');
     zwave.disconnect();
+    redisInterface.cleanUp();
     process.exit();
 });
 
 var myZWave = new MyZWave(zwave);
-var programmeFactory = new ProgrammeFactory(null);
+
+var redisInterface = new RedisInterface();
+var programmeFactory = new ProgrammeFactory(function(name) { redisInterface.programmeChanged(name); });
 var programmes = programmeFactory.build(config);
 
 var eventProcessor = new EventProcessor(myZWave, programmes);
