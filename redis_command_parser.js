@@ -22,13 +22,13 @@ function RedisCommandParser() {
 
   function parse(command) {
     _.each(handlers, function (handler) {
-      const key   = handler[0];
-      const value = handler[1];
+      const regex = handler[0];
+      const callback = handler[1];
 
-      const match = command.match(key);
+      const match = command.match(regex);
 
       if (match) {
-        value.call(null, match);
+        callback(match);
         return;
       }
     });
