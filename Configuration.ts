@@ -82,6 +82,10 @@ export class Configuration {
         return this.json["transitions"];
     }
 
+    get zwaveDevicePath() {
+        return this.json["zwaveDevicePath"];
+    }
+
     private objectToMap<T>(input: object): Map<string, T> {
         const result = new Map<string, T>();
 

@@ -4,17 +4,15 @@ import { SwitchPressName } from "./SwitchPressName";
 import { ITimeStateMachine } from "./TimeStateMachine";
 
 class NextProgrammeChooser {
-  private readonly timeService: ITimeService;
-  private readonly stateMachines: Map<TimePeriod, ITimeStateMachine>; // { 'morning': ITimeStateMachine }
-
-  constructor(timeService: ITimeService, stateMachines: Map<TimePeriod, ITimeStateMachine>) {
+  constructor(
+      private readonly timeService: ITimeService,
+      private readonly stateMachines: Map<TimePeriod, ITimeStateMachine>
+  ) {
     Logger.debug(
       `NextProgrammeChooser.constructor: Initializing with timeService ${JSON.stringify(timeService)} and stateMachines ${[
-        JSON.stringify(...stateMachines)
+        JSON.stringify(stateMachines)
       ]}`
     );
-    this.timeService = timeService;
-    this.stateMachines = stateMachines;
   }
 
   handle(switchPressName: SwitchPressName, currentState: string | null): string | null{

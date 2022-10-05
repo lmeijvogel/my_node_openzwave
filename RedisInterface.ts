@@ -13,8 +13,8 @@ class RedisInterface {
   }
 
   getVacationMode() : Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.redis.hgetall('zwave_vacation_mode', (err, values) => {
+    return new Promise((resolve, _reject) => {
+      this.redis.hgetall('zwave_vacation_mode', (_err, values) => {
         resolve(values || {state: 'off'});
       });
     });

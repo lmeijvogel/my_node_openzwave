@@ -1,19 +1,19 @@
-import { Logger } from "./Logger";
 import { EventEmitter } from "events";
 
+import { Logger } from "./Logger";
 import { Configuration } from "./Configuration";
+import { IProgramme } from "./Programme";
+
 import { NextProgrammeChooser } from "./NextProgrammeChooser";
 import { SwitchPressName } from "./SwitchPressName";
-
-import { IMyZWave } from "./IMyZWave";
 
 class EventProcessor {
   private readonly eventEmitter: EventEmitter;
 
   constructor(
-    private readonly zwave: IMyZWave,
     private readonly config: Pick<Configuration, "programmes">,
-    private readonly nextProgrammeChooser: NextProgrammeChooser
+    private readonly nextProgrammeChooser: NextProgrammeChooser,
+    private readonly onProgrammeApply: (programme: IProgramme) => void
   ) {
     this.eventEmitter = new EventEmitter();
   }
@@ -26,7 +26,7 @@ class EventProcessor {
     const programme = this.config.programmes.find(programme => programme.name === programmeName);
 
     if (programme) {
-      programme.apply(this.zwave);
+      this.onProgrammeApply(programme);
 
       this.eventEmitter.emit("programmeSelected", programmeName);
 
