@@ -5,13 +5,14 @@
         "noImplicitAny": false,
         "module": "commonjs",
         "target": "es2018",
-        "strict": false
+        "strict": false,
+        "baseUrl": "./",
+        "typeRoots": ["node_modules/@types/", "node_modules/openzwave-shared/types/"],
+        "paths": {
+            "*": ["node_modules/openzwave-shared/types/*", "*"]
+        }
     },
-    "include": [
-        "**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
-    ]
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts"],
+    "comment": "Re openzwave typing, see https://stackoverflow.com/a/41969123"
 }
