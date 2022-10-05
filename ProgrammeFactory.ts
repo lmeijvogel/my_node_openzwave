@@ -6,7 +6,7 @@ import { Programme } from "./Programme";
 
 type ConfigProgramme = {
     displayName: string;
-    values: { [name: string]: number }
+    values: { [name: string]: number | boolean }
 }
 
 class ProgrammeFactory {

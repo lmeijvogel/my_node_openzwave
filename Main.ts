@@ -136,7 +136,7 @@ redisInterface.start();
         zwave.refreshNodeInfo(nodeId);
     });
 
-    api.onSimulateSwitchPressRequested((signal: string) => {
+    api.onSimulateSwitchPressRequested((signal: number) => {
         mainSwitchPressed(signal);
     });
 

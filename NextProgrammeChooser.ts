@@ -9,8 +9,8 @@ class NextProgrammeChooser {
 
   constructor(timeService: ITimeService, stateMachines: Map<TimePeriod, ITimeStateMachine>) {
     Logger.debug(
-      `NextProgrammeChooser.constructor: Initializing with timeService ${timeService} and stateMachines ${[
-        ...stateMachines
+      `NextProgrammeChooser.constructor: Initializing with timeService ${JSON.stringify(timeService)} and stateMachines ${[
+        JSON.stringify(...stateMachines)
       ]}`
     );
     this.timeService = timeService;

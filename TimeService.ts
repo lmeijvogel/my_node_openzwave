@@ -12,7 +12,7 @@ interface ITimeService {
 class TimeService implements ITimeService {
   constructor(private readonly config: Pick<Configuration, "periodStarts">) {}
 
-  getPeriod(now): TimePeriod {
+  getPeriod(now: Date): TimePeriod {
     Logger.debug(`TimeService.getPeriod: lookupTable: ${JSON.stringify([...this.lookupTable])}`);
     const candidateKeys: string[] = [];
 
@@ -43,7 +43,7 @@ class TimeService implements ITimeService {
     return this.lookupTable.values().next().value;
   }
 
-  public stringToTimeToday(timeString): Date {
+  public stringToTimeToday(timeString: string): Date {
     const splittedString: string[] = timeString.split(":");
     const hoursMinutes: number[] = map(splittedString, str => parseInt(str, 10));
 
