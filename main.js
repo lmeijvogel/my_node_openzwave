@@ -63,9 +63,8 @@ const redisInterface = RedisInterface('MyZWave');
 const redisCommandParser = RedisCommandParser();
 
 redisInterface.start();
-Promise.all([
-  redisInterface.clearAvailableProgrammes()
-]).then(function () {
+// TODO: Remove Promise.resolve()
+Promise.resolve().then(function () {
   let currentProgramme = null;
   let switchEnabled = true;
 
@@ -151,6 +150,10 @@ Promise.all([
     return config.lights;
   });
 
+  api.setCurrentProgrammeFinder(function () {
+    return currentProgramme;
+  });
+
   api.onProgrammeChosen(function (programmeName) {
     eventProcessor.programmeSelected(programmeName);
   });
@@ -179,7 +182,6 @@ Promise.all([
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
-      redisInterface.programmeChanged(programmeName);
 
       eventLogger.store({
         initiator: 'event processor',

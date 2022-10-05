@@ -25,29 +25,12 @@ function RedisInterface(commandChannel) {
     subscriptionRedis.subscribe(commandChannel);
   }
 
-  function programmeChanged(name) {
-    Logger.verbose('Storing new programme in Redis: "%s"', name);
-    dataRedis.set('zwave_programme', name);
-  }
-
   function getVacationMode() {
     return new Promise(function (resolve, reject) {
       dataRedis.hgetall('zwave_vacation_mode', function (err, values) {
         resolve(values || { state: 'off' });
       });
     });
-  }
-
-  function clearAvailableProgrammes() {
-    return new Promise(function (resolve) {
-      dataRedis.del('zwave_available_programmes', function () {
-        resolve();
-      });
-    });
-  }
-
-  function addAvailableProgramme(name, displayName) {
-    dataRedis.hset('zwave_available_programmes', name, displayName);
   }
 
   function vacationModeStarted(startTime, endTime) {
@@ -82,12 +65,9 @@ function RedisInterface(commandChannel) {
 
   return {
     start:                    start,
-    programmeChanged:         programmeChanged,
     getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
-    clearAvailableProgrammes: clearAvailableProgrammes,
-    addAvailableProgramme:    addAvailableProgramme,
     switchEnabled:            switchEnabled,
     switchDisabled:           switchDisabled,
     on:                       on,

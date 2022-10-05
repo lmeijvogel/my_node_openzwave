@@ -13,6 +13,7 @@ module.exports = function (options) {
 
   let programmesListFinderCallback = function () {};
   let lightsListFinderCallback = function() {};
+  let currentProgrammeFinderCallback = function() {};
 
   let programmes = {};
 
@@ -21,6 +22,10 @@ module.exports = function (options) {
 
   app.get('/programmes', (req, res) => {
     res.send({programmes: programmesListFinderCallback()});
+  });
+
+  app.get('/programmes/current', (req, res) => {
+    res.send({programme: currentProgrammeFinderCallback()});
   });
 
   app.post('/programmes/:name/start', (req, res) => {
@@ -93,6 +98,10 @@ module.exports = function (options) {
     programmesListFinderCallback = callback;
   };
 
+  const setCurrentProgrammeFinder = (callback) => {
+    currentProgrammeFinderCallback = callback;
+  }
+
   const setLightsListFinder = (callback) => {
     lightsListFinderCallback = callback;
   };
@@ -106,6 +115,8 @@ module.exports = function (options) {
     stop: stop,
     onProgrammeChosen: onProgrammeChosen,
     setProgrammesListFinder: setProgrammesListFinder,
+    setCurrentProgrammeFinder: setCurrentProgrammeFinder,
+
     setLightsListFinder: setLightsListFinder
   }
 }
