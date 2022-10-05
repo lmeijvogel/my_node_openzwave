@@ -8,7 +8,7 @@ class AutomaticRunner {
   private readonly periodEnd: Date;
   private readonly offsetProvider: Function;
 
-  private runnerForToday;
+  private runnerForToday: SingleDayRunner;
 
   constructor(fn: () => void, options) {
     this.fn = fn;
@@ -39,8 +39,8 @@ class AutomaticRunner {
 
 class SingleDayRunner {
   private readonly fn: Function;
-  private readonly periodStartOnToday;
-  private readonly periodEndOnToday;
+  private readonly periodStartOnToday: Date;
+  private readonly periodEndOnToday: Date;
   private readonly timeService: TimeService;
   private readonly currentDay: Date;
   private readonly actualStartTimeToday: Date;
@@ -84,7 +84,7 @@ class SingleDayRunner {
     return currentTime.getDate() !== this.currentDay.getDate();
   }
 
-  private onDay(time, day): Date {
+  private onDay(time: Date, day: Date): Date {
     return new Date(
       day.getFullYear(),
       day.getMonth(),
@@ -95,7 +95,7 @@ class SingleDayRunner {
     );
   }
 
-  private addMinutes(time, minutes): Date {
+  private addMinutes(time: Date, minutes: number): Date {
     return new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes() + minutes);
   }
 }

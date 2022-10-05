@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
 class ConfigReader {
-  read(filename) {
+  read(filename: string) {
     const contents = readFileSync(filename, 'utf8');
 
     return JSON.parse(contents);

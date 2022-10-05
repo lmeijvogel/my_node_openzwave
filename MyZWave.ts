@@ -1,12 +1,9 @@
 import { IZWave } from "./IZWave";
-import { IMyZWave } from "./IMyZWave";
-import { Node, ValueId } from "./Node";
+import { IMyZWave, NodeEventHandler, ValueChangeEventHandler } from "./IMyZWave";
+import { Node } from "./Node";
 import { Logger } from "./Logger";
 
 const DEVICE_PATH = "/dev/ttyUSB0";
-
-export type ValueChangeEventHandler = (node: Node, commandClass: string, value: ValueId) => void;
-export type NodeEventHandler = (node: Node, event: number) => void;
 
 class MyZWave implements IMyZWave {
   private readonly nodes: object[];

@@ -4,9 +4,9 @@ import { objectToNestedMap } from './objectToNestedMap';
 
 import { Programme } from '../Programme';
 import { Light } from '../Light';
+import { SwitchPressName } from "../SwitchPressName";
 import { StateMachineBuilder } from '../StateMachineBuilder';
 import { TimeStateMachine } from '../TimeStateMachine';
-import { TimePeriod } from '../TimeService';
 
 describe('StateMachineBuilder', function () {
   describe('call', function () {
@@ -15,19 +15,18 @@ describe('StateMachineBuilder', function () {
     it('builds the expected TimeStateMachines', function () {
       const transitions = {
         evening: {
-          on: {
+          [SwitchPressName.SingleOn]: {
             default: 'evening',
             evening: 'dimmed'
           },
-
-          off: {
+          [SwitchPressName.  SingleOff]: {
             default: 'tree',
             tree: 'off'
           }
         },
 
         morning: {
-          on: {
+          [SwitchPressName.SingleOn]: {
             default: 'morning'
           }
         }
@@ -36,11 +35,11 @@ describe('StateMachineBuilder', function () {
       const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
       const eveningTSMachine = new TimeStateMachine(objectToNestedMap({
-        on: {
+        [SwitchPressName.SingleOn]: {
           default: 'evening',
           evening: 'dimmed'
         },
-        off: {
+        [SwitchPressName.SingleOff]: {
           default: 'tree',
           tree: 'off'
         }
@@ -58,13 +57,13 @@ describe('StateMachineBuilder', function () {
     it('sets a default "off" transition if it is not specified', function () {
       const transitions = {
         evening: {
-          on: {
+          [SwitchPressName.SingleOn]: {
             default: 'evening'
           }
         },
 
         morning: {
-          on: {
+          [SwitchPressName.SingleOn]: {
             default: 'morning'
           }
         }
@@ -73,19 +72,19 @@ describe('StateMachineBuilder', function () {
       const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
       const eveningTSMachine = new TimeStateMachine(objectToNestedMap({
-        on: {
+        [SwitchPressName.SingleOn]: {
           default: 'evening'
         },
-        off: {
+        [SwitchPressName.SingleOff]: {
           default: 'off'
         }
       }));
 
       const morningTSMachine = new TimeStateMachine(objectToNestedMap({
-        on: {
+        [SwitchPressName.SingleOn]: {
           default: 'morning'
         },
-        off: {
+        [SwitchPressName.SingleOff]: {
           default: 'off'
         }
       }));
@@ -110,13 +109,13 @@ describe('StateMachineBuilder', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               default: 'evening'
             }
           },
 
           morning: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               default: 'morning'
             }
           }
@@ -134,13 +133,13 @@ describe('StateMachineBuilder', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               nonexistent: 'evening'
             }
           },
 
           morning: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               default: 'morning'
             }
           }
@@ -156,13 +155,13 @@ describe('StateMachineBuilder', function () {
       it('throws an error', function () {
         const transitions = {
           evening: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               default: 'nonexistent'
             }
           },
 
           morning: {
-            on: {
+            [SwitchPressName.SingleOn]: {
               default: 'morning'
             }
           }

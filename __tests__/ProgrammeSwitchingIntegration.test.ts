@@ -5,38 +5,32 @@ import { objectToNestedMap } from "./objectToNestedMap";
 import { objectToMap } from "./objectToNestedMap";
 import { NextProgrammeChooser } from "../NextProgrammeChooser";
 import { TimeStateMachine } from "../TimeStateMachine";
+import { SwitchPressName } from "../SwitchPressName";
 import { MockTimeService } from "./MockTimeService";
 import { EventProcessor } from "../EventProcessor";
 import { IProgramme } from "../Programme";
 
+import { NodeEventHandler, ValueChangeEventHandler } from "../IMyZWave";
+
 import { IMyZWave } from "../IMyZWave";
 
 class MockProgramme implements IProgramme {
-  public readonly name: string;
-  private readonly onApply: Function;
-
-  constructor(name, onApply: Function) {
-    this.name = name;
-    this.onApply = onApply;
+  constructor(readonly name: string, private readonly onApply: Function) {
   }
 
-  apply(zwave) {
+  apply(_zwave: any) {
     this.onApply(this);
   }
 }
 
 class MyFakeZWave implements IMyZWave {
-  private handler: any;
-
-  onNodeEvent(h) {
-    this.handler = h;
-  }
+  onNodeEvent(_h: NodeEventHandler) {}
 
   registerEvents() {}
   connect() {}
   disconnect() {}
-  onValueChange() {}
-  addNode(nodeid: any) {}
+  onValueChange(_h: ValueChangeEventHandler) {}
+  addNode(_nodeid: any) {}
   nodeReady() {}
   enablePoll() {}
   setLevel() {}
@@ -44,7 +38,7 @@ class MyFakeZWave implements IMyZWave {
   switchOff() {}
   healNetwork() {}
 
-  nodes: [];
+  nodes: Node[];
 }
 
 describe("integration", function() {
@@ -65,12 +59,12 @@ describe("integration", function() {
   const stateMachines = objectToMap<TimeStateMachine>({
     evening: new TimeStateMachine(
       objectToNestedMap({
-        on: {
+        [SwitchPressName.SingleOn]: {
           evening: "dimmed",
           default: "evening"
         },
 
-        off: {
+        [SwitchPressName.SingleOff]: {
           default: "off"
         }
       })
@@ -81,7 +75,7 @@ describe("integration", function() {
   let programmes: IProgramme[] = [];
 
   ["evening", "tree", "dimmed", "off"].forEach(function(name) {
-    const mockProgramme = new MockProgramme(name, zwave => {
+    const mockProgramme = new MockProgramme(name, _zwave => {
       programme = name;
     });
     programmes.push(mockProgramme);
@@ -94,7 +88,7 @@ describe("integration", function() {
 
     eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
-    myZWave.onNodeEvent(function(node, event) {
+    myZWave.onNodeEvent(function(_node, event) {
       eventProcessor.mainSwitchPressed(event, programme);
     });
   });
@@ -146,7 +140,7 @@ describe("integration", function() {
 
       eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
-      myZWave.onNodeEvent(function(node, event) {
+      myZWave.onNodeEvent(function(_node, event) {
         eventProcessor.mainSwitchPressed(event, programme);
       });
     });
