@@ -7,7 +7,7 @@ class ProgrammeFactory
     lights = config.lights
     programmes = {}
     _(config.programmes).forIn (programme, name) ->
-      programmes[name] = new Programme(name, programme, lights)
+      programmes[name] = new Programme(name, programme.displayName, programme.values, lights)
 
     programmes
 
