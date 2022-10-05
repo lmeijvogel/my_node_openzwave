@@ -24,6 +24,8 @@ import { VacationMode } from "./VacationMode";
 
 const argv = minimist(process.argv.slice(2));
 
+// NOTE: The light values are stored in `config.lights`, which is confusing.
+// Maybe change that?
 const configFile = argv["config"] || "./config.json";
 const config = new ConfigReader().read(configFile);
 
