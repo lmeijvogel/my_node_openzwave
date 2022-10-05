@@ -239,4 +239,8 @@ Promise.all([
       Logger.warn('Switch pressed but temporarily disabled.');
     }
   }
+}).catch(function (error) {
+  console.error(error);
+
+  process.exit(1);
 });
