@@ -2,6 +2,7 @@
 
 var util = require('util');
 var _ = require('lodash');
+var Logger = require('./logger');
 
 var nodes = {};
 
@@ -17,7 +18,7 @@ function Node(nodeId) {
       values[commandClass] = [];
     }
 
-    setValue(commandClass, value);
+    values[commandClass][value.index] = value;
   }
 
   function setValue(commandClass, value) {
@@ -25,7 +26,21 @@ function Node(nodeId) {
       throw 'Command class "' +  commandClass  + '" was never added to this node (' +  nodeId  + ')';
     }
 
-    values[commandClass][value.index] = value;
+    if (getValue(commandClass, value.index).value !== value.value) {
+      if (isReady()) {
+        if (commandClass === 38 || commandClass === 37) {
+          Logger.info('Received node change: node %d: %s => %s', nodeId, value['label'], value['value']);
+        } else {
+          Logger.verbose('Received node change: node %d: %d:%s:%s => %s',
+            nodeId, commandClass, value['label'], getValue(commandClass, value.index)['value'], value['value']);
+        }
+      } else {
+        Logger.debug('Received node change: node %d: %d:%s:%s => %s (before nodeReady event)',
+          nodeId, commandClass, value['label'], getValue(commandClass, value.index)['value'], value['value']);
+      }
+
+      values[commandClass][value.index] = value;
+    }
   }
 
   function getValue(commandClass, index) {
