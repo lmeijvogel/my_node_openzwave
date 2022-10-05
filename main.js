@@ -174,9 +174,10 @@ redisInterface.start();
 
     myZWave.onValueChange(function (node, commandClass, value) {
       if (node.nodeId === 3) {
-        Logger.verbose('Received value from main switch: %d, %d -- Ignoring', commandClass, value.value);
+        Logger.info('Received value from main switch: %d, %d -- Ignoring', commandClass, value.value);
+        Logger.error('ERROR: Main switch is now probably ignored by OpenZWave. Exiting process so it can be restarted.');
 
-        return
+        throw 'Main switch erroneously ignored. Exiting!'
       }
 
       const lightName = _.findKey(lights, function (light) {
