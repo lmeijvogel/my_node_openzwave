@@ -9,6 +9,7 @@ rules:
   key-spacing: [2, {"beforeColon": false, "afterColon": true, "mode": "minimum"}]
   semi: [2, "always"]
   eqeqeq: 2
+  strict: [2, "global"]
 globals:
   require: false
   module: false

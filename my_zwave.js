@@ -1,3 +1,5 @@
+"use strict";
+
 var Node = require("./node");
 var _ = require("lodash");
 var Logger = require('./logger');

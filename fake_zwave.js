@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * This is for testing to see some feedback.
 

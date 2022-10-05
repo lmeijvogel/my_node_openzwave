@@ -1,3 +1,5 @@
+"use strict";
+
 var Logger = require('./logger');
 var EventEmitter = require("events").EventEmitter;
 
