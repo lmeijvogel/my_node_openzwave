@@ -130,9 +130,7 @@ Promise.all([
   });
 
   redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
-    const vactionModeState = state;
-
-    if (vactionModeState) {
+    if (state) {
       const vacationMeanStartTime = meanStartTime;
       const vacationMeanEndTime   = meanEndTime;
 
