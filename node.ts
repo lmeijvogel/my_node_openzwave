@@ -1,5 +1,3 @@
-'use strict';
-
 import * as util from 'util';
 import { extend, filter, forIn, includes, keys as _keys, some } from 'lodash';
 import { Logger } from './logger';

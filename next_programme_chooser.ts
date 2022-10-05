@@ -1,5 +1,3 @@
-'use strict';
-
 import { Logger } from './logger';
 import { ITimeService, TimePeriod } from './time_service';
 import { ITimeStateMachine } from './time_state_machine';

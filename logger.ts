@@ -1,5 +1,3 @@
-'use strict';
-
 import * as winston from 'winston';
 import { each, map, padStart, values } from 'lodash';
 

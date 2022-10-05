@@ -1,5 +1,3 @@
-'use strict';
-
 import { AutomaticRunner } from '../automatic_runner';
 import { TimeService } from '../time_service';
 import * as assert from 'assert';

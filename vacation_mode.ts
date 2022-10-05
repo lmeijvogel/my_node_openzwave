@@ -1,4 +1,3 @@
-'use strict';
 import { Ticker } from './ticker';
 import { AutomaticRunner } from './automatic_runner';
 import { TimeService } from './time_service';
