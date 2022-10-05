@@ -57,7 +57,7 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = new EventLogger();
 
-const redisInterface = RedisInterface();
+const redisInterface = new RedisInterface();
 
 redisInterface.start();
 
