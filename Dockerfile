@@ -27,10 +27,12 @@ RUN cd /root \
 
 RUN mkdir /driver
 
-COPY package.json yarn.lock /driver/
-
 WORKDIR /driver
+
+COPY package.json yarn.lock /driver/
 
 RUN yarn install
 
-CMD yarn live
+COPY . .
+
+CMD yarn live --config /etc/config.json
