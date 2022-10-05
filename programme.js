@@ -20,12 +20,17 @@ var Programme = classy.define({
     _.forIn(this.data, function(value, key) {
       var nodeid = self.lights[key];
 
-      if (value === true) {
-        zwave.switchOn(nodeid);
-      } else if (value === false) {
-        zwave.switchOff(nodeid);
-      } else {
-        zwave.setLevel(nodeid, value);
+      try {
+        if (value === true) {
+          zwave.switchOn(nodeid);
+        } else if (value === false) {
+          zwave.switchOff(nodeid);
+        } else {
+          zwave.setLevel(nodeid, value);
+        }
+      }
+      catch(e) {
+        console.log("ERROR in programme '"+ self.name +"': Could not switch node '"+ key +"'");
       }
     });
 
