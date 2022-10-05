@@ -2,14 +2,18 @@
 
 import restServer from './rest_server';
 import * as minimist from 'minimist';
-import { findKey, forIn } from 'lodash';
+import { findKey, forOwn } from 'lodash';
 
 import MyZWave from './my_zwave';
 import Light from './light';
+import { IProgramme } from './programme';
 import ProgrammeFactory from './programme_factory';
+import TimeStateMachine from './time_state_machine';
 import StateMachineBuilder from './state_machine_builder';
 
 import TimeService from './time_service';
+import { TimePeriod } from './time_service';
+
 import NextProgrammeChooser from './next_programme_chooser';
 
 import EventProcessor from './event_processor';
@@ -80,13 +84,14 @@ redisInterface.start();
 
   const lights = new Map<string, Light>();
 
-  forIn(config.lights, (light, name) => {
+  forOwn(config.lights, (light, name) => {
     lights.set(name, new Light(light.id, light.displayName));
   });
 
-  const programmes = programmeFactory.build(config.programmes, config.lights);
+  Logger.debug("main: configuration:", JSON.stringify(config));
+  const programmes : IProgramme[] = programmeFactory.build(objectToMap(config.programmes), lights);
 
-  const stateMachines = new StateMachineBuilder(config.transitions, programmes).call();
+  const stateMachines : Map<TimePeriod, TimeStateMachine> = new StateMachineBuilder(config.transitions, programmes).call();
 
   const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config.periodStarts), stateMachines);
 
@@ -197,6 +202,8 @@ redisInterface.start();
           commandClass,
           value,
           '"');
+
+        return;
       } else if (!lights[lightName]) {
         Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: "',
           lightName,
@@ -204,6 +211,8 @@ redisInterface.start();
           commandClass,
           value,
           '"');
+
+        return;
       }
 
       if (!lights[lightName].values) {
@@ -246,3 +255,13 @@ redisInterface.start();
     return vacationMode;
   }
 })();
+
+function objectToMap(input : object) : Map<string, object> {
+  const result = new Map<string, object>();
+
+  forOwn(input, (value, key) => {
+    result.set(key, value);
+  });
+
+  return result;
+}

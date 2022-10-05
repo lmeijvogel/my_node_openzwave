@@ -4,13 +4,12 @@ class RedisInterface {
   private redis : RedisClient;
 
   constructor() {
-    this.redis = null;
-  }
-
-  start() {
     const redisHost = process.env.REDIS_HOST || 'localhost';
 
     this.redis = createClient(6379, redisHost);
+  }
+
+  start() {
   }
 
   getVacationMode() : Promise<any> {
@@ -21,7 +20,7 @@ class RedisInterface {
     });
   }
 
-  vacationModeStarted(startTime, endTime) {
+  vacationModeStarted(startTime: string, endTime : string) {
     this.redis.hset('zwave_vacation_mode', 'state', 'on');
     this.redis.hset('zwave_vacation_mode', 'start_time', startTime);
     this.redis.hset('zwave_vacation_mode', 'end_time', endTime);

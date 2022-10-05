@@ -2,7 +2,7 @@
 
 import AutomaticRunner from '../automatic_runner';
 import TimeService from '../time_service';
-import assert from 'assert';
+import * as assert from 'assert';
 
 let called = false;
 
@@ -17,8 +17,8 @@ describe('AutomaticRunner', function () {
     called = false;
   });
 
-  context('when it is later than the start time', function () {
-    context('but before the random offset', function () {
+  describe('when it is later than the start time', function () {
+    describe('but before the random offset', function () {
       it('does not run the function', function () {
         const mockTimeService = {
           currentTime: function () {
@@ -27,7 +27,7 @@ describe('AutomaticRunner', function () {
           stringToTimeToday: timeService.stringToTimeToday
         };
 
-        const starter = AutomaticRunner(fn, {
+        const starter = new AutomaticRunner(fn, {
           periodStart: '18:00',
           periodEnd: '20:00',
           offsetProvider: () => 12,
@@ -40,7 +40,7 @@ describe('AutomaticRunner', function () {
       });
     });
 
-    context('and after the random offset', function () {
+    describe('and after the random offset', function () {
       it('runs the function', function () {
         const mockTimeService = {
           currentTime: function () {
@@ -49,7 +49,7 @@ describe('AutomaticRunner', function () {
           stringToTimeToday: timeService.stringToTimeToday
         };
 
-        const starter = AutomaticRunner(fn, {
+        const starter = new AutomaticRunner(fn, {
           periodStart: '18:00',
           periodEnd: '20:00',
           offsetProvider: () => 12,
@@ -62,7 +62,7 @@ describe('AutomaticRunner', function () {
       });
     });
 
-    context('and also later than the end time', function () {
+    describe('and also later than the end time', function () {
       it('runs the function', function () {
         const mockTimeService = {
           currentTime: function () {
@@ -71,7 +71,7 @@ describe('AutomaticRunner', function () {
           stringToTimeToday: timeService.stringToTimeToday
         };
 
-        const starter = AutomaticRunner(fn, {
+        const starter = new AutomaticRunner(fn, {
           periodStart: '18:00',
           periodEnd: '20:00',
           offsetProvider: () => 12,
@@ -94,7 +94,7 @@ describe('AutomaticRunner', function () {
         stringToTimeToday: timeService.stringToTimeToday
       };
 
-      const starter = AutomaticRunner(fn, {
+      const starter = new AutomaticRunner(fn, {
         periodStart: '18:00',
         periodEnd: '20:00',
         offsetProvider: () => 12,
@@ -109,8 +109,8 @@ describe('AutomaticRunner', function () {
 
   describe('when the function was run', function () {
     it('is not run again', function () {
-      let currentTime   = null;
-      let currentOffset = null;
+      let currentTime   = '';
+      let currentOffset = -100000;
 
       const mockTimeService = {
         currentTime: function () {
@@ -127,7 +127,7 @@ describe('AutomaticRunner', function () {
         return currentOffset;
       };
 
-      const starter = AutomaticRunner(fn, {
+      const starter = new AutomaticRunner(fn, {
         periodStart: '18:00',
         periodEnd: '20:00',
         offsetProvider: offsetProvider,
@@ -155,9 +155,9 @@ describe('AutomaticRunner', function () {
 
   describe('when a new day starts', function () {
     it('gets a new random offset', function () {
-      let currentTime   = null;
-      let currentDay    = 0;
-      let currentOffset = null;
+      let currentTime   = '';
+      let currentDay    = -100000;
+      let currentOffset = -100000;
 
       const mockTimeService = {
         currentTime: function () {
@@ -174,7 +174,7 @@ describe('AutomaticRunner', function () {
         return currentOffset;
       };
 
-      const starter = AutomaticRunner(fn, {
+      const starter = new AutomaticRunner(fn, {
         periodStart: '18:00',
         periodEnd: '20:00',
         offsetProvider: offsetProvider,

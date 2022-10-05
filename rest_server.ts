@@ -1,15 +1,5 @@
-'use strict';
-
 import Logger from './logger';
 import * as express from 'express';
-
-//export default class Server {
-  //public app : express.Application;
-
-  //public static bootstrap() : Server {
-    //return new Server();
-  //}
-//}
 
 export default function (options) {
   const app = express();
@@ -17,8 +7,8 @@ export default function (options) {
 
   let server;
 
-  let programmeChosenCallbacks = [];
-  let switchStateChangeRequestedCallbacks = [];
+  let programmeChosenCallbacks : Function[] = [];
+  let switchStateChangeRequestedCallbacks : Function[] = [];
 
   let programmesListFinderCallback = function () {};
   let lightsListFinderCallback = function () {};

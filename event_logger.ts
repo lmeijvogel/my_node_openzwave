@@ -5,13 +5,12 @@ class EventLogger {
   private redis : RedisClient;
 
   constructor() {
-    this.redis = null;
-  }
-
-  start() {
     const redisHost = process.env.REDIS_HOST || 'localhost';
 
     this.redis = createClient(6379, redisHost);
+  }
+
+  start() {
   }
 
   store(event) {

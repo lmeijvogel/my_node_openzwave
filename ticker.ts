@@ -4,7 +4,7 @@ import Logger from './logger';
 
 class Ticker {
   private readonly name : String;
-  ticker : number;
+  ticker : number | null;
 
   constructor(name) {
     this.ticker = null;

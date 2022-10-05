@@ -13,11 +13,11 @@ class VacationMode {
   private readonly startCallbacks : Function[];
   private readonly stopCallbacks : Function[];
 
-  private onTicker : Ticker;
-  private offTicker : Ticker;
+  private onTicker : Ticker | null;
+  private offTicker : Ticker | null;
 
-  private _meanStartTime : String;
-  private _meanEndTime : String;
+  private _meanStartTime : String | null;
+  private _meanEndTime : String | null;
 
   constructor(timeService : TimeService, onFunction : Function, offFunction : Function) {
     this.timeService = timeService;
@@ -41,7 +41,7 @@ class VacationMode {
     this._meanEndTime = meanEndTime;
 
     this.onTicker = new Ticker('startProgramme');
-    this.onTicker.start(AutomaticRunner(this.onFunction, {
+    this.onTicker.start(new AutomaticRunner(this.onFunction, {
       periodStart: meanStartTime,
       periodEnd: meanEndTime,
       timeService: this.timeService,
@@ -49,7 +49,7 @@ class VacationMode {
     }), 15000);
 
     this.offTicker = new Ticker('endProgramme');
-    this.offTicker.start(AutomaticRunner(this.offFunction, {
+    this.offTicker.start(new AutomaticRunner(this.offFunction, {
       periodStart: meanEndTime,
       periodEnd: '23:59',
       timeService: this.timeService,

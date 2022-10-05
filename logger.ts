@@ -46,7 +46,7 @@ class WinstonLogger {
 
   createLogger(filename = null, level = 'info') {
     const transports = [
-      new winston.transports.Console({'timestamp': this.timestamp.bind(this), 'level': 'info'})
+      new winston.transports.Console({'timestamp': this.timestamp.bind(this), 'level': 'debug'})
     ];
 
     if (filename) {
@@ -77,4 +77,21 @@ class WinstonLogger {
   }
 }
 
+function mapToString(map : Map<string, any>) : string {
+  let result = '';
+
+  map.forEach((value, key) => {
+    let valueToString;
+    if (value instanceof Map) {
+      valueToString = mapToString(value);
+    } else {
+      valueToString = JSON.stringify(value);
+    }
+    result += `${key}: ${valueToString}`;
+  });
+
+  return result;
+}
+
 export default new WinstonLogger();
+export { mapToString };

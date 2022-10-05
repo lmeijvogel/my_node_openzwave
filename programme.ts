@@ -1,5 +1,6 @@
 import { each, map } from 'lodash';
 import Logger from './logger';
+import { mapToString } from './logger';
 import Light from './light';
 
 class Action {
@@ -7,31 +8,40 @@ class Action {
   public readonly nodeid : number;
   public readonly value : any;
 
-  constructor(nodeName, nodeId, value) {
+  constructor(nodeName : string, nodeId : number, value : any) {
     this.nodeName = nodeName;
     this.nodeid = nodeId;
     this.value = value;
   }
 }
 
-class Programme {
-  public readonly name : String;
+interface IProgramme {
+  readonly name : string;
+  apply(zwave) : void;
+}
 
-  private readonly displayName : String;
-  private readonly actions: Action[];
+class Programme implements IProgramme {
+  public readonly name : string;
 
-  constructor(name, displayName, data, lights : Map<string, Light>) {
+  public readonly displayName : string;
+  public readonly actions: Action[];
+
+  constructor(name : string, displayName : string, data: Map<string, object>, lights : Map<string, Light>) {
     this.name = name;
     this.displayName = displayName;
+    this.actions = [];
 
-    this.actions = map(data, (value, key) => {
-      if (!lights[key]) {
-        throw 'Error creating Programme "' + this.name + '": node "' + key + '" does not exist';
+    Logger.debug('Programme.constructor: Creating node with data:', [...data], ', lights:', [...lights]);
+    data.forEach((value, key) => {
+      const light = lights.get(key)
+
+      if (!light) {
+        throw new Error('Error creating Programme "' + this.name + '": node "' + key + '" does not exist');
       }
 
-      return new Action(key, lights[key].id, value);
+      const action = new Action(key, light.id, value);
+      this.actions.push(action);
     });
-
   }
 
   apply(zwave) : void {
@@ -56,3 +66,4 @@ class Programme {
 }
 
 export default Programme;
+export { IProgramme };

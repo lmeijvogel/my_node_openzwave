@@ -1,11 +1,9 @@
-'use strict';
-
 import Logger from '../logger';
 
-before(function () {
+beforeEach(function () {
   Logger.setSilent(true);
 });
 
-after(function () {
+afterEach(function () {
   Logger.setSilent(false);
 });

@@ -1,12 +1,27 @@
-'use strict';
-
-import assert from 'assert';
+import * as assert from 'assert';
 import Node from '../node';
-import _ from 'lodash';
 
+import objectToNestedMap from './objectToNestedMap';
+import { objectToMap } from './objectToNestedMap';
 import NextProgrammeChooser from '../next_programme_chooser';
 import TimeStateMachine from '../time_state_machine';
+import MockTimeService from './mock_time_service';
 import EventProcessor from '../event_processor';
+import { IProgramme } from '../programme';
+
+class MockProgramme implements IProgramme {
+  public readonly name : string;
+  private readonly onApply : Function;
+
+  constructor(name, onApply: Function) {
+    this.name = name;
+    this.onApply = onApply;
+  }
+
+  apply(zwave) {
+    this.onApply(this);
+  }
+}
 
 describe('integration', function () {
   let handler;
@@ -15,9 +30,7 @@ describe('integration', function () {
     onNodeEvent: function (h) { handler = h; }
   };
 
-  const timeService = {
-    getPeriod: function () { return 'evening'; }
-  };
+  const timeService = new MockTimeService('evening', new Date());
 
   const switchOff = function () {
     handler.call(myZWave, new Node(3), 0);
@@ -27,8 +40,8 @@ describe('integration', function () {
     handler.call(myZWave, new Node(3), 255);
   };
 
-  const stateMachines = {
-    evening: new TimeStateMachine({
+  const stateMachines = objectToMap<TimeStateMachine>({
+    evening: new TimeStateMachine(objectToNestedMap({
       on: {
         evening: 'dimmed',
         default: 'evening'
@@ -37,24 +50,20 @@ describe('integration', function () {
       off: {
         default: 'off'
       }
-    })
-  };
+    }))
+  });
 
-  let programme;
-  let programmes = {};
+  var programme = 'boe';
+  let programmes : IProgramme[] = [];
 
-  _(['evening', 'tree', 'dimmed', 'off']).each(function (name) {
-    programmes[name] = {
-      name:  name,
-      apply: function () {
-        programme = name;
-      }
-    };
+  ['evening', 'tree', 'dimmed', 'off'].forEach(function (name) {
+    const mockProgramme = new MockProgramme(name, (zwave) => { programme = name })
+    programmes.push(mockProgramme);
   });
 
   let nextProgrammeChooser, eventProcessor;
 
-  before(function () {
+  beforeEach(function () {
     nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines);
 
     eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
@@ -64,7 +73,7 @@ describe('integration', function () {
     });
   });
 
-  context('when switching the lights off and on', function () {
+  describe('when switching the lights off and on', function () {
     it('ends up in "evening" state', function () {
       switchOff();
       assert.equal(programme, 'off');
@@ -74,7 +83,7 @@ describe('integration', function () {
     });
   });
 
-  context('when alternating between programmes', function () {
+  describe('when alternating between programmes', function () {
     it('works', function () {
       switchOff();
       assert.equal(programme, 'off');
@@ -90,9 +99,9 @@ describe('integration', function () {
     });
   });
 
-  context('when there are multiple "off" steps', function () {
-    const stateMachines = {
-      evening: new TimeStateMachine({
+  describe('when there are multiple "off" steps', function () {
+    const stateMachines = objectToMap<TimeStateMachine>({
+      evening: new TimeStateMachine(objectToNestedMap({
         on: {
           default: 'evening'
         },
@@ -101,10 +110,10 @@ describe('integration', function () {
           default: 'tree',
           tree:    'off'
         }
-      })
-    };
+      }))
+    });
 
-    before(function () {
+    beforeEach(function () {
       nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines);
 
       eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
