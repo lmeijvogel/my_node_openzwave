@@ -1,6 +1,8 @@
 var classy = require('classy');
 var util = require('util');
 
+var _ = require('lodash');
+
 var nodes = {}
 
 var Node = classy.define({
