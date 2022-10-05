@@ -114,7 +114,7 @@ function MyZWave(zwave) {
 
   function connect() {
     registerEvents();
-    zwave.connect();
+    zwave.connect('/dev/ttyUSB0');
   }
 
   function onNodeEvent(handler) {
@@ -166,15 +166,15 @@ function MyZWave(zwave) {
   }
 
   function setLevel(nodeid, level) {
-    zwave.setLevel(nodeid, level);
+    zwave.setValue(nodeid, 38, 1, 0, level);
   }
 
   function switchOn(nodeid) {
-    zwave.switchOn(nodeid);
+    zwave.setValue(nodeid, 37, 1, 0, true);
   }
 
   function switchOff(nodeid) {
-    zwave.switchOff(nodeid);
+    zwave.setValue(nodeid, 37, 1, 0, false);
   }
 
   function getNeighbors(nodeid) {
