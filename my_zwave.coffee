@@ -33,11 +33,11 @@ class MyZWave
       node = Node.find(nodeid)
       if node.isReady()
         if comclass == 38 || comclass == 37
-          Logger.info("Node %d: %s => %s", nodeid, value["label"], value["value"])
+          Logger.info("Received node change: node %d: %s => %s", nodeid, value["label"], value["value"])
         else
-          Logger.verbose "node%d: changed: %d:%s:%s->%s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
+          Logger.verbose "Received node change: node %d: %d:%s:%s => %s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
       else
-        Logger.debug "(before nodeReady): node%d: changed: %d:%s:%s->%s", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
+        Logger.debug "Received node change: node %d: %d:%s:%s => %s (before nodeReady event)", nodeid, comclass, value["label"], node.getValue(comclass, value.index)["value"], value["value"]
 
       node.setValue comclass, value
 
