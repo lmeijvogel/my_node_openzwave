@@ -76,7 +76,7 @@ class MyZWave
         handler.call this, node, event
 
     zwave.on "scan complete", ->
-      Logger.info "scan complete, hit ^C to finish."
+      Logger.info "Scan complete, hit ^C to end program."
 
   connect: ->
     @registerEvents()
