@@ -2,26 +2,26 @@
 
 const _ = require('lodash');
 
-function TimeService(periodStarts) {
-  const lookupTable = periodStarts;
+class TimeService {
+  constructor(periodStarts) {
+    this.lookupTable = periodStarts;
+  }
 
-  function getPeriod(now) {
-    const candidateKeys = _.chain(_.keys(lookupTable)).filter(function (k) {
-      const periodStart = stringToTimeToday(k);
+  getPeriod(now) {
+    const candidateKeys = _.chain(_.keys(this.lookupTable)).filter((k) => {
+      const periodStart = this.stringToTimeToday(k);
 
       return periodStart < now;
     }).value();
 
     const key = _.last(candidateKeys);
 
-    return lookupTable[key];
+    return this.lookupTable[key];
   }
 
-  function stringToTimeToday(timeString) {
+  stringToTimeToday(timeString) {
     const splittedString = timeString.split(':');
-    const hoursMinutes = _.map(splittedString, function (str) {
-      return parseInt(str, 10);
-    });
+    const hoursMinutes = _.map(splittedString, (str) => parseInt(str, 10));
 
     const hours = hoursMinutes[0];
     const minutes = hoursMinutes[1];
@@ -35,15 +35,9 @@ function TimeService(periodStarts) {
     return result;
   }
 
-  function currentTime() {
+  currentTime() {
     return new Date();
   }
-
-  return {
-    currentTime: currentTime,
-    getPeriod: getPeriod,
-    stringToTimeToday: stringToTimeToday
-  };
 }
 
 module.exports = TimeService;

@@ -6,7 +6,7 @@ const assert = require('assert');
 
 let called = false;
 
-let timeService = TimeService({periodStarts: []});
+let timeService = new TimeService({periodStarts: []});
 
 const fn = function () {
   called = true;
