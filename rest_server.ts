@@ -1,4 +1,7 @@
 import Logger from './logger';
+
+import Light from './light';
+import { IProgramme } from './programme';
 import * as express from 'express';
 
 export default function (options) {
@@ -7,17 +10,17 @@ export default function (options) {
 
   let server;
 
-  let programmeChosenCallbacks : Function[] = [];
-  let switchStateChangeRequestedCallbacks : Function[] = [];
+  let programmeChosenCallbacks : ((name : string) => void)[] = [];
+  let switchStateChangeRequestedCallbacks : ((newState : boolean) => void)[] = [];
 
-  let programmesListFinderCallback = function () {};
-  let lightsListFinderCallback = function () {};
-  let currentProgrammeFinderCallback = function () {};
-  let switchStateFinderCallback = function () {};
+  let programmesListFinderCallback : () => IProgramme[];
+  let lightsListFinderCallback : () => Light[];
+  let currentProgrammeFinderCallback : () => IProgramme;
+  let switchStateFinderCallback  : () => boolean;
 
-  let onHealNetworkRequestedCallback = function () {};
-  let onRefreshNodeRequestedCallback = function (nodeid : number) {};
-  let onSimulateSwitchPressRequestedCallback = function (signal: number) {};
+  let onHealNetworkRequestedCallback : () => void;
+  let onRefreshNodeRequestedCallback : (nodeid : number) => void;
+  let onSimulateSwitchPressRequestedCallback : (signal: number) => void;
 
   let programmes = {};
 
@@ -33,7 +36,7 @@ export default function (options) {
   });
 
   app.post('/programmes/:name/start', (req, res) => {
-    programmeChosenCallbacks.forEach((callback) => { callback.call(null, req.params.name); });
+    programmeChosenCallbacks.forEach((callback) => { callback(req.params.name); });
 
     res.send({currentProgramme: req.params.name});
   });
@@ -124,11 +127,11 @@ export default function (options) {
     Logger.info('Stopped REST interface');
   };
 
-  const onProgrammeChosen = (callback) => {
+  const onProgrammeChosen = (callback : (name) => void) => {
     programmeChosenCallbacks.push(callback);
   };
 
-  const onSwitchStateChangeRequested = (callback) => {
+  const onSwitchStateChangeRequested = (callback : (newState : boolean) => void) => {
     switchStateChangeRequestedCallbacks.push(callback);
   };
 
@@ -140,24 +143,24 @@ export default function (options) {
     onRefreshNodeRequestedCallback = callback;
   };
 
-  const onSimulateSwitchPressRequested = (callback) => {
+  const onSimulateSwitchPressRequested = (callback : (signal: number) => void) => {
     onSimulateSwitchPressRequestedCallback = callback;
   };
 
 
-  const setMainSwitchStateFinder = (callback) => {
+  const setMainSwitchStateFinder = (callback : () => boolean) => {
     switchStateFinderCallback = callback;
   };
 
-  const setProgrammesListFinder = (callback) => {
+  const setProgrammesListFinder = (callback : () => IProgramme[]) => {
     programmesListFinderCallback = callback;
   };
 
-  const setCurrentProgrammeFinder = (callback) => {
+  const setCurrentProgrammeFinder = (callback : () => IProgramme) => {
     currentProgrammeFinderCallback = callback;
   };
 
-  const setLightsListFinder = (callback) => {
+  const setLightsListFinder = (callback : () => Light[]) => {
     lightsListFinderCallback = callback;
   };
 

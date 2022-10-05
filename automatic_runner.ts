@@ -2,7 +2,7 @@ import Logger from './logger';
 import TimeService from './time_service';
 
 class AutomaticRunner {
-  private readonly fn : Function;
+  private readonly fn : () => void;
   private readonly timeService : TimeService;
   private readonly periodStart : Date;
   private readonly periodEnd : Date;
@@ -10,7 +10,7 @@ class AutomaticRunner {
 
   private runnerForToday;
 
-  constructor(fn, options) {
+  constructor(fn: () => void, options) {
     this.fn = fn;
     this.timeService = options.timeService;
     this.periodStart = this.timeService.stringToTimeToday(options.periodStart);
