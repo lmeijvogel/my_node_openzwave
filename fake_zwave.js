@@ -12,18 +12,14 @@
  * switch, reporting as little as possible.
  */
 
-const _                 = require('lodash');
-
-const FakeRequestParser = require('./fake_request_parser');
-const Logger            = require('./logger');
+const _      = require('lodash');
+const Logger = require('./logger');
 
 function FakeZWave() {
   let callbacks = {};
   let nodes = {};
   const SWITCH_BINARY = 37;
   const SWITCH_MULTILEVEL = 38;
-
-  const fakeRequestParser = FakeRequestParser();
 
   function on(eventName, callback) {
     if (!callbacks[eventName]) {
@@ -53,17 +49,6 @@ function FakeZWave() {
   }
 
   function disconnect() {
-  }
-
-  function tryParse(req) {
-    const result = fakeRequestParser.parse(req);
-
-    if (result) {
-      emitEvent(result.type, [
-        result.node,
-        result.value
-      ]);
-    }
   }
 
   function logValue(nodeId, commandClass) {
@@ -324,7 +309,6 @@ function FakeZWave() {
     on: on,
     connect: connect,
     disconnect: disconnect,
-    tryParse: tryParse,
     enablePoll: enablePoll,
     setValue: setValue,
     refreshNodeInfo: refreshNodeInfo,
