@@ -1,5 +1,9 @@
 # My Node-OpenZWave
 
+## No longer maintained
+
+I stopped using this project and am no longer maintaining it.
+
 ## Summary
 
 Personal project for dealing with my OpenZWave issues.
