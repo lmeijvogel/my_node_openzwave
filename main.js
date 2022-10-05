@@ -136,10 +136,6 @@ Promise.resolve().then(function () {
 
   });
 
-  redisCommandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
-    myZWave.logValue(nodeId, commandClass, index);
-  });
-
   api.setProgrammesListFinder(function () {
     return programmes;
   });

@@ -4,7 +4,6 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
-  const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
   const healNetworkRegex         = /healNetwork/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
   const refreshNodeRegex         = /refreshNode (\d+)/;
@@ -12,7 +11,6 @@ function RedisCommandParser() {
   const eventEmitter = new EventEmitter();
 
   const handlers = [
-    [nodeValueRegex,           nodeValueRequested],
     [healNetworkRegex,         healNetworkRequested],
     [simulateSwitchPressRegex, simulateSwitchPress],
     [refreshNodeRegex,         refreshNodeRequested]
@@ -30,14 +28,6 @@ function RedisCommandParser() {
         return;
       }
     });
-  }
-
-  function nodeValueRequested(match) {
-    const nodeId       = match[1];
-    const commandClass = match[2];
-    const index        = match[3];
-
-    eventEmitter.emit('nodeValueRequested', nodeId, commandClass, index);
   }
 
   function healNetworkRequested() {
