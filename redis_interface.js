@@ -30,8 +30,9 @@ function RedisInterface(commandChannel) {
     dataRedis.set('zwave_programme', name);
   }
 
-  function storeNode(lightName, nodeId) {
+  function storeNode(lightName, nodeId, displayName) {
     dataRedis.hset('node_' + lightName, 'node_id', nodeId);
+    dataRedis.hset('node_' + lightName, 'display_name', displayName);
 
     Logger.debug('Stored in Redis: ', lightName, nodeId, displayName);
   }

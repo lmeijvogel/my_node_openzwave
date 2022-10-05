@@ -8,19 +8,24 @@
 
   "lights": {
     "uplight": {
-      "id": 2
-    }
+      "id": 2,
+      "displayName": "Uplight"
+    },
     "diningTable": {
-      "id": 5
-    }
+      "id": 5,
+      "displayName": "Eettafel"
+    },
     "coffeeTable": {
-      "id": 7
-    }
+      "id": 7,
+      "displayName": "Salontafel"
+    },
     "kitchen": {
-      "id": 8
-    }
+      "id": 8,
+      "displayName": "Keuken"
+    },
     "tree": {
-      "id": 9
+      "id": 9,
+      "displayName": "Kerstboom"
     }
   },
 

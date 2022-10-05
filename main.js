@@ -82,7 +82,7 @@ Promise.all([
   _(config.lights).each(function (light, key) {
     const lightName = key;
 
-    redisInterface.storeNode(lightName, light.id);
+    redisInterface.storeNode(lightName, light.id, light.displayName);
   });
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
