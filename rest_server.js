@@ -113,7 +113,8 @@ module.exports = function (options) {
   });
 
   const start = () => {
-    server = app.listen(port);
+    // Only bind to localhost, so I don't have to implement API tokens just yet :)
+    server = app.listen(port, 'localhost');
     Logger.info("REST interface listening on port", port);
   };
 
