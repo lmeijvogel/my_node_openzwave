@@ -1,11 +1,13 @@
 import * as assert from "assert";
 import { Node } from "../Node";
+import * as winston from "winston";
 
+import { Logger } from "../Logger";
 import { objectToNestedMap } from "./objectToNestedMap";
 import { objectToMap } from "./objectToNestedMap";
 import { NextProgrammeChooser } from "../NextProgrammeChooser";
 import { TimeStateMachine } from "../TimeStateMachine";
-import { SwitchPressName } from "../SwitchPressName";
+import { mainSceneIdToSwitchPressName, SwitchPressName } from "../SwitchPressName";
 import { MockTimeService } from "./MockTimeService";
 import { EventProcessor } from "../EventProcessor";
 import { IProgramme } from "../Programme";
@@ -24,7 +26,9 @@ class MockProgramme implements IProgramme {
 }
 
 class MyFakeZWave implements IMyZWave {
-  onNodeEvent(_h: NodeEventHandler) {}
+  private nodeEventHandler: NodeEventHandler | null = null;
+
+  onNodeEvent(h: NodeEventHandler) { this.nodeEventHandler = h; }
 
   registerEvents() {}
   connect() {}
@@ -34,26 +38,24 @@ class MyFakeZWave implements IMyZWave {
   nodeReady() {}
   enablePoll() {}
   setLevel() {}
-  switchOn() {}
-  switchOff() {}
+  switchOn() { this.nodeEventHandler!(new Node(12), 10); }
+  switchOff() { this.nodeEventHandler!(new Node(12), 11); }
   healNetwork() {}
 
-  nodes: Node[];
+  nodes: Node[] = [];
 }
 
 describe("integration", function() {
-  let handler;
-
   const myZWave = new MyFakeZWave();
 
   const timeService = new MockTimeService("evening", new Date());
 
   const switchOff = function() {
-    handler.call(myZWave, new Node(3), 0);
+      myZWave.switchOff();
   };
 
   const switchOn = function() {
-    handler.call(myZWave, new Node(3), 255);
+      myZWave.switchOn();
   };
 
   const stateMachines = objectToMap<TimeStateMachine>({
@@ -71,25 +73,27 @@ describe("integration", function() {
     )
   });
 
-  var programme = "boe";
+  var programme = "unknown";
   let programmes: IProgramme[] = [];
 
   ["evening", "tree", "dimmed", "off"].forEach(function(name) {
-    const mockProgramme = new MockProgramme(name, _zwave => {
+    const mockProgramme = new MockProgramme(name, (_zwave: IMyZWave) => {
       programme = name;
     });
     programmes.push(mockProgramme);
   });
 
-  let nextProgrammeChooser, eventProcessor;
+  let nextProgrammeChooser: NextProgrammeChooser, eventProcessor: EventProcessor;
 
   beforeEach(function() {
     nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines);
 
-    eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
+    eventProcessor = new EventProcessor(myZWave, { programmes }, nextProgrammeChooser);
 
     myZWave.onNodeEvent(function(_node, event) {
-      eventProcessor.mainSwitchPressed(event, programme);
+      const switchPressName = mainSceneIdToSwitchPressName(event);
+
+      eventProcessor.mainSwitchPressed(switchPressName, programme);
     });
   });
 
@@ -123,11 +127,11 @@ describe("integration", function() {
     const stateMachines = objectToMap<TimeStateMachine>({
       evening: new TimeStateMachine(
         objectToNestedMap({
-          on: {
+          [SwitchPressName.SingleOn]: {
             default: "evening"
           },
 
-          off: {
+          [SwitchPressName.SingleOff]: {
             default: "tree",
             tree: "off"
           }
@@ -138,15 +142,18 @@ describe("integration", function() {
     beforeEach(function() {
       nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines);
 
-      eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
+      eventProcessor = new EventProcessor(myZWave, { programmes }, nextProgrammeChooser);
 
       myZWave.onNodeEvent(function(_node, event) {
-        eventProcessor.mainSwitchPressed(event, programme);
+        const switchPressName = mainSceneIdToSwitchPressName(event);
+
+        eventProcessor.mainSwitchPressed(switchPressName, programme);
       });
     });
 
     it("traverses all steps", function() {
       switchOn();
+      assert.equal(programme, "evening");
 
       switchOff();
       assert.equal(programme, "tree");
