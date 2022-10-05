@@ -35,4 +35,8 @@ RUN yarn install
 
 COPY . .
 
+RUN addgroup node dialout
+
+USER node
+
 CMD yarn live --config /etc/config.json
