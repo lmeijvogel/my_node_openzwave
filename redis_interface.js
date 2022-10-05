@@ -2,18 +2,47 @@ var classy = require('classy');
 var Redis  = require('redis');
 
 var RedisInterface = classy.define({
-  redis: null,
+  subscriptionRedis: null,
+  dataRedis: null,
 
-  init: function() {
-    this.redis = Redis.createClient();
+  commandReceivedHandlers: null,
+
+  commandChannel: null,
+
+  init: function(commandChannel) {
+    this.commandChannel   = commandChannel;
+
+    this.commandReceivedHandlers = [];
+  },
+
+  start: function() {
+    var self = this;
+    this.subscriptionRedis = Redis.createClient();
+    this.dataRedis = Redis.createClient();
+    this.subscriptionRedis.on("message", function(channel, message) {
+      console.log("Message received: "+ channel +": '"+ message +"'");
+      if (channel == self.commandChannel) {
+        _.each(self.commandReceivedHandlers, function(handler) {
+          handler.call(this, message);
+        });
+      }
+    });
+
+    this.subscriptionRedis.subscribe(this.commandChannel);
   },
 
   programmeChanged: function(name) {
-    this.redis.set("zwave_programme", name);
+    this.dataRedis.set("zwave_programme", name);
+  },
+
+  onCommandReceived: function(handler) {
+    this.commandReceivedHandlers.push(handler);
   },
 
   cleanUp: function() {
-    this.redis.end();
+    this.subscriptionRedis.unsubscribe();
+    this.subscriptionRedis.end();
+    this.dataRedis.end();
   }
 });
 

@@ -5,6 +5,7 @@ var MyZWave = require('./my_zwave');
 var ProgrammeFactory = require('./programme_factory');
 var EventProcessor = require('./event_processor');
 
+var CommandParser = require('./command_parser');
 var RedisInterface = require('./redis_interface');
 var ConfigReader = require('./config_reader');
 var config = ConfigReader.read("config.json");
@@ -43,10 +44,21 @@ process.on('SIGINT', function() {
 
 var myZWave = new MyZWave(zwave);
 
-var redisInterface = new RedisInterface();
+var redisInterface = new RedisInterface("MyZWave");
+var commandParser = new CommandParser(programmes);
+
 var programmeFactory = new ProgrammeFactory(function(name) { redisInterface.programmeChanged(name); });
 var programmes = programmeFactory.build(config);
 
+redisInterface.onCommandReceived(function(command) {
+  commandParser.parse(command);
+});
+
+commandParser.onProgrammeSelected(function(programmeName) {
+  programmes[programmeName].apply(zwave);
+});
+
 var eventProcessor = new EventProcessor(myZWave, programmes);
 
+redisInterface.start();
 myZWave.connect();
