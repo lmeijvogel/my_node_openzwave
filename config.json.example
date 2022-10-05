@@ -1,0 +1,152 @@
+{
+  "_comment": "A programme that includes a christmas tree that is regularly switched on while all the other lights are switched off",
+  "http": {
+    "enabled": false,
+    "port": 4567
+  },
+
+ "lights": {
+    "uplight":     2,
+    "diningTable": 5,
+    "coffeeTable": 7,
+    "kitchen":     8,
+    "tree":        9
+  },
+
+  "programmes": {
+    "off": {
+      "displayName": "Uit",
+      "values": {
+        "uplight":      0,
+        "kitchen":      0,
+        "diningTable":  0,
+        "coffeeTable":  false,
+        "tree":           0
+      }
+    },
+
+    "morning": {
+      "displayName": "Ochtend",
+      "values": {
+        "uplight":      0,
+        "kitchen":     99,
+        "diningTable": 99,
+        "coffeeTable": true,
+        "tree":          99
+      }
+    },
+
+    "evening": {
+      "displayName": "Avond",
+      "values": {
+        "uplight":     50,
+        "kitchen":     57,
+        "diningTable": 99,
+        "coffeeTable": false,
+        "tree":          99
+      }
+    },
+
+    "kitchen_full": {
+      "displayName": "Keuken fel",
+      "values": {
+        "uplight":     50,
+        "kitchen":     99,
+        "diningTable": 99,
+        "coffeeTable": false,
+        "tree":          99
+      }
+    },
+
+
+    "evening_tv": {
+      "displayName": "Avond (tv-meubel uit)",
+      "values": {
+        "uplight":     50,
+        "kitchen":     57,
+        "diningTable": 99,
+        "coffeeTable": false,
+        "tree":           0
+      }
+    },
+    "dimmed": {
+      "displayName": "Gedimd",
+      "values": {
+        "uplight":     50,
+        "kitchen":     50,
+        "diningTable": 50,
+        "coffeeTable": false,
+        "tree":          99
+      }
+    },
+
+    "night": {
+      "displayName": "Nacht (sterk gedimd)",
+      "values": {
+        "uplight":     30,
+        "kitchen":     46,
+        "diningTable":  0,
+        "coffeeTable": false,
+        "tree":           0
+      }
+    },
+    "tree": {
+      "displayName": "Kerstboom",
+      "values": {
+        "uplight":      0,
+        "kitchen":      0,
+        "diningTable":  0,
+        "coffeeTable": false,
+        "tree":          99
+      }
+    },
+    "full": {
+      "displayName": "Vol",
+      "values": {
+        "uplight":      99,
+        "kitchen":      99,
+        "diningTable":  99,
+        "coffeeTable":  true,
+        "tree":           99
+      }
+    }
+  },
+
+  "transitions": {
+    "evening": {
+      "on": {
+        "default": "evening",
+        "evening": "tree"
+      },
+
+      "off": {
+        "default": "tree",
+        "tree": "off"
+      }
+    },
+    "morning": {
+      "on": {
+        "default": "morning",
+        "morning": "tree"
+      },
+
+      "off": {
+        "default": "tree",
+        "tree": "off"
+      }
+    },
+    "night": {
+      "on": {
+        "default": "night",
+        "night":   "morning"
+      }
+    }
+  },
+
+  "periodStarts": {
+    "00:00": "night",
+    "07:00": "morning",
+    "14:00": "evening",
+    "23:15": "night"
+  }
+}
