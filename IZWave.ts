@@ -1,18 +1,17 @@
+import { ValueId } from "./Node";
+
 export interface IZWave {
-    on(eventName: string, callback: any): void;
+  on(eventName: string, callback: any): void;
 
-    connect(path: string): void;
+  connect(path: string): void;
 
-    disconnect(path: string): void;
+  disconnect(path: string): void;
 
-    setNodeLevel(nodeId: number, level: number): void;
+  setValue(nodeid: number, commandClass: number, instance: number, index: number, value: number | boolean);
 
-    setNodeOn(nodeId: number): void;
-    setNodeOff(nodeId): void;
+  refreshNodeInfo(nodeid): void;
 
-    refreshNodeInfo(nodeid): void;
+  healNetwork(): void;
 
-    healNetwork(): void;
-
-    enablePoll(nodeid, commandClass): void;
+  enablePoll(valueId: ValueId, pollIntensity: number): boolean;
 }

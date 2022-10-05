@@ -10,10 +10,12 @@ const POLLABLE_CLASSES = [0x25, 0x26];
 
 // Copied from openzwave-shared.d.ts, since I can't seem to import it correctly.
 interface ValueId {
-  nodeid: number;
+  value_id?: number;
+  node_id: number;
   class_id: number;
   instance: number;
   index: number;
+  label?: string;
 }
 
 class Node {

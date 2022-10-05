@@ -12,6 +12,7 @@
 
 import { each } from "lodash";
 import { Logger } from "./Logger";
+import { ValueId } from "./Node";
 import { IZWave } from "./IZWave";
 
 const SWITCH_BINARY = 37;
@@ -42,54 +43,49 @@ class FakeZWave implements IZWave {
     this.initializeDevices();
 
     this.emitEvent("scan complete");
-    this.setNodeLevel(2, 99);
+    this.setLevel(2, 38, 1, 0, 99);
 
-    this.setNodeLevel(5, 99);
-    this.setNodeOn(7);
-    this.setNodeLevel(8, 99);
-    this.setNodeLevel(2, 0);
-    this.setNodeLevel(5, 0);
-    this.setNodeOff(7);
-    this.setNodeLevel(8, 0);
+    this.setLevel(5, 38, 1, 0, 99);
+    this.setSwitch(7, 37, 1, 0, true);
+    this.setLevel(8, 38, 1, 0, 99);
+    this.setLevel(2, 38, 1, 0, 0);
+    this.setLevel(5, 38, 1, 0, 0);
+    this.setSwitch(7, 37, 1, 0, false);
+    this.setLevel(8, 38, 1, 0, 0);
   }
 
-  disconnect() {}
+  disconnect() { }
 
-  setNodeLevel(nodeId, level) {
+  setValue(nodeId: number, commandClass: number, instance: number, index: number, value: number | boolean) {
+    if (Number.isInteger(value as any)) {
+      this.setLevel(nodeId, commandClass, instance, index, value as number);
+    } else {
+      this.setSwitch(nodeId, commandClass, instance, index, value as boolean);
+    }
+  }
+
+  private setLevel(nodeId: number, commandClass: number, instance: number, index: number, level: number) {
     this.nodes[nodeId]["level"] = level;
     this.emitEvent("value changed", [
       nodeId,
       38,
       {
         label: "level",
-        index: 0,
+        index: index,
         value: level
       }
     ]);
   }
 
-  setNodeOn(nodeId) {
-    this.nodes[nodeId]["value"] = true;
+  private setSwitch(nodeId: number, commandClass: number, instance: number, index: number, state: boolean) {
+    this.nodes[nodeId]["value"] = state;
     this.emitEvent("value changed", [
       nodeId,
-      37,
+      commandClass,
       {
         label: "Switch",
         index: 0,
-        value: true
-      }
-    ]);
-  }
-
-  setNodeOff(nodeId) {
-    this.nodes[nodeId]["value"] = false;
-    this.emitEvent("value changed", [
-      nodeId,
-      37,
-      {
-        label: "Switch",
-        index: 0,
-        value: false
+        value: state
       }
     ]);
   }
@@ -102,8 +98,10 @@ class FakeZWave implements IZWave {
     Logger.info("FAKE: HealNetwork");
   }
 
-  enablePoll(nodeid, commandClass) {
-    Logger.info(`FAKE: EnablePoll. nodeId ${nodeid}, commandClass: ${commandClass}`);
+  enablePoll(valueId: ValueId, pollIntensity: number): boolean {
+    Logger.info(`FAKE: EnablePoll. nodeId ${valueId.node_id}, commandClass ${valueId.class_id}, pollIntensity: ${pollIntensity}`);
+
+    return true;
   }
 
   private initializeDevices() {
