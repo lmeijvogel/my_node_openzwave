@@ -10,10 +10,12 @@ module.exports = function (options) {
   let server;
 
   let programmeChosenCallbacks = [];
+  let switchStateChangeRequestedCallbacks = [];
 
   let programmesListFinderCallback = function () {};
   let lightsListFinderCallback = function() {};
   let currentProgrammeFinderCallback = function() {};
+  let switchStateFinderCallback = function() {};
 
   let programmes = {};
 
@@ -80,6 +82,16 @@ module.exports = function (options) {
     res.send({node: nodeId, state: req.params.state == "on"});
   });
 
+  app.get('/main_switch/enabled', (req, res) => {
+    res.send({state: switchStateFinderCallback()});
+  });
+
+  app.post('/main_switch/enabled/:state', (req, res) => {
+    const newState = req.params.state == "on";
+    switchStateChangeRequestedCallbacks.forEach( callback => callback(newState));
+    res.send({state: newState});
+  });
+
   const start = () => {
     server = app.listen(port);
     Logger.info("REST interface listening on port", port);
@@ -92,6 +104,14 @@ module.exports = function (options) {
 
   const onProgrammeChosen = (callback) => {
     programmeChosenCallbacks.push(callback);
+  };
+
+  const onSwitchStateChangeRequested = (callback) => {
+    switchStateChangeRequestedCallbacks.push(callback);
+  };
+
+  const setMainSwitchStateFinder = (callback) => {
+    switchStateFinderCallback = callback;
   };
 
   const setProgrammesListFinder = (callback) => {
@@ -114,6 +134,9 @@ module.exports = function (options) {
     start: start,
     stop: stop,
     onProgrammeChosen: onProgrammeChosen,
+    onSwitchStateChangeRequested: onSwitchStateChangeRequested,
+
+    setMainSwitchStateFinder: setMainSwitchStateFinder,
     setProgrammesListFinder: setProgrammesListFinder,
     setCurrentProgrammeFinder: setCurrentProgrammeFinder,
 

@@ -68,8 +68,6 @@ Promise.resolve().then(function () {
   let currentProgramme = null;
   let switchEnabled = true;
 
-  redisInterface.switchEnabled();
-
   eventLogger.start();
 
   eventLogger.store({
@@ -158,6 +156,20 @@ Promise.resolve().then(function () {
     eventProcessor.programmeSelected(programmeName);
   });
 
+  api.setMainSwitchStateFinder(function () {
+    return switchEnabled;
+  });
+
+  api.onSwitchStateChangeRequested(function (enabled) {
+    if (enabled) {
+      Logger.info('Enabling switch');
+    } else {
+      Logger.info('Disabling switch');
+    }
+
+    switchEnabled = enabled;
+  });
+
   redisCommandParser.on('neighborsRequested', function (nodeId) {
     zwave.getNeighbors(nodeId);
   });
@@ -165,18 +177,6 @@ Promise.resolve().then(function () {
   redisCommandParser.on('healNetworkRequested', function () {
     Logger.info('Requested healing the network');
     zwave.healNetwork();
-  });
-
-  redisCommandParser.on('disableSwitch', function () {
-    Logger.info('Disabling switch');
-    redisInterface.switchDisabled();
-    switchEnabled = false;
-  });
-
-  redisCommandParser.on('enableSwitch', function () {
-    Logger.info('Enabling switch');
-    redisInterface.switchEnabled();
-    switchEnabled = true;
   });
 
   eventProcessor.on('programmeSelected', function (programmeName) {

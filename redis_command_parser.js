@@ -8,8 +8,6 @@ function RedisCommandParser() {
   const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
   const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
-  const disableSwitchRegex       = /disableSwitch/;
-  const enableSwitchRegex        = /enableSwitch/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
   const refreshNodeRegex         = /refreshNode (\d+)/;
 
@@ -20,8 +18,6 @@ function RedisCommandParser() {
     [getNeighborsRegex,        neighborsRequested],
     [healNetworkRegex,         healNetworkRequested],
     [setVacationModeRegex,     setVacationModeRequested],
-    [disableSwitchRegex,       disableSwitch],
-    [enableSwitchRegex,        enableSwitch],
     [simulateSwitchPressRegex, simulateSwitchPress],
     [refreshNodeRegex,         refreshNodeRequested]
   ];
@@ -67,14 +63,6 @@ function RedisCommandParser() {
     } else if (match[4] === 'off') {
       eventEmitter.emit('setVacationModeRequested', false);
     }
-  }
-
-  function disableSwitch() {
-    eventEmitter.emit('disableSwitch');
-  }
-
-  function enableSwitch() {
-    eventEmitter.emit('enableSwitch');
   }
 
   function simulateSwitchPress(match) {

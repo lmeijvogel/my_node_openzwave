@@ -45,14 +45,6 @@ function RedisInterface(commandChannel) {
     dataRedis.hdel('zwave_vacation_mode', 'end_time');
   }
 
-  function switchDisabled() {
-    dataRedis.set('zwave_switch_enabled', false);
-  }
-
-  function switchEnabled() {
-    dataRedis.set('zwave_switch_enabled', true);
-  }
-
   function cleanUp() {
     subscriptionRedis.unsubscribe();
     subscriptionRedis.end();
@@ -68,8 +60,6 @@ function RedisInterface(commandChannel) {
     getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
-    switchEnabled:            switchEnabled,
-    switchDisabled:           switchDisabled,
     on:                       on,
     cleanUp:                  cleanUp
   };
