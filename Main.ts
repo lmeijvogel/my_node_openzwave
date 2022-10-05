@@ -1,13 +1,11 @@
-import { RestServer } from "./RestServer";
+import { IRestServer, RestServer } from "./RestServer";
 import * as minimist from "minimist";
-import { forOwn } from "lodash";
 import { IZWave } from "./IZWave";
 
-import { ConfigLight } from "./ConfigLight";
-import { MyZWave } from "./MyZWave";
-import { Light } from "./Light";
+import { Configuration } from "./Configuration";
 import { IProgramme } from "./Programme";
-import { ProgrammeFactory } from "./ProgrammeFactory";
+
+import { MyZWave } from "./MyZWave";
 import { TimeStateMachine } from "./TimeStateMachine";
 import { StateMachineBuilder } from "./StateMachineBuilder";
 import { SwitchPressName } from "./SwitchPressName";
@@ -20,7 +18,6 @@ import { NextProgrammeChooser } from "./NextProgrammeChooser";
 
 import { EventProcessor } from "./EventProcessor";
 import { RedisInterface } from "./RedisInterface";
-import { ConfigReader } from "./ConfigReader";
 import { Logger } from "./Logger";
 import { EventLogger } from "./EventLogger";
 
@@ -31,11 +28,11 @@ const argv = minimist(process.argv.slice(2));
 // NOTE: The light values are stored in `config.lights`, which is confusing.
 // Maybe change that?
 const configFile = argv["config"] || "./config.json";
-const config = new ConfigReader().read(configFile);
+const config = Configuration.fromFile(configFile);
 
-const logFile = argv["logfile"] || config["log"]["file"] || "./log/openzwave.log";
+const logfileName = argv["logfile"] || config.logFilename || "./log/openzwave.log";
 
-Logger.enableLogToFile(logFile, config["log"]["level"]);
+Logger.enableLogToFile(logfileName, (config.logLevel as any));
 
 Logger.info("Starting server");
 
@@ -45,7 +42,7 @@ import { ZWaveFactory } from "./ZWaveFactory";
 
 const zwave: IZWave = new ZWaveFactory(testMode).create();
 
-let api;
+let api: IRestServer | null = null;
 
 function stopProgramme() {
     Logger.info("disconnecting...");
@@ -54,7 +51,11 @@ function stopProgramme() {
         event: "Daemon stopped",
         data: null
     });
-    api.stop();
+
+    if (api) {
+        api.stop();
+    }
+
     zwave.disconnect("/dev/ttyUSB0");
     redisInterface.cleanUp();
     eventLogger.stop();
@@ -72,7 +73,7 @@ const redisInterface = new RedisInterface();
 redisInterface.start();
 
 (function() {
-    let currentProgramme = null;
+    let currentProgrammeName: string | null = null;
     let switchEnabled = true;
 
     eventLogger.start();
@@ -83,41 +84,23 @@ redisInterface.start();
         data: null
     });
 
-    const myZWave = initMyZWave(zwave, config.lights);
-
-    const programmeFactory = new ProgrammeFactory();
-
-    const lights = new Map<string, Light>();
-
-    forOwn(config.lights, (light: ConfigLight, name: string) => {
-        lights.set(name, new Light(light.id, light.displayName));
-    });
+    const myZWave = initMyZWave(zwave, config);
 
     Logger.debug(`main: configuration: ${JSON.stringify(config)}`);
-    const programmes: IProgramme[] = programmeFactory.build(objectToMap(config.programmes), lights);
 
-    const stateMachines: Map<TimePeriod, TimeStateMachine> = new StateMachineBuilder(
-        config.transitions,
-        programmes
-    ).call();
+    const stateMachines: Map<TimePeriod, TimeStateMachine> = new StateMachineBuilder(config).call();
 
-    const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config.periodStarts), stateMachines);
+    const nextProgrammeChooser = new NextProgrammeChooser(new TimeService(config), stateMachines);
 
-    const eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
+    const eventProcessor = new EventProcessor(myZWave, config, nextProgrammeChooser);
 
     const vacationMode = initVacationMode(eventProcessor, redisInterface);
 
     api = RestServer({ vacationMode: vacationMode, myZWave: myZWave });
 
-    api.setProgrammesListFinder(function() {
-        return programmes;
-    });
-
+    api.setProgrammesListFinder(() => config.programmes);
     api.setLightsListFinder(() => config.lights);
-
-    api.setCurrentProgrammeFinder(function() {
-        return currentProgramme;
-    });
+    api.setCurrentProgrammeFinder(() => currentProgrammeName);
 
     api.onProgrammeChosen((programmeName: string) => {
         eventProcessor.programmeSelected(programmeName);
@@ -144,16 +127,16 @@ redisInterface.start();
         zwave.refreshNodeInfo(nodeId);
     });
 
-    api.onSimulateSwitchPressRequested(function(signal: number) {
+    api.onSimulateSwitchPressRequested((signal: string) => {
         mainSwitchPressed(signal);
     });
 
     api.start();
 
-    eventProcessor.on("programmeSelected", function(programmeName) {
+    eventProcessor.on("programmeSelected", function(programmeName: string) {
         if (programmeName) {
-            Logger.debug(`Storing new currentProgramme "${programmeName}"`);
-            currentProgramme = programmeName;
+            Logger.debug(`Storing new currentProgrammeName "${programmeName}"`);
+            currentProgrammeName = programmeName;
 
             eventLogger.store({
                 initiator: "event processor",
@@ -187,7 +170,7 @@ redisInterface.start();
             return;
         }
 
-        eventProcessor.mainSwitchPressed(switchPressName, currentProgramme);
+        eventProcessor.mainSwitchPressed(switchPressName, currentProgrammeName);
 
         eventLogger.store({
             initiator: "main switch",
@@ -229,7 +212,7 @@ redisInterface.start();
             return;
         }
 
-        eventProcessor.auxSwitchPressed(currentProgramme);
+        eventProcessor.auxSwitchPressed(currentProgrammeName);
 
         eventLogger.store({
             initiator: "aux switch",
@@ -239,13 +222,13 @@ redisInterface.start();
     }
 
 
-    function initMyZWave(zwave: IZWave, lights: ConfigLight[]): MyZWave {
+    function initMyZWave(zwave: IZWave, config: Configuration): MyZWave {
         const myZWave = new MyZWave(zwave);
 
-        const listener = new ZWaveValueChangeListener(myZWave, lights);
+        const listener = new ZWaveValueChangeListener(myZWave, config);
 
         listener.switchPressed = (node: Node, sceneId: number) => {
-            if (node.nodeId === config.switches["main"]) {
+            if (node.nodeId === config.mainSwitchId) {
                 mainSwitchPressed(sceneId);
             } else {
                 auxSwitchPressed(node, sceneId);
@@ -257,7 +240,7 @@ redisInterface.start();
 
     function initVacationMode(eventProcessor: EventProcessor, redisInterface: RedisInterface) {
         const vacationMode = new VacationMode(
-            new TimeService(config.periodStarts),
+            new TimeService(config),
             () => {
                 eventProcessor.programmeSelected("evening");
             },
@@ -277,13 +260,3 @@ redisInterface.start();
         return vacationMode;
     }
 })();
-
-function objectToMap<T>(input: object): Map<string, T> {
-    const result = new Map<string, T>();
-
-    forOwn(input, (value: T, key: string) => {
-        result.set(key, value);
-    });
-
-    return result;
-}

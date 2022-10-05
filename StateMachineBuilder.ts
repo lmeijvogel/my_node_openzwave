@@ -1,4 +1,5 @@
 import { keys, find, forOwn, toPairs } from "lodash";
+import { Configuration } from "./Configuration";
 import { Logger } from "./Logger";
 import { SwitchPressName } from "./SwitchPressName";
 import { TimeStateMachine } from "./TimeStateMachine";
@@ -10,15 +11,15 @@ type Transitions = Map<string, string>;
 
 class StateMachineBuilder {
   private readonly transitionsConfiguration: object;
-  private readonly existingProgrammes: IProgramme[];
+  private readonly programmes: IProgramme[];
 
-  constructor(transitionsConfiguration: object, existingProgrammes: IProgramme[]) {
+  constructor(config: Configuration) {
+    this.transitionsConfiguration = config.transitions;
     Logger.debug(
       `StateMachineBuilder.constructor: transitionsConfiguration: ${JSON.stringify(transitionsConfiguration)}`
     );
-    Logger.debug(`StateMachineBuilder.constructor: existingProgrammes: ${existingProgrammes}`);
-    this.transitionsConfiguration = transitionsConfiguration;
-    this.existingProgrammes = existingProgrammes;
+    this.programmes = config.programmes;
+    Logger.debug(`StateMachineBuilder.constructor: programmes: ${this.programmes}`);
   }
 
   call(): Map<TimePeriod, TimeStateMachine> {
@@ -73,8 +74,8 @@ class StateMachineBuilder {
   }
 
   private programmeWithName(name: String): IProgramme | undefined {
-    Logger.debug(`StateMachineBuilder.programmeWithName: Finding programme ${name} in ${this.existingProgrammes}`);
-    const result = find(this.existingProgrammes, programme => programme.name === name);
+    Logger.debug(`StateMachineBuilder.programmeWithName: Finding programme ${name} in ${this.programmes}`);
+    const result = find(this.programmes, programme => programme.name === name);
 
     return result;
   }

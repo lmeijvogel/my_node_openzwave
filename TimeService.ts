@@ -1,4 +1,5 @@
-import { chain, forOwn, keys, last, map } from "lodash";
+import { forOwn, last, map } from "lodash";
+import { Configuration } from "./Configuration";
 import { Logger } from "./Logger";
 
 export type TimePeriod = string;
@@ -9,11 +10,7 @@ interface ITimeService {
 }
 
 class TimeService implements ITimeService {
-  private readonly lookupTable: Map<string, TimePeriod>;
-
-  constructor(periodStarts: object) {
-    this.lookupTable = this.buildLookupTable(periodStarts);
-  }
+  constructor(private config: Configuration) { }
 
   getPeriod(now): TimePeriod {
     Logger.debug(`TimeService.getPeriod: lookupTable: ${JSON.stringify([...this.lookupTable])}`);
@@ -66,7 +63,9 @@ class TimeService implements ITimeService {
     return new Date();
   }
 
-  private buildLookupTable(periodStarts: object): Map<string, TimePeriod> {
+  get lookupTable(): Map<string, TimePeriod> {
+      const periodStarts = this.config.periodStarts;
+
     let result = new Map<string, TimePeriod>();
 
     forOwn(periodStarts, (value, key) => {

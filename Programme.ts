@@ -1,6 +1,6 @@
-import { each, map } from "lodash";
-import { Logger, mapToString } from "./Logger";
-import { Light } from "./Light";
+import { Logger } from "./Logger";
+import { ConfigLight } from "./ConfigLight";
+import { IMyZWave } from "./IMyZWave";
 
 class Action {
   public readonly nodeName: string;
@@ -16,7 +16,7 @@ class Action {
 
 interface IProgramme {
   readonly name: string;
-  apply(zwave): void;
+  apply(zwave: IMyZWave): void;
 }
 
 class Programme implements IProgramme {
@@ -25,14 +25,14 @@ class Programme implements IProgramme {
   public readonly displayName: string;
   public readonly actions: Action[];
 
-  constructor(name: string, displayName: string, data: Map<string, object>, lights: Map<string, Light>) {
+  constructor(name: string, displayName: string, data: Map<string, object>, lights: ConfigLight[]) {
     this.name = name;
     this.displayName = displayName;
     this.actions = [];
 
     Logger.debug(`Programme.constructor: Creating node with data: ${[...data]}, lights: ${[...lights]}`);
     data.forEach((value, key) => {
-      const light = lights.get(key);
+      const light = lights.find(l => l.name === key);
 
       if (!light) {
         throw new Error(`Error creating Programme "${this.name}": node "${key}" does not exist`);
@@ -43,7 +43,7 @@ class Programme implements IProgramme {
     });
   }
 
-  apply(zwave): void {
+  apply(zwave: IMyZWave): void {
     this.actions.forEach(action => {
       try {
         if (action.value === true) {

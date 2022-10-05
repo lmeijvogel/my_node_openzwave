@@ -3,6 +3,7 @@ import * as Transport from "winston-transport";
 
 import { each, map, padStart } from "lodash";
 
+export type LogLevel = "error" | "warn" | "info" | "verbose" | "debug";
 class WinstonLogger {
     private logger: winston.Logger;
 
@@ -12,11 +13,11 @@ class WinstonLogger {
 
     // Don't enable logging to file by default since it would then also do
     // that while running tests
-    enableLogToFile(filename, level) {
+    enableLogToFile(filename: string, level: LogLevel) {
         this.logger = this.createLogger(filename, level);
     }
 
-    setSilent(silent) {
+    setSilent(silent: boolean) {
         each(this.logger.transports, transport => {
             transport.silent = silent;
         });
@@ -38,11 +39,11 @@ class WinstonLogger {
         this._log("error", message);
     }
 
-    _log(level, message) {
+    _log(level: LogLevel, message: string) {
         this.logger.log(level, message);
     }
 
-    createLogger(filename = null, level = "info") {
+    createLogger(filename: string | null = null, level = "info") {
         const transports: Transport[] = [new winston.transports.Console({ level: level })];
 
         if (filename) {
@@ -69,12 +70,12 @@ class WinstonLogger {
         return datePart + " " + timePart;
     };
 
-    padToTwoZeros(parts) {
-        return map(parts, val => padStart("" + val, 2, "0"));
+    padToTwoZeros(parts: number[]) {
+        return map(parts, val => padStart(`${val}`, 2, "0"));
     }
 }
 
-function mapToString(map: Map<string, any>): string {
+function mapToString(map: Map<string, object>): string {
     let result = "";
 
     map.forEach((value, key) => {

@@ -2,10 +2,12 @@ import { IZWave } from "./IZWave";
 import { IMyZWave, NodeEventHandler, ValueChangeEventHandler } from "./IMyZWave";
 import { Node } from "./Node";
 import { Logger } from "./Logger";
+import { NodeInfo } from "./NodeInfo";
+import { ValueId } from "./ValueId";
 
 const DEVICE_PATH = "/dev/ttyUSB0";
 
-class MyZWave implements IMyZWave {
+export class MyZWave implements IMyZWave {
   private readonly nodes: object[];
 
   private readonly valueChangeEventListeners: ValueChangeEventHandler[] = [];
@@ -20,8 +22,8 @@ class MyZWave implements IMyZWave {
   }
 
   registerEvents() {
-    this.zwave.on("driver ready", homeid => {
-      Logger.verbose(`Scanning homeid=0x${homeid}...`);
+    this.zwave.on("driver ready", (homeId: string) => {
+      Logger.verbose(`Scanning homeid=0x${homeId}...`);
     });
 
     this.zwave.on("driver failed", () => {
@@ -30,76 +32,76 @@ class MyZWave implements IMyZWave {
       process.exit();
     });
 
-    this.zwave.on("node added", nodeid => {
-      this.addNode(nodeid);
-      Logger.verbose(`Added node ${nodeid}`);
+    this.zwave.on("node added", (nodeId: number) => {
+      this.addNode(nodeId);
+      Logger.verbose(`Added node ${nodeId}`);
     });
 
-    this.zwave.on("value added", (nodeid, comclass, value) => {
-      const node = Node.find(nodeid);
+    this.zwave.on("value added", (nodeId: number, commandClass: number, value: ValueId) => {
+      const node = Node.find(nodeId);
 
-      node.addValue(comclass, value);
+      node.addValue(commandClass, value);
     });
 
-    this.zwave.on("value changed", (nodeid: number, comclass, value) => {
-      const node = Node.find(nodeid);
+    this.zwave.on("value changed", (nodeId: number, commandClass: number, value: ValueId) => {
+      const node = Node.find(nodeId);
 
-      node.setValue(comclass, value);
+      node.setValue(commandClass, value);
 
-      this.valueChangeEventListeners.forEach(handler => handler(node, comclass, value) );
+      this.valueChangeEventListeners.forEach(handler => handler(node, commandClass, value) );
     });
 
-    this.zwave.on("value removed", (nodeid: number, comclass, index) => {
-      const node = Node.find(nodeid);
+    this.zwave.on("value removed", (nodeId: number, commandClass: number, index: number) => {
+      const node = Node.find(nodeId);
 
-      node.removeValue(comclass, index);
+      node.removeValue(commandClass, index);
     });
 
-    this.zwave.on("node ready", (nodeid: number, nodeinfo) => {
-      this.nodeReady(nodeid, nodeinfo);
+    this.zwave.on("node ready", (nodeId: number, nodeinfo: NodeInfo) => {
+      this.nodeReady(nodeId, nodeinfo);
     });
 
-    this.zwave.on("notification", (nodeid: number, notif) => {
+    this.zwave.on("notification", (nodeId: number, notif: number) => {
       switch (notif) {
         case 0:
-          Logger.info(`node ${nodeid}: message complete`);
+          Logger.info(`node ${nodeId}: message complete`);
           break;
         case 1:
-          Logger.warn(`node ${nodeid}: timeout`);
+          Logger.warn(`node ${nodeId}: timeout`);
           break;
         case 2:
-          Logger.info(`node ${nodeid}: nop`);
+          Logger.info(`node ${nodeId}: nop`);
           break;
         case 3:
-          Logger.info(`node ${nodeid}: node awake`);
+          Logger.info(`node ${nodeId}: node awake`);
           break;
         case 4:
-          Logger.info(`node ${nodeid}: node sleep`);
+          Logger.info(`node ${nodeId}: node sleep`);
           break;
         case 5:
-          Logger.warn(`node ${nodeid}: node dead`);
+          Logger.warn(`node ${nodeId}: node dead`);
           break;
         case 6:
-          Logger.info(`node ${nodeid}: node alive`);
+          Logger.info(`node ${nodeId}: node alive`);
           break;
         default:
-          Logger.info(`node ${nodeid}: unexpected message (nothing serious)`);
+          Logger.info(`node ${nodeId}: unexpected message (nothing serious)`);
           break;
       }
     });
 
-    this.zwave.on("node event", (nodeid: number, event) => {
-      Logger.verbose(`node ${nodeid}: event: ${event}`);
+    this.zwave.on("node event", (nodeId: number, event: number) => {
+      Logger.verbose(`node ${nodeId}: event: ${event}`);
 
-      const node = Node.find(nodeid);
+      const node = Node.find(nodeId);
 
       this.nodeEventListeners.forEach(handler => handler(node, event));
     });
 
-    this.zwave.on("neighbors", (nodeid: number, neighbors) => {
+    this.zwave.on("neighbors", (nodeId: number, neighbors: string[]) => {
       const formattedNeighbors = neighbors.join(", ");
 
-      Logger.info(`node ${nodeid}: neighbors: [ ${formattedNeighbors} ]`);
+      Logger.info(`node ${nodeId}: neighbors: [ ${formattedNeighbors} ]`);
     });
 
     this.zwave.on("scan complete", () => {
@@ -122,9 +124,9 @@ class MyZWave implements IMyZWave {
     this.valueChangeEventListeners.push(handler);
   }
 
-  addNode(nodeid: number) {
-    Node.add(nodeid);
-    this.nodes[nodeid] = {
+  addNode(nodeId: number) {
+    Node.add(nodeId);
+    this.nodes[nodeId] = {
       manufacturer: "",
       manufacturerid: "",
       product: "",
@@ -138,8 +140,8 @@ class MyZWave implements IMyZWave {
     };
   }
 
-  nodeReady(nodeid: number, nodeinfo) {
-    const node = Node.find(nodeid);
+  nodeReady(nodeId: number, nodeinfo: NodeInfo) {
+    const node = Node.find(nodeId);
 
     node.setNodeInfo(nodeinfo);
     node.setReady();
@@ -165,25 +167,25 @@ class MyZWave implements IMyZWave {
     });
   }
 
-  setLevel(nodeid: number, level: number) {
+  setLevel(nodeId: number, level: number) {
     if (this.scanComplete) {
-      this.zwave.setValue(nodeid, 38, 1, 0, level);
+      this.zwave.setValue(nodeId, 38, 1, 0, level);
     } else {
       Logger.info("Not setting level: Initial scan not yet completed.");
     }
   }
 
-  switchOn(nodeid: number) {
+  switchOn(nodeId: number) {
     if (this.scanComplete) {
-      this.zwave.setValue(nodeid, 37, 1, 0, true);
+      this.zwave.setValue(nodeId, 37, 1, 0, true);
     } else {
       Logger.info("Not switching on: Initial scan not yet completed.");
     }
   }
 
-  switchOff(nodeid: number) {
+  switchOff(nodeId: number) {
     if (this.scanComplete) {
-      this.zwave.setValue(nodeid, 37, 1, 0, false);
+      this.zwave.setValue(nodeId, 37, 1, 0, false);
     } else {
       Logger.info("Not switching off: Initial scan not yet completed.");
     }
@@ -193,5 +195,3 @@ class MyZWave implements IMyZWave {
     this.zwave.healNetwork();
   }
 }
-
-export { MyZWave };
