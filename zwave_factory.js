@@ -6,8 +6,12 @@ const FakeZWave = require('./fake_zwave');
 
 const LOGLEVEL_INFO = 6;
 
-function ZWaveFactory(testMode) {
-  function create() {
+class ZWaveFactory {
+  constructor(testMode) {
+    this.testMode = testMode;
+  }
+
+  create() {
     // Always create real instance, even if it's not going to be used.
     // This makes sure that even in test mode, we can ascertain that the
     // the real library can be compiled correctly, which saves panic fixes at 24:00.
@@ -20,7 +24,7 @@ function ZWaveFactory(testMode) {
 
     const fakeZWave = new FakeZWave();
 
-    if (testMode) {
+    if (this.testMode) {
       Logger.info('ZWaveFactory: Creating Fake ZWave');
 
       return fakeZWave;
@@ -30,10 +34,6 @@ function ZWaveFactory(testMode) {
       return realZwave;
     }
   }
-
-  return {
-    create: create
-  };
 }
 
 module.exports = ZWaveFactory;

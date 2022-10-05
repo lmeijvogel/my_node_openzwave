@@ -33,7 +33,7 @@ Logger.info('Starting server');
 const testMode = !argv['live'];
 
 const ZWaveFactory = require('./zwave_factory');
-const zwave = ZWaveFactory(testMode).create();
+const zwave = new ZWaveFactory(testMode).create();
 
 let api;
 
