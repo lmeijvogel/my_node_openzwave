@@ -1,6 +1,6 @@
 'use strict';
 
-import Logger from './logger';
+import { Logger } from './logger';
 
 class Ticker {
   private readonly name : String;
@@ -37,4 +37,4 @@ class Ticker {
   };
 }
 
-export default Ticker;
+export { Ticker };

@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import Programme from '../programme';
+import { Programme } from '../programme';
 import { IProgramme } from '../programme';
-import ProgrammeFactory from '../programme_factory';
-import Light from '../light';
+import { ProgrammeFactory } from '../programme_factory';
+import { Light } from '../light';
 
 const lightId1 = 12;
 const lightId2 = 13;

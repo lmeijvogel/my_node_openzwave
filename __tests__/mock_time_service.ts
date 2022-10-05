@@ -18,4 +18,4 @@ class MockTimeService implements ITimeService {
   }
 }
 
-export default MockTimeService;
+export { MockTimeService };

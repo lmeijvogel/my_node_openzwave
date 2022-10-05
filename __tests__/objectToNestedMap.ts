@@ -22,5 +22,5 @@ function objectToMap<T>(input : object) : Map<string, T> {
   return result;
 }
 
-export default objectToNestedMap;
+export { objectToNestedMap };
 export { objectToMap };

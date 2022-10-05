@@ -93,5 +93,6 @@ function mapToString(map : Map<string, any>) : string {
   return result;
 }
 
-export default new WinstonLogger();
-export { mapToString };
+const Logger = new WinstonLogger();
+
+export { Logger, mapToString };

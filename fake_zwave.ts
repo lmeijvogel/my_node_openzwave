@@ -13,7 +13,7 @@
  */
 
 import { each } from 'lodash';
-import Logger from './logger';
+import { Logger } from './logger';
 
 const SWITCH_BINARY = 37;
 const SWITCH_MULTILEVEL = 38;
@@ -312,4 +312,4 @@ class FakeZWave {
   }
 }
 
-export default FakeZWave;
+export { FakeZWave };
