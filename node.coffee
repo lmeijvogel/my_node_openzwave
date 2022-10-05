@@ -21,7 +21,10 @@ class Node
     @values[commandClass][value.index] = value
 
   getValue: (commandClass, index) ->
-    @values[commandClass][index]
+    if @values[commandClass]
+      @values[commandClass][index]
+    else
+      {label: "Unknown", value: "-"}
 
   removeValue: (commandClass, index) ->
     delete @values[commandClass][index]  if @values[commandClass] && @values[commandClass][index]

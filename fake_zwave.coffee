@@ -58,6 +58,10 @@ class FakeZWave
     ]
     result
 
+  logValue: (nodeId, commandClass, index) ->
+    value = { label: "TestLabel", value: 12}
+    Logger.info "Node value requested: node %d: %d:%s: %s", parseInt(nodeId, 10), commandClass, value["label"], value["value"]
+
   setLevel: (nodeId, level) ->
     @nodes[nodeId]["level"] = level
     @emit_event "value changed", [
