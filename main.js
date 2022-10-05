@@ -175,6 +175,10 @@ Promise.resolve().then(function () {
     zwave.refreshNodeInfo(nodeId);
   });
 
+  api.onSimulateSwitchPressRequested(function (signal) {
+    switchPressed(signal);
+  });
+
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
@@ -185,10 +189,6 @@ Promise.resolve().then(function () {
         data: programmeName
       });
     }
-  });
-
-  redisCommandParser.on('simulateSwitchPress', function (event) {
-    switchPressed(event);
   });
 
   redisInterface.getVacationMode().then(function (data) {
