@@ -69,4 +69,4 @@ var NextProgrammeChooser = classy.define({
   }
 });
 
-exports.NextProgrammeChooser = NextProgrammeChooser;
+module.exports = NextProgrammeChooser;

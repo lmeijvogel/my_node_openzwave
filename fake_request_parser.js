@@ -19,4 +19,4 @@ var FakeRequestParser = classy.define({
     return null;
   }
 });
-exports.FakeRequestParser = FakeRequestParser;
+module.exports = FakeRequestParser;

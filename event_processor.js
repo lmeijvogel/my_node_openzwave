@@ -1,7 +1,7 @@
 var Node = require('./node').node;
 var classy = require('classy');
 var Programme = require('./programme');
-var NextProgrammeChooser = require('./next_programme_chooser').NextProgrammeChooser;
+var NextProgrammeChooser = require('./next_programme_chooser');
 var _ = require('lodash');
 
 var EventProcessor = classy.define({
@@ -48,4 +48,4 @@ var EventProcessor = classy.define({
   }
 });
 
-exports.EventProcessor = EventProcessor
+module.exports = EventProcessor

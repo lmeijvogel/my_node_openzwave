@@ -100,4 +100,4 @@ Node.add = function(nodeid) {
   nodes[nodeid] = new Node(nodeid);
 };
 
-exports.node = Node;
+module.exports = Node;
