@@ -49,7 +49,7 @@ class EventProcessor
     try
       @programmeSelected nextProgrammeName
     catch e
-      Logger.error("Could not start '%s'", nextProgrammeName)
+      Logger.error("After switch pressed: Could not start '%s'", nextProgrammeName)
       Logger.error(e)
 
 module.exports = EventProcessor
