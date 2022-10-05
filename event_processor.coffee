@@ -28,7 +28,7 @@ class EventProcessor
 
     if programme
       programme.apply @zwave
-      @nextProgrammeChooser.setProgramme programme
+      @nextProgrammeChooser.setCurrentState programme
 
       _(@programmeSelectedCallbacks).each((callback) ->
         callback(programmeName)
