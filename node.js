@@ -67,11 +67,11 @@ function Node(nodeId) {
   function toString() {
     var result = "";
 
-    _.forIn(values, function(commandClass, commandClassIdx) {
+    _.forIn(values, function (commandClass, commandClassIdx) {
       result += util.format("node%d: class %d\n", nodeId, commandClassIdx);
 
-      _.forIn(commandClass, function(command) {
-        result += util.format("node%d:   %s=%s", nodeId, command["label"], command["value"])
+      _.forIn(commandClass, function (command) {
+        result += util.format("node%d:   %s=%s", nodeId, command["label"], command["value"]);
       });
     });
 
@@ -86,7 +86,6 @@ function Node(nodeId) {
     var keys = _.keys(values);
 
     return _.select(keys, function (commandClassIdx) {
-      var commandClass = values[commandClassIdx];
       var intCommandClassIdx = parseInt(commandClassIdx, 10);
 
       // 0x25: COMMAND_CLASS_SWITCH_BINARY
@@ -107,19 +106,19 @@ function Node(nodeId) {
     toString:        toString,
     isPollable:      isPollable,
     pollableClasses: pollableClasses
-  }
+  };
 }
 
 Node.find = function (nodeid) {
   return nodes[parseInt(nodeid, 10)];
 };
 
-Node.all = function() {
+Node.all = function () {
   return _.extend({}, nodes);
-}
+};
 
 Node.add = function (nodeid) {
   nodes[nodeid] = new Node(nodeid);
-}
+};
 
 module.exports = Node;

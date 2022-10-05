@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var Logger = require('./logger');
 
 function NextProgrammeChooser(timeService, stateMachines) {
@@ -30,7 +29,7 @@ function NextProgrammeChooser(timeService, stateMachines) {
     if (stateMachine) {
       return stateMachine;
     } else {
-      Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time")
+      Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time");
       return stateMachines.morning;
     }
   }
@@ -42,4 +41,4 @@ function NextProgrammeChooser(timeService, stateMachines) {
   };
 }
 
-module.exports = NextProgrammeChooser
+module.exports = NextProgrammeChooser;
