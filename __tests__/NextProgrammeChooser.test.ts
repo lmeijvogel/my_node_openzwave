@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as assert from 'assert';
-import { NextProgrammeChooser } from '../next_programme_chooser';
-import { ITimeStateMachine } from '../time_state_machine';
+import { NextProgrammeChooser } from '../NextProgrammeChooser';
+import { ITimeStateMachine } from '../TimeStateMachine';
 import { MockTimeService } from './mock_time_service';
 
 const stub = (result) => function () { return result; };

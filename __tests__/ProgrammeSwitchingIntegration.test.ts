@@ -1,15 +1,15 @@
 import * as assert from "assert";
-import { Node } from "../node";
+import { Node } from "../Node";
 
 import { objectToNestedMap } from "./objectToNestedMap";
 import { objectToMap } from "./objectToNestedMap";
-import { NextProgrammeChooser } from "../next_programme_chooser";
-import { TimeStateMachine } from "../time_state_machine";
+import { NextProgrammeChooser } from "../NextProgrammeChooser";
+import { TimeStateMachine } from "../TimeStateMachine";
 import { MockTimeService } from "./mock_time_service";
-import { EventProcessor } from "../event_processor";
-import { IProgramme } from "../programme";
+import { EventProcessor } from "../EventProcessor";
+import { IProgramme } from "../Programme";
 
-import { IMyZWave } from "../imy_zwave";
+import { IMyZWave } from "../ImyZWave";
 
 class MockProgramme implements IProgramme {
   public readonly name: string;

@@ -1,5 +1,5 @@
-import { AutomaticRunner } from '../automatic_runner';
-import { TimeService } from '../time_service';
+import { AutomaticRunner } from '../AutomaticRunner';
+import { TimeService } from '../TimeService';
 import * as assert from 'assert';
 
 let called = false;

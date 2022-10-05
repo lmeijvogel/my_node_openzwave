@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Programme } from '../programme';
-import { MyZWave } from '../my_zwave';
-import { FakeZWave } from '../fake_zwave';
-import { Light } from '../light';
+import { Programme } from '../Programme';
+import { MyZWave } from '../MyZWave';
+import { FakeZWave } from '../FakeZWave';
+import { Light } from '../Light';
 
 const lightId1 = 12;
 const lightId2 = 13;

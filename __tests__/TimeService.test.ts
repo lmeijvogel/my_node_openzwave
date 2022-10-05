@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as assert from 'assert';
 
-import { TimeService } from '../time_service';
+import { TimeService } from '../TimeService';
 
 let timeService = new TimeService({});
 

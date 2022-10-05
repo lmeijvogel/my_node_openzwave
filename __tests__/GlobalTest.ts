@@ -1,4 +1,4 @@
-import { Logger } from '../logger';
+import { Logger } from '../Logger';
 
 beforeEach(function () {
   Logger.setSilent(true);
