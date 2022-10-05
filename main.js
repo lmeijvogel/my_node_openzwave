@@ -1,12 +1,13 @@
-/*
- * OpenZWave test program.
- */
-
 var http = require('http');
 var fs = require('fs');
-var MyZWave = require('./my_zwave');
 
-var port = 4567;
+var MyZWave = require('./my_zwave');
+var EventProcessor = require('./event_processor');
+
+var ConfigReader = require('./config_reader');
+var config = ConfigReader.read("config.json");
+
+var port = config["http"]["port"];
 
 var testMode = process.argv[2] != 'live';
 
@@ -14,12 +15,12 @@ var zwaveFactory = require('./zwave_factory');
 var zwave = zwaveFactory.create(testMode);
 
 http.createServer(function (req, res) {
-    if (testMode) {
-      zwave.tryParse(req, res);
-    }
-    console.log("received request.");
-    res.writeHead(200, {'Content-Type': 'text/xml'});
-    res.end(index);
+  var result = "";
+  if (testMode) {
+    result = zwave.tryParse(req, res);
+  }
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(req.url+"<br/><pre>"+result+"</pre>");
 }).listen(port);
 
 console.log("Listening on 0.0.0.0:%d", port);
@@ -30,4 +31,6 @@ process.on('SIGINT', function() {
     process.exit();
 });
 
-(new MyZWave.MyZWave(zwave).connect());
+var myZWave = new MyZWave.MyZWave(zwave);
+var eventProcessor = new EventProcessor.EventProcessor(myZWave, config);
+myZWave.connect();

@@ -7,7 +7,7 @@ var Node = classy.define({
   init: function(nodeId) {
     this.nodeId = nodeId;
 
-    this.values = [];
+    this.values = {};
     this.info   = {};
   },
 
@@ -76,8 +76,7 @@ var Node = classy.define({
   pollableClasses: function() {
     for (commandClassIdx in this.values) {
       var commandClass = this.values[commandClassIdx];
-
-      switch (commandClass) {
+      switch (commandClassIdx) {
         case 0x25: // COMMAND_CLASS_SWITCH_BINARY
         case 0x26: // COMMAND_CLASS_SWITCH_MULTILEVEL
           zwave.enablePoll(nodeid, comclass);
@@ -88,7 +87,7 @@ var Node = classy.define({
 });
 
 Node.find = function(nodeid) {
-  return nodes[nodeid];
+  return nodes[parseInt(nodeid, 10)];
 };
 
 Node.all = function() {
