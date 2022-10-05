@@ -10,49 +10,53 @@ function AutomaticRunner(fn, options) {
   const periodEnd = timeService.stringToTimeToday(options.periodEnd);
   const offsetProvider = options.offsetProvider;
 
-  let lastRecordedTime = null;
+  let runnerForToday = null;
 
-  let actualStartTimeToday = null;
-  let wasRunToday = false;
+  function SingleDayRunner(fn, currentDay, periodStart, periodEnd, currentOffset) {
+    const periodStartOnToday = onDay(periodStart, currentDay);
+    const periodEndOnToday = onDay(periodEnd, currentDay);
+
+    const actualStartTimeToday = addMinutes(periodStartOnToday, currentOffset);
+
+    Logger.debug('SingleDayRunner.tick: Determined start time for today: ', actualStartTimeToday);
+
+    let wasRunToday = false;
+
+    function tick() {
+      const currentTime = timeService.currentTime();
+
+      if (!wasRunToday && actualStartTimeToday < currentTime && currentTime < periodEndOnToday) {
+        Logger.info('SingleDayRunner.tick: Run given function');
+        fn.call();
+        wasRunToday = true; // Do not run again: It should not be necessary (the state shouldn't change)
+                            // and even if it changed, it was probably a manual action that did not need
+                            // to be overridden by a scheduler.
+      } else {
+        Logger.debug('SingleDayRunner.tick: Not running function');
+      }
+    }
+
+    function expired() {
+      const currentTime = timeService.currentTime();
+
+      return currentTime.getDate() !== currentDay.getDate();
+    }
+
+    return {
+      tick: tick,
+      expired: expired
+    };
+  }
 
   function tick() {
-    const currentTime = timeService.currentTime();
-    const isNewDay = lastRecordedTime && currentTime.getDate() !== lastRecordedTime.getDate();
+    const newRunnerNeeded = !runnerForToday || runnerForToday.expired();
 
-    const periodStartOnToday = onDay(periodStart, currentTime);
-    const periodEndOnToday = onDay(periodEnd, currentTime);
-
-    if (isNewDay) {
+    if (newRunnerNeeded) {
       Logger.debug('AutomaticRunner.tick: New day');
-      actualStartTimeToday = null;
-      wasRunToday = false;
+      runnerForToday = SingleDayRunner(fn, timeService.currentTime(), periodStart, periodEnd, offsetProvider());
     }
 
-    lastRecordedTime = currentTime;
-
-    if (currentTime < periodEndOnToday && actualStartTimeToday === null) {
-      const currentOffset = offsetProvider();
-
-      Logger.debug('AutomaticRunner.tick: current offset:', currentOffset);
-
-      actualStartTimeToday = addMinutes(periodStartOnToday, currentOffset);
-      Logger.debug('AutomaticRunner.tick: Determined start time for today: ', actualStartTimeToday);
-    }
-
-    Logger.debug('AutomaticRunner.tick: wasRunToday:', wasRunToday,
-        'actualStartTimeToday:', actualStartTimeToday,
-        'currentTime:', currentTime,
-        'periodEndOnToday', periodEndOnToday);
-
-    if (!wasRunToday && actualStartTimeToday && actualStartTimeToday < currentTime && currentTime < periodEndOnToday) {
-      Logger.info('AutomaticRunner.tick: Run given function');
-      fn.call();
-      wasRunToday = true; // Do not run again: It should not be necessary (the state shouldn't change)
-                          // and even if it changed, it was probably a manual action that did not need
-                          // to be overridden by a scheduler.
-    } else {
-      Logger.debug('AutomaticRunner.tick: Not running function');
-    }
+    runnerForToday.tick();
   }
 
   function addMinutes(time, minutes) {
