@@ -1,7 +1,6 @@
 'use strict';
 
 const winston = require('winston');
-const moment  = require('moment');
 const _       = require('lodash');
 
 function WinstonLogger() {
@@ -55,8 +54,30 @@ function WinstonLogger() {
     });
   }
 
-  function timestamp(time) {
-    return moment(time).format('YYYY-MM-DD HH:mm:ss');
+  function timestamp() {
+    const now = new Date();
+
+    let   dateParts = getValues(now, ['getFullYear', 'getMonth', 'getDate']);
+    const timeParts = getValues(now, ['getHours', 'getMinutes', 'getSeconds']);
+
+    dateParts[1]++;
+
+    const datePart = padToTwoZeros(dateParts).join('-');
+    const timePart = padToTwoZeros(timeParts).join(':');
+
+    return datePart + ' ' + timePart;
+  }
+
+  function getValues(now, functionNames) {
+    return _(functionNames).map(function (fn) {
+      return now[fn].call(now);
+    }).value();
+  }
+
+  function padToTwoZeros(parts) {
+    return _.map(parts, function (val) {
+      return _.padStart('' + val, 2, '0');
+    });
   }
 
   return {
