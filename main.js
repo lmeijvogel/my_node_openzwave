@@ -79,20 +79,20 @@ Promise.all([
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
 
-  const programmes = programmeFactory.build(config);
+  const programmes = programmeFactory.build(config.programmes, config.lights);
 
   _(programmes).values().each(function (programme) {
     redisInterface.addAvailableProgramme(programme.name, programme.displayName);
   });
 
-  const stateMachines = StateMachineBuilder(config).call();
+  const stateMachines = StateMachineBuilder(config.transitions).call();
 
-  const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
+  const nextProgrammeChooser = NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
 
   const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
   const vacationMode = new VacationMode({
-    timeService: TimeService(config),
+    timeService: TimeService(config.periodStarts),
     onFunction: function () { eventProcessor.programmeSelected('evening'); },
     offFunction: function () { eventProcessor.programmeSelected('off'); }
   });

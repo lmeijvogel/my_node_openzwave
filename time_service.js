@@ -2,12 +2,8 @@
 
 const _ = require('lodash');
 
-function TimeService(config) {
-  if (!config.periodStarts) {
-    throw 'No periodStarts defined in config';
-  }
-
-  const lookupTable = config.periodStarts;
+function TimeService(periodStarts) {
+  const lookupTable = periodStarts;
 
   function getPeriod(now) {
     const candidateKeys = _.chain(_.keys(lookupTable)).filter(function (k) {
