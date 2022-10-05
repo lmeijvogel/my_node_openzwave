@@ -8,6 +8,8 @@ function MyZWave(zwave) {
   let nodes = [];
   let eventListeners = {};
 
+  let scanComplete = false;
+
   function registerEvents() {
     zwave.on('driver ready', function (homeid) {
       Logger.verbose('Scanning homeid=0x%s...', homeid.toString(16));
@@ -96,6 +98,8 @@ function MyZWave(zwave) {
     });
 
     zwave.on('scan complete', function () {
+      scanComplete = true;
+
       Logger.info('Scan complete, hit ^C to end program.');
     });
   }
@@ -154,15 +158,27 @@ function MyZWave(zwave) {
   }
 
   function setLevel(nodeid, level) {
-    zwave.setValue(nodeid, 38, 1, 0, level);
+    if (scanComplete) {
+      zwave.setValue(nodeid, 38, 1, 0, level);
+    } else {
+      Logger.info('Not setting level: Initial scan not yet completed.');
+    }
   }
 
   function switchOn(nodeid) {
-    zwave.setValue(nodeid, 37, 1, 0, true);
+    if (scanComplete) {
+      zwave.setValue(nodeid, 37, 1, 0, true);
+    } else {
+      Logger.info('Not switching on: Initial scan not yet completed.');
+    }
   }
 
   function switchOff(nodeid) {
-    zwave.setValue(nodeid, 37, 1, 0, false);
+    if (scanComplete) {
+      zwave.setValue(nodeid, 37, 1, 0, false);
+    } else {
+      Logger.info('Not switching off: Initial scan not yet completed.');
+    }
   }
 
   function getNeighbors(nodeid) {
