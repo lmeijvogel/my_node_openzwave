@@ -91,7 +91,7 @@ Promise.all([
     redisInterface.addAvailableProgramme(programme.name, programme.displayName);
   });
 
-  const stateMachines = StateMachineBuilder(config.transitions).call();
+  const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
 
   const nextProgrammeChooser = NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
 
