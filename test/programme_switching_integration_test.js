@@ -52,12 +52,16 @@ describe('integration', function () {
     };
   });
 
-  let nextProgrammeChooser;
+  let nextProgrammeChooser, eventProcessor;
 
   before(function () {
     nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-    EventProcessor(myZWave, programmes, nextProgrammeChooser);
+    eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+
+    myZWave.onNodeEvent(function (node, event) {
+      eventProcessor.mainSwitchPressed(event);
+    });
   });
 
   context('when switching the lights off and on', function () {
@@ -103,7 +107,11 @@ describe('integration', function () {
     before(function () {
       nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
 
-      EventProcessor(myZWave, programmes, nextProgrammeChooser);
+      eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+
+      myZWave.onNodeEvent(function (node, event) {
+        eventProcessor.mainSwitchPressed(event);
+      });
     });
 
     it('traverses all steps', function () {
