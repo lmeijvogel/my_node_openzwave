@@ -1,9 +1,9 @@
-import { keys, find, forOwn, toPairs } from 'lodash';
-import { Logger } from './logger';
-import { TimeStateMachine } from './time_state_machine';
-import { IProgramme } from './programme';
+import { keys, find, forOwn, toPairs } from "lodash";
+import { Logger } from "./logger";
+import { TimeStateMachine } from "./time_state_machine";
+import { IProgramme } from "./programme";
 
-import { TimePeriod } from './time_service';
+import { TimePeriod } from "./time_service";
 
 type Transitions = Map<string, string>;
 
@@ -11,20 +11,22 @@ class StateMachineBuilder {
   private readonly transitionsConfiguration: object;
   private readonly existingProgrammes: IProgramme[];
 
-  constructor(transitionsConfiguration : object, existingProgrammes : IProgramme[]) {
-    Logger.debug("StateMachineBuilder.constructor: transitionsConfiguration: ", JSON.stringify(transitionsConfiguration));
-    Logger.debug("StateMachineBuilder.constructor: existingProgrammes: ", existingProgrammes);
+  constructor(transitionsConfiguration: object, existingProgrammes: IProgramme[]) {
+    Logger.debug(
+      `StateMachineBuilder.constructor: transitionsConfiguration: ${JSON.stringify(transitionsConfiguration)}`
+    );
+    Logger.debug(`StateMachineBuilder.constructor: existingProgrammes: ${existingProgrammes}`);
     this.transitionsConfiguration = transitionsConfiguration;
     this.existingProgrammes = existingProgrammes;
   }
 
-  call() : Map<TimePeriod, TimeStateMachine> {
+  call(): Map<TimePeriod, TimeStateMachine> {
     this.checkConfiguration();
 
     const result = new Map<TimePeriod, TimeStateMachine>();
 
-    keys(this.transitionsConfiguration).forEach((period) => {
-      const value : object = this.transitionsConfiguration[period];
+    keys(this.transitionsConfiguration).forEach(period => {
+      const value: object = this.transitionsConfiguration[period];
 
       result.set(period, new TimeStateMachine(this.toNestedMap(value)));
     });
@@ -33,33 +35,35 @@ class StateMachineBuilder {
   }
 
   private checkConfiguration() {
-    if (!this.programmeWithName('off')) {
-      throw new Error('A programme named \'off\' should be defined!');
+    if (!this.programmeWithName("off")) {
+      throw new Error("A programme named 'off' should be defined!");
     }
 
     forOwn(this.transitionsConfiguration, (transitionsPerSwitch, period) => {
       forOwn(transitionsPerSwitch, (transitions, onOrOff) => {
         forOwn(transitions, (to, from) => {
-          Logger.debug('Checking transition', from,'=>', to);
+          Logger.debug(`Checking transition "${from}" => "${to}"`);
           if (!this.programmeWithName(to)) {
-            throw 'Error creating transition \'' + period + '\':' +
-            '\'' + onOrOff + '\', end programme \'' + to + '\' not found.';
+            const errorMessage = `Error creating transition '${period}': '${onOrOff}', end programme '${to}' not found.`;
+
+            throw new Error(errorMessage);
           }
-          Logger.debug('will check', from);
-          if (from !== 'default' && !this.programmeWithName(from)) {
-            throw 'Error creating transition \'' + period + '\':' +
-            '\'' + onOrOff + '\', start programme \'' + from + '\' not found.';
+          Logger.debug(`will check ${from}`);
+          if (from !== "default" && !this.programmeWithName(from)) {
+            const errorMessage = `Error creating transition '${period}': '${onOrOff}', start programme '${from}' not found.`;
+
+            throw new Error(errorMessage);
           }
         });
       });
     });
   }
 
-  private toNestedMap(input) : Map<string, Transitions> {
+  private toNestedMap(input): Map<string, Transitions> {
     let result = new Map<string, Transitions>();
 
     forOwn(input, (transitionsInput, event) => {
-      let transitions : Transitions = new Map(toPairs(transitionsInput));
+      let transitions: Transitions = new Map(toPairs(transitionsInput));
 
       result.set(event, transitions);
     });
@@ -67,8 +71,8 @@ class StateMachineBuilder {
     return result;
   }
 
-  private programmeWithName(name : String) : IProgramme | undefined {
-    Logger.debug('StateMachineBuilder.programmeWithName: Finding programme', name, 'in', this.existingProgrammes);
+  private programmeWithName(name: String): IProgramme | undefined {
+    Logger.debug(`StateMachineBuilder.programmeWithName: Finding programme ${name} in ${this.existingProgrammes}`);
     const result = find(this.existingProgrammes, programme => programme.name === name);
 
     return result;

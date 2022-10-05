@@ -1,48 +1,52 @@
-import { Logger } from './logger';
-import { ITimeService, TimePeriod } from './time_service';
-import { ITimeStateMachine } from './time_state_machine';
+import { Logger } from "./logger";
+import { ITimeService, TimePeriod } from "./time_service";
+import { ITimeStateMachine } from "./time_state_machine";
 
 class NextProgrammeChooser {
   private readonly timeService: ITimeService;
   private readonly stateMachines: Map<TimePeriod, ITimeStateMachine>; // { 'morning': ITimeStateMachine }
 
-  constructor(timeService : ITimeService, stateMachines : Map<TimePeriod, ITimeStateMachine>) {
-    Logger.debug("NextProgrammeChooser.constructor: Initializing with timeService", timeService,"and stateMachines", [...stateMachines]);
+  constructor(timeService: ITimeService, stateMachines: Map<TimePeriod, ITimeStateMachine>) {
+    Logger.debug(
+      `NextProgrammeChooser.constructor: Initializing with timeService ${timeService} and stateMachines ${[
+        ...stateMachines
+      ]}`
+    );
     this.timeService = timeService;
     this.stateMachines = stateMachines;
   }
 
-  handle(event, currentState : string) : string {
-    Logger.debug('NextProgrammeChooser.handle: currentState:', JSON.stringify(currentState));
+  handle(event, currentState: string): string {
+    Logger.debug(`NextProgrammeChooser.handle: currentState: ${JSON.stringify(currentState)}`);
 
     const currentStateMachine = this.chooseStateMachine();
 
     const newState = currentStateMachine.handle(event, currentState);
 
-    Logger.verbose('NextProgrammeChooser.handle: new currentState:', newState);
+    Logger.verbose(`NextProgrammeChooser.handle: new currentState: ${newState}`);
 
     return newState;
   }
 
-  chooseStateMachine() : ITimeStateMachine {
+  chooseStateMachine(): ITimeStateMachine {
     const now = this.timeService.currentTime();
 
-    const currentPeriod : TimePeriod = this.timeService.getPeriod(now);
+    const currentPeriod: TimePeriod = this.timeService.getPeriod(now);
 
-    Logger.debug('NextProgrammeChooser.chooseStateMachine: Time is', now.toString());
-    Logger.debug('NextProgrammeChooser.chooseStateMachine: currentPeriod is', currentPeriod);
+    Logger.debug(`NextProgrammeChooser.chooseStateMachine: Time is ${now.toString()}`);
+    Logger.debug(`NextProgrammeChooser.chooseStateMachine: currentPeriod is ${currentPeriod}`);
 
     const stateMachine = this.stateMachines.get(currentPeriod);
 
     if (stateMachine) {
       return stateMachine;
     } else {
-      Logger.error('NextProgrammeChooser.chooseStateMachine: Unknown time');
+      Logger.error("NextProgrammeChooser.chooseStateMachine: Unknown time");
 
-      const result = this.stateMachines.get('morning');
+      const result = this.stateMachines.get("morning");
 
       if (!result) {
-        throw "Error!: Unknown time and unknown default stateMachine 'morning'"
+        throw "Error!: Unknown time and unknown default stateMachine 'morning'";
       }
 
       return result;
