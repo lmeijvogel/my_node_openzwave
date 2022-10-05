@@ -171,6 +171,10 @@ Promise.resolve().then(function () {
     zwave.healNetwork();
   });
 
+  api.onRefreshNodeRequested(function (nodeId) {
+    zwave.refreshNodeInfo(nodeId);
+  });
+
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
@@ -186,11 +190,6 @@ Promise.resolve().then(function () {
   redisCommandParser.on('simulateSwitchPress', function (event) {
     switchPressed(event);
   });
-
-  redisCommandParser.on('refreshNodeRequested', function (nodeid) {
-    zwave.refreshNodeInfo(nodeid);
-  });
-
 
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
