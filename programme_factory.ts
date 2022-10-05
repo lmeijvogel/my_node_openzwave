@@ -2,9 +2,10 @@
 
 import { each } from 'lodash';
 import Programme from './programme';
+import Light from './light';
 
 class ProgrammeFactory {
-  build(programmesConfiguration, lights) {
+  build(programmesConfiguration, lights : Map<string, Light>) {
     let programmes = {};
 
     each(programmesConfiguration, function (programme, name) {
