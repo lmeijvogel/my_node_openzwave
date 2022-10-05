@@ -178,9 +178,9 @@ redisInterface.start();
       });
 
       if (!lightName) {
-        Logger.error('Unknown light with nodeId %d. Command class: %d, value: %d', node.nodeId, commandClass, value);
+        Logger.error('Unknown light with nodeId %d. Command class: %d, value: "', node.nodeId, commandClass, value, '"');
       } else if (!lights[lightName]) {
-        Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: %d', lightName, node.nodeId, commandClass, value);
+        Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: "', lightName, node.nodeId, commandClass, value, '"');
       }
 
       if (!lights[lightName].values) {
