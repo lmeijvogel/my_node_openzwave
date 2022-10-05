@@ -32,7 +32,7 @@ function TimeStateMachine(transitions) {
     const transitionFromTable = currentTransitions[state];
 
     if (transitionFromTable) {
-      Logger.debug('TimeStateMachine.handle: Found transition: ', transitionFromTable);
+      Logger.debug('TimeStateMachine.handle: Found transition: ', JSON.stringify(transitionFromTable));
 
       newState = transitionFromTable;
     } else {
