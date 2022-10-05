@@ -11,6 +11,7 @@ class EventProcessor
   constructor: (@zwave, @programmes) ->
     @nextProgrammeChooser = new NextProgrammeChooser()
     zwave.onEvent @onEvent.bind(this)
+    @programmeSelectedCallbacks = []
 
   onEvent: (node, event) ->
     switch node.nodeId
@@ -21,12 +22,19 @@ class EventProcessor
         Logger.warn "Event from unexpected node ", node
         Logger.verbose ".. event: ", event
 
+  onProgrammeSelected: (callback) ->
+    @programmeSelectedCallbacks.push callback
+
   programmeSelected: (programmeName) ->
     programme = @programmes[programmeName]
 
     if programme
       programme.apply @zwave
       @nextProgrammeChooser.setProgramme programme
+
+      _(@programmeSelectedCallbacks).each((callback) ->
+        callback(programmeName) if programmeName
+      )
 
       Logger.info("Programme selected: %s", programmeName)
     else
