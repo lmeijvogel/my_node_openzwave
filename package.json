@@ -32,7 +32,8 @@
   "scripts": {
     "test": "mocha -r ts-node/register __tests__/**/*.ts",
     "start": "node main",
-    "dev": "node ./node_modules/.bin/tsc-watch"
+    "dev": "node ./node_modules/.bin/tsc-watch",
+    "dist": "tsc --outDir dist/ main.ts"
   },
   "repository": {
     "type": "git",
