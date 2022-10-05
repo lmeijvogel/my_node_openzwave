@@ -5,10 +5,11 @@ class CommandParser
 
   constructor: ->
     @programmeSelectedCallbacks = []
+    @programmeRegex = /programme (.*)/
+
 
   parse: (command) ->
-    programmeRegex = /programme (.*)/
-    match = command.match(programmeRegex)
+    match = command.match(@programmeRegex)
     if match
       programmeName = match[1]
       @callProgrammeSelectedCallbacks programmeName
@@ -18,6 +19,6 @@ class CommandParser
 
   callProgrammeSelectedCallbacks: (programmeName) ->
     _.each @programmeSelectedCallbacks, (handler) ->
-      handler.call this, programmeName
+      handler.call(this, programmeName)
 
 module.exports = CommandParser
