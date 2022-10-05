@@ -6,7 +6,10 @@ _ = require("lodash")
 MyZWave = require("./my_zwave")
 ProgrammeFactory = require("./programme_factory")
 StateMachineBuilder = require("./state_machine_builder")
+
+TimeService = require("./time_service")
 NextProgrammeChooser = require("./next_programme_chooser")
+
 EventProcessor = require("./event_processor")
 CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
@@ -58,7 +61,9 @@ programmes = programmeFactory.build(config)
 
 stateMachineBuilder = new StateMachineBuilder(config)
 stateMachines = stateMachineBuilder.call()
-nextProgrammeChooser = new NextProgrammeChooser(stateMachines)
+
+timeService = new TimeService(config)
+nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines)
 
 eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser)
 

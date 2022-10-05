@@ -1,6 +1,4 @@
 _ = require('lodash')
-TimeService = require("./time_service")
-TimeStateMachine = require("./time_state_machine")
 Logger = require('./logger')
 
 class NextProgrammeChooser
@@ -9,8 +7,7 @@ class NextProgrammeChooser
   timeService: null
   currentState: null
 
-  constructor: (@stateMachines) ->
-    @timeService = new TimeService()
+  constructor: (@timeService, @stateMachines) ->
 
   setProgramme: (programme) ->
     @programme = programme
@@ -23,11 +20,14 @@ class NextProgrammeChooser
     @currentState
 
   chooseStateMachine: ->
-    if      @timeService.isEvening() then @stateMachines.evening
-    else if @timeService.isMorning() then @stateMachines.morning
-    else if @timeService.isNight()   then @stateMachines.night
-    else
-      Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time")
-      @stateMachines.morning
+    now = new Date()
+    currentPeriod = @timeService.getPeriod(now)
+
+    stateMachine = @stateMachines[currentPeriod]
+
+    return stateMachine if stateMachine
+
+    Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time")
+    @stateMachines.morning
 
 module.exports = NextProgrammeChooser

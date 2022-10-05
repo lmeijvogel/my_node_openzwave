@@ -12,33 +12,26 @@ describe "NextProgrammeChooser", ->
       evening: {}
       night:   {}
 
-    @subject = new NextProgrammeChooser(@stateMachines)
-
     @timeService = {}
-    @subject.timeService = @timeService
 
-    _([ "isMorning", "isEvening", "isNight" ]).each (method) =>
-      @timeService[method] = stub(false)
+    @subject = new NextProgrammeChooser(@timeService, @stateMachines)
 
   describe "chooseStateMachine", ->
-    _([
-      [ "isMorning", "morning" ]
-      [ "isEvening", "evening" ]
-      [ "isNight",   "night"   ]
-    ]).each (pair) ->
-      [method, name] = pair
-
-      context "when it is #{name}", ->
+    _(["morning" , "evening" , "night"]).each (period) ->
+      context "when it is #{period}", ->
         beforeEach ->
-          @timeService[method] = stub(true)
+          @timeService.getPeriod = -> period
 
         it "sets the correct state machine", ->
           result = @subject.chooseStateMachine()
-          assert.equal result, @stateMachines[name]
+          assert.equal result, @stateMachines[period]
 
     # This should of course never happen, but it's nice
     # to know that at least some lights will always turn on.
     context "when the time is unknown", ->
+      beforeEach ->
+        @timeService.getPeriod = -> undefined
+
       it "default to 'morning'", ->
         result = @subject.chooseStateMachine()
         assert.equal result, @stateMachines.morning
