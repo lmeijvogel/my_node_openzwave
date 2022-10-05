@@ -7,7 +7,7 @@ let subject = null;
 
 describe('TimeStateMachine', function () {
   beforeEach(function () {
-    subject = TimeStateMachine({
+    subject = new TimeStateMachine({
       on: {
         morning: 'afternoon',
         default: 'evening'
