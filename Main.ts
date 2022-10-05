@@ -9,6 +9,7 @@ import { MyZWave } from "./MyZWave";
 import { TimeStateMachine } from "./TimeStateMachine";
 import { StateMachineBuilder } from "./StateMachineBuilder";
 import { SwitchPressName } from "./SwitchPressName";
+import { mainSceneIdToSwitchPressName, SwitchPressName } from "./SwitchPressName";
 import { ZWaveValueChangeListener } from "./ZWaveValueChangeListener";
 
 import { TimeService, TimePeriod } from "./TimeService";
@@ -185,25 +186,6 @@ redisInterface.start();
             event: "switch pressed",
             data: switchPressName
         });
-    }
-
-    function mainSceneIdToSwitchPressName(sceneId: number): SwitchPressName {
-        switch (sceneId) {
-            case 0:
-                return SwitchPressName.SceneReturn;
-            case 10:
-                return SwitchPressName.SingleOn;
-            case 11:
-                return SwitchPressName.SingleOff;
-            case 14:
-                return SwitchPressName.Double; // This is the same for up and down
-            case 17:
-                return SwitchPressName.HoldOn;
-            case 18:
-                return SwitchPressName.HoldOff;
-            default:
-                return SwitchPressName.Unknown;
-        }
     }
 
     function auxSwitchPressed(_node: Node, sceneId: number) {
