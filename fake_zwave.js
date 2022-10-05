@@ -133,6 +133,10 @@ function FakeZWave() {
     Logger.info('FAKE: RefreshNodeInfo', nodeid);
   }
 
+  function healNetwork() {
+    Logger.info('FAKE: HealNetwork');
+  }
+
   function enablePoll(nodeid, commandClass) {
     Logger.info('FAKE: EnablePoll', nodeid, commandClass);
   }
@@ -324,6 +328,7 @@ function FakeZWave() {
     enablePoll: enablePoll,
     setValue: setValue,
     refreshNodeInfo: refreshNodeInfo,
+    healNetwork: healNetwork,
     logValue: logValue
   };
 }

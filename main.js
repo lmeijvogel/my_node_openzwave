@@ -166,7 +166,7 @@ Promise.resolve().then(function () {
     switchEnabled = enabled;
   });
 
-  redisCommandParser.on('healNetworkRequested', function () {
+  api.onHealNetworkRequested(function () {
     Logger.info('Requested healing the network');
     zwave.healNetwork();
   });

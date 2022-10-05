@@ -17,6 +17,7 @@ module.exports = function (options) {
   let currentProgrammeFinderCallback = function() {};
   let switchStateFinderCallback = function() {};
 
+  let onHealNetworkRequestedCallback = function() {};
   let programmes = {};
 
   const vacationMode = options.vacationMode;
@@ -92,6 +93,11 @@ module.exports = function (options) {
     res.send({state: newState});
   });
 
+  app.post('/debug/heal_network', (req, res) => {
+    onHealNetworkRequestedCallback();
+    res.send({status: "sent"});
+  });
+
   const start = () => {
     server = app.listen(port);
     Logger.info("REST interface listening on port", port);
@@ -108,6 +114,10 @@ module.exports = function (options) {
 
   const onSwitchStateChangeRequested = (callback) => {
     switchStateChangeRequestedCallbacks.push(callback);
+  };
+
+  const onHealNetworkRequested = (callback) => {
+    onHealNetworkRequestedCallback = callback;
   };
 
   const setMainSwitchStateFinder = (callback) => {
@@ -135,6 +145,8 @@ module.exports = function (options) {
     stop: stop,
     onProgrammeChosen: onProgrammeChosen,
     onSwitchStateChangeRequested: onSwitchStateChangeRequested,
+
+    onHealNetworkRequested: onHealNetworkRequested,
 
     setMainSwitchStateFinder: setMainSwitchStateFinder,
     setProgrammesListFinder: setProgrammesListFinder,
