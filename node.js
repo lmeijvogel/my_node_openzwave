@@ -95,18 +95,18 @@ function Node(nodeId) {
   }
 
   function isPollable() {
-    return _.any(pollableClasses());
+    return _.some(pollableClasses());
   }
 
   function pollableClasses() {
     const keys = _.keys(values);
 
-    return _.select(keys, function (commandClassIdx) {
+    return _.filter(keys, function (commandClassIdx) {
       const intCommandClassIdx = parseInt(commandClassIdx, 10);
 
       // 0x25: COMMAND_CLASS_SWITCH_BINARY
       // 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL
-      return _.contains(POLLABLE_CLASSES, intCommandClassIdx);
+      return _.includes(POLLABLE_CLASSES, intCommandClassIdx);
     });
   }
 
