@@ -72,10 +72,13 @@ myZWave.onValueChange((node, commandClass, value) ->
   redisInterface.storeValue(lightName, commandClass, value)
 )
 
-redisInterface.onCommandReceived (command) ->
-  commandParser.parse(command, (programmeName) -> eventProcessor.programmeSelected(programmeName) )
+redisInterface.on "commandReceived", (command) ->
+  commandParser.parse(command)
 
-eventProcessor.onProgrammeSelected (programmeName) ->
+commandParser.on "programmeChosen", (programmeName) ->
+  eventProcessor.programmeSelected(programmeName)
+
+eventProcessor.on "programmeSelected", (programmeName) ->
   redisInterface.programmeChanged(programmeName) if programmeName
 
 redisInterface.start()

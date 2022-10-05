@@ -1,14 +1,14 @@
 _ = require("lodash")
+EventEmitter = require("events").EventEmitter
 
-class CommandParser
-
+class CommandParser extends EventEmitter
   constructor: ->
     @programmeRegex = /programme (.*)/
 
-  parse: (command, onProgrammeSelected) ->
+  parse: (command) ->
     match = command.match(@programmeRegex)
     if match
       programmeName = match[1]
-      onProgrammeSelected(programmeName)
+      @emit("programmeChosen", programmeName)
 
 module.exports = CommandParser
