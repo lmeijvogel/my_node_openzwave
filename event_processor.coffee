@@ -24,7 +24,7 @@ class EventProcessor extends EventEmitter
 
     if programme
       programme.apply @zwave
-      @nextProgrammeChooser.setCurrentState programme
+      @nextProgrammeChooser.setCurrentState programme.name
 
       @emit("programmeSelected", programmeName)
 
