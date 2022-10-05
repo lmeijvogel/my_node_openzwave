@@ -217,6 +217,11 @@ Promise.all([
     switchPressed(event);
   });
 
+  redisCommandParser.on('refreshNodeRequested', function (nodeid) {
+    zwave.refreshNodeInfo(nodeid);
+  });
+
+
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
       Logger.info('Vacation mode was still on. Enabling.');

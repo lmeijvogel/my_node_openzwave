@@ -129,8 +129,12 @@ function FakeZWave() {
     ]);
   }
 
+  function refreshNodeInfo(nodeid) {
+    Logger.info('FAKE: RefreshNodeInfo', nodeid);
+  }
+
   function enablePoll(nodeid, commandClass) {
-    Logger.debug('FAKE: EnablePoll', nodeid, commandClass);
+    Logger.info('FAKE: EnablePoll', nodeid, commandClass);
   }
 
   function initializeDevices() {
@@ -319,6 +323,7 @@ function FakeZWave() {
     tryParse: tryParse,
     enablePoll: enablePoll,
     setValue: setValue,
+    refreshNodeInfo: refreshNodeInfo,
     logValue: logValue
   };
 }
