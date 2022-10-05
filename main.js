@@ -143,17 +143,15 @@ Promise.all([
     myZWave.logValue(nodeId, commandClass, index);
   });
 
-  redisCommandParser.on('setNodeValue', function (nodeId, value) {
-    switch (value) {
-    case 'on':
+  redisCommandParser.on('dimNode', function (nodeId, value) {
+    myZWave.setLevel(nodeId, value);
+  });
+
+  redisCommandParser.on('switchNode', function (nodeId, value) {
+    if (value) {
       myZWave.switchOn(nodeId);
-      break;
-    case 'off':
+    } else {
       myZWave.switchOff(nodeId);
-      break;
-    default:
-      myZWave.setLevel(nodeId, value);
-      break;
     }
   });
 
