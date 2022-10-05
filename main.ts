@@ -11,8 +11,7 @@ import { ProgrammeFactory } from './programme_factory';
 import { TimeStateMachine } from './time_state_machine';
 import { StateMachineBuilder } from './state_machine_builder';
 
-import { TimeService } from './time_service';
-import { TimePeriod } from './time_service';
+import { TimeService, TimePeriod } from './time_service';
 
 import { NextProgrammeChooser } from './next_programme_chooser';
 

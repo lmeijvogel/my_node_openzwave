@@ -1,10 +1,8 @@
 'use strict';
 
 import { Logger } from './logger';
-import { TimeService } from './time_service';
-import { ITimeService } from './time_service';
+import { ITimeService, TimePeriod } from './time_service';
 import { ITimeStateMachine } from './time_state_machine';
-import { TimePeriod } from './time_service';
 
 class NextProgrammeChooser {
   private readonly timeService: ITimeService;

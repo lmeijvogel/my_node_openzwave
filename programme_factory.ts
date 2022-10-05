@@ -3,8 +3,7 @@
 import { forOwn } from 'lodash';
 
 import { Logger } from './logger';
-import { Programme } from './programme';
-import { IProgramme } from './programme';
+import { IProgramme, Programme } from './programme';
 import { Light } from './light';
 
 class ProgrammeFactory {
