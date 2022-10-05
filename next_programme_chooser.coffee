@@ -1,3 +1,4 @@
+_ = require('lodash')
 TimeService = require("./time_service")
 TimeStateMachine = require("./time_state_machine")
 Logger = require('./logger')
@@ -8,8 +9,7 @@ class NextProgrammeChooser
   timeService: null
   currentState: null
 
-  constructor: ->
-    @stateMachines = @buildStateMachines()
+  constructor: (@stateMachines) ->
     @timeService = new TimeService()
 
   setProgramme: (programme) ->
@@ -29,19 +29,5 @@ class NextProgrammeChooser
     else
       Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time")
       @stateMachines.morning
-
-  buildStateMachines: ->
-    {
-      evening: new TimeStateMachine(on:
-        default: "evening"
-        evening: "dimmed"
-      )
-      morning: new TimeStateMachine(on:
-        default: "morning"
-      )
-      night: new TimeStateMachine(on:
-        default: "night"
-      )
-    }
 
 module.exports = NextProgrammeChooser

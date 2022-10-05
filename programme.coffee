@@ -22,5 +22,6 @@ class Programme
           zwave.setLevel nodeid, value
       catch e
         Logger.error("ERROR in programme '" + @name + "': Could not switch node '" + key + "'")
+        Logger.error(e)
 
 module.exports = Programme

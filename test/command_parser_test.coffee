@@ -6,24 +6,20 @@ stub = (result) -> (-> return result)
 
 describe "CommandParser", ->
   beforeEach ->
-    @programmeSelectedCallbackCalled = false
-    @selectedProgrammeName = null
     @subject = new CommandParser(regular: {})
-
-    @subject.onProgrammeSelected (programmeName) =>
-      @programmeSelectedCallbackCalled = true
-      @selectedProgrammeName = programmeName
 
   describe "parse", ->
     context "when the command cannot be parsed", ->
       it "does not call programmeSelected callbacks", ->
-        @subject.parse "something something"
-
-        assert.equal @programmeSelectedCallbackCalled, false, "programmeSelected callback should not have been called"
+        @subject.parse "something something", ->
+          assert.fail("Callback should not have been called")
 
     context "when a programme is selected", ->
-      it "calls the programmeSelected callback with the given programme name", ->
-        @subject.parse "programme regular"
+      it "calls the given block with the given programme name", ->
+        programmeSelectedCallbackCalled = false
 
-        assert.equal @programmeSelectedCallbackCalled, true, "programmeSelected callback should have been called"
-        assert.equal @selectedProgrammeName, "regular"
+        @subject.parse "programme regular", (programmeName)->
+          programmeSelectedCallbackCalled = true
+          assert.equal programmeName, "regular"
+
+        assert.equal programmeSelectedCallbackCalled, true, "programmeSelected callback should have been called"
