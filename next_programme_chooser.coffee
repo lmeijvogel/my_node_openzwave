@@ -10,7 +10,8 @@ class NextProgrammeChooser
   constructor: (@timeService, @stateMachines) ->
 
   setCurrentState: (currentState) ->
-    @currentState = currentState.name
+    Logger.debug("NextProgrammeChooser: Registering current state as", currentState)
+    @currentState = currentState
 
   handle: (event) ->
     Logger.debug("Leaving state", @currentState)
