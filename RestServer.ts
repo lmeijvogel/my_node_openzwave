@@ -1,7 +1,7 @@
 import * as express from "express";
 import { Logger } from "./Logger";
 
-import { Light } from "./Light";
+import { ConfigLight } from "./ConfigLight";
 import { IProgramme } from "./Programme";
 import { MyZWave } from "./MyZWave";
 import { VacationMode } from "./VacationMode";
@@ -19,7 +19,7 @@ export type IRestServer = {
     setMainSwitchStateFinder: (callback: () => boolean) => void;
     setProgrammesListFinder: (callback: () => IProgramme[]) => void;
     setCurrentProgrammeFinder: (callback: () => string | null) => void;
-    setLightsListFinder: (callback: () => Light[]) => void;
+    setLightsListFinder: (callback: () => ConfigLight[]) => void;
 };
 
 const RestServer = function(options : { vacationMode : VacationMode, myZWave: MyZWave }): IRestServer {
@@ -32,7 +32,7 @@ const RestServer = function(options : { vacationMode : VacationMode, myZWave: My
   let switchStateChangeRequestedCallbacks: ((newState: boolean) => void)[] = [];
 
   let programmesListFinderCallback: () => IProgramme[];
-  let lightsListFinderCallback: () => Light[];
+  let lightsListFinderCallback: () => ConfigLight[];
   let currentProgrammeFinderCallback: () => string | null;
   let switchStateFinderCallback: () => boolean;
 
@@ -178,7 +178,7 @@ const RestServer = function(options : { vacationMode : VacationMode, myZWave: My
     currentProgrammeFinderCallback = callback;
   };
 
-  const setLightsListFinder = (callback: () => Light[]) => {
+  const setLightsListFinder = (callback: () => ConfigLight[]) => {
     lightsListFinderCallback = callback;
   };
 
