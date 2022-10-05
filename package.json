@@ -2,7 +2,7 @@
   "name": "my_node_openzwave",
   "version": "0.1.0",
   "description": "My very own OpenZWave interface.",
-  "main": "main.js",
+  "main": "main.ts",
   "directories": {
     "test": "out/__tests__"
   },
