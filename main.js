@@ -129,12 +129,9 @@ Promise.all([
 
   redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
     if (state) {
-      const vacationMeanStartTime = meanStartTime;
-      const vacationMeanEndTime   = meanEndTime;
-
       vacationMode.start(meanStartTime, meanEndTime);
-      Logger.info('Started Vacation mode. Mean start time:', vacationMeanStartTime,
-        'mean end time:', vacationMeanEndTime);
+      Logger.info('Started Vacation mode. Mean start time:', meanStartTime,
+        'mean end time:', meanEndTime);
     } else {
       vacationMode.stop();
       Logger.info('Stopped vacation mode');
@@ -151,10 +148,8 @@ Promise.all([
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
       Logger.info('Vacation mode was still on. Enabling.');
-      const meanStartTime = data.start_time;
-      const meanEndTime   = data.end_time;
 
-      vacationMode.start(meanStartTime, meanEndTime);
+      vacationMode.start(data.start_time, data.end_time);
     }
   });
 
