@@ -36,7 +36,7 @@ describe('StateMachineBuilder', function () {
         }
       };
 
-      const result = StateMachineBuilder(transitions, existingProgrammes).call();
+      const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
       const eveningTSMachine = new TimeStateMachine({
         on: {
@@ -67,7 +67,7 @@ describe('StateMachineBuilder', function () {
         }
       };
 
-      const result = StateMachineBuilder(transitions, existingProgrammes).call();
+      const result = new StateMachineBuilder(transitions, existingProgrammes).call();
 
       const eveningTSMachine = new TimeStateMachine({
         on: {
@@ -108,7 +108,7 @@ describe('StateMachineBuilder', function () {
         };
 
         assert.throws(function () {
-          StateMachineBuilder(transitions, {morning: {}, evening: {}}).call();
+          new StateMachineBuilder(transitions, {morning: {}, evening: {}}).call();
         }, /programme named 'off' should be defined/);
       });
     });
@@ -130,7 +130,7 @@ describe('StateMachineBuilder', function () {
         };
 
         assert.throws(function () {
-          StateMachineBuilder(transitions, existingProgrammes).call();
+          new StateMachineBuilder(transitions, existingProgrammes).call();
         }, /programme 'nonexistent' not found/);
       });
     });
@@ -152,7 +152,7 @@ describe('StateMachineBuilder', function () {
         };
 
         assert.throws(function () {
-          StateMachineBuilder(transitions, existingProgrammes).call();
+          new StateMachineBuilder(transitions, existingProgrammes).call();
         }, /programme 'nonexistent' not found/);
       });
     });
