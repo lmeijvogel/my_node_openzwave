@@ -140,12 +140,12 @@ export class MyZWave implements IMyZWave {
     };
   }
 
-  nodeReady(nodeId: number, nodeinfo: NodeInfo) {
+  nodeReady(nodeId: number, _nodeinfo: NodeInfo) {
     const node = Node.find(nodeId);
 
-    node.setNodeInfo(nodeinfo);
     node.setReady();
     Logger.debug(`Node ready, node: ${node}`);
+
     if (node.isPollable()) {
       Logger.debug(".. enabling poll");
       this.enablePoll(node);

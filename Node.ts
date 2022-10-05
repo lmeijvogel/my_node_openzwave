@@ -1,6 +1,5 @@
-import { extend, map, without } from "lodash";
+import { map } from "lodash";
 import { Logger } from "./Logger";
-import { NodeInfo } from "./NodeInfo";
 import { ValueId } from "./ValueId";
 
 const nodes = new Map<number, Node>();
@@ -11,10 +10,9 @@ const COMMAND_CLASS_SWITCH_MULTILEVEL = 0x26;
 const POLLABLE_CLASSES = [COMMAND_CLASS_SWITCH_BINARY, COMMAND_CLASS_SWITCH_MULTILEVEL];
 
 export class Node {
-  nodeId: number;
-  values: Map<number, ValueId[]>;
-  info: any;
-  ready: boolean;
+  readonly values: Map<number, ValueId[]>;
+
+  private isReady: boolean = false;
 
   static find(nodeId: number): Node {
     // TODO: Exclamation point?
@@ -29,28 +27,25 @@ export class Node {
     nodes.set(nodeId, new Node(nodeId));
   }
 
-  constructor(nodeId: number) {
-    this.nodeId = nodeId;
+  constructor(readonly nodeId: number) {
     this.values = new Map<number, ValueId[]>();
-    this.info = {};
-    this.ready = false;
   }
 
   addValue(commandClass: number, value: ValueId) {
-    if (!this.commandClassExists(commandClass)) {
+    if (!this.getValues(commandClass)) {
       this.values.set(commandClass, []);
     }
 
-    this.values.get(commandClass)[value.index] = value;
+    this.values.get(commandClass)![value.index] = value;
   }
 
   setValue(commandClass: number, value: ValueId) {
-    if (!this.commandClassExists(commandClass)) {
+    if (!this.getValues(commandClass)) {
       throw 'Command class "' + commandClass + '" was never added to this node (' + this.nodeId + ")";
     }
 
     if (this.getValue(commandClass, value.index).value !== value.value) {
-      if (this.isReady()) {
+      if (this.isReady) {
         if (commandClass === 38 || commandClass === 37) {
           Logger.info(`Received node change: node ${this.nodeId}: ${value["label"]} => ${value["value"]}`);
         } else if (commandClass === 43) {
@@ -78,47 +73,37 @@ export class Node {
         );
       }
 
-      this.values.get(commandClass)[value.index] = value;
+      this.values.get(commandClass)![value.index] = value;
     }
   }
 
-  getValue(commandClass: number, index) {
-    if (this.commandClassExists(commandClass)) {
-      return this.values.get(commandClass)[index];
+  getValue(commandClass: number, index: number) {
+    const commandClassValues = this.values.get(commandClass);
+
+    if (commandClassValues) {
+      return commandClassValues[index];
     } else {
       return { label: "Unknown", value: "-" };
     }
   }
 
-  commandClassExists(commandClass: number) {
-    return this.values.has(commandClass);
-  }
-
   removeValue(commandClass: number, index: number) {
-    if (this.commandClassExists(commandClass)) {
-      const filteredCommandClass = without(this.values[commandClass], index);
+    const commandClassValues = this.getValues(commandClass);
 
-      this.values.set(commandClass, filteredCommandClass);
+    if (commandClassValues) {
+      const newCommandClassValues = [...commandClassValues];
+      newCommandClassValues.splice(index, 1);
+
+      this.values.set(commandClass, newCommandClassValues);
     }
   }
 
+  getValues(commandClass: number): ValueId[] | undefined {
+    return this.values.get(commandClass);
+  }
+
   setReady() {
-    this.ready = true;
-  }
-
-  isReady() {
-    return this.ready;
-  }
-
-  setNodeInfo(nodeInfo: NodeInfo) {
-    this.info["manufacturer"] = nodeInfo.manufacturer;
-    this.info["manufacturerid"] = nodeInfo.manufacturerid;
-    this.info["product"] = nodeInfo.product;
-    this.info["producttype"] = nodeInfo.producttype;
-    this.info["productid"] = nodeInfo.productid;
-    this.info["type"] = nodeInfo.type;
-    this.info["name"] = nodeInfo.name;
-    this.info["loc"] = nodeInfo.loc;
+    this.isReady = true;
   }
 
   toString() {
