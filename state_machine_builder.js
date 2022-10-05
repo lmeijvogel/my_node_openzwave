@@ -22,10 +22,12 @@ function StateMachineBuilder(transitionsConfiguration, existingProgrammes) {
       _.forIn(transitionsPerSwitch, function (transitions, onOrOff) {
         _.forIn(transitions, function (to, from) {
           if (!existingProgrammes[to]) {
-            throw 'Error creating transition \'' + period + '\':\'' + onOrOff + '\', end programme \'' + to + '\' not found.';
+            throw 'Error creating transition \'' + period + '\':' +
+            '\'' + onOrOff + '\', end programme \'' + to + '\' not found.';
           }
           if (from !== 'default' && !existingProgrammes[from]) {
-            throw 'Error creating transition \'' + period + '\':\'' + onOrOff + '\', start programme \'' + from + '\' not found.';
+            throw 'Error creating transition \'' + period + '\':' +
+            '\'' + onOrOff + '\', start programme \'' + from + '\' not found.';
           }
         });
       });
