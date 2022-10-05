@@ -2,6 +2,7 @@ var http = require('http');
 var fs = require('fs');
 
 var MyZWave = require('./my_zwave');
+var ProgrammeFactory = require('./programme_factory');
 var EventProcessor = require('./event_processor');
 
 var ConfigReader = require('./config_reader');
@@ -32,5 +33,9 @@ process.on('SIGINT', function() {
 });
 
 var myZWave = new MyZWave(zwave);
-var eventProcessor = new EventProcessor(myZWave, config);
+var programmeFactory = new ProgrammeFactory(null);
+var programmes = programmeFactory.build(config);
+
+var eventProcessor = new EventProcessor(myZWave, programmes);
+
 myZWave.connect();

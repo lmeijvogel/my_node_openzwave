@@ -1,24 +1,15 @@
-var Node = require('./node').node;
 var classy = require('classy');
-var Programme = require('./programme');
 var NextProgrammeChooser = require('./next_programme_chooser');
 var _ = require('lodash');
 
 var EventProcessor = classy.define({
   zwave: null,
-  lights: null,
   programmes: null,
   nextProgrammeChooser: null,
 
-  init: function(zwave, config) {
+  init: function(zwave, programmes) {
     this.zwave = zwave;
-    this.lights = config.lights;
-    this.programmes = {};
-
-    var self = this;
-    _(config.programmes).forIn(function(programme, name) {
-      self.programmes[name] = new Programme(programme, self.lights);
-    });
+    this.programmes = programmes;
 
     this.nextProgrammeChooser = new NextProgrammeChooser();
 
