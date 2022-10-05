@@ -3,8 +3,8 @@
 const _ = require('lodash');
 const Programme = require('./programme');
 
-function ProgrammeFactory() {
-  function build(programmesConfiguration, lights) {
+class ProgrammeFactory {
+  build(programmesConfiguration, lights) {
     let programmes = {};
 
     _.each(programmesConfiguration, function (programme, name) {
@@ -15,10 +15,6 @@ function ProgrammeFactory() {
 
     return programmes;
   }
-
-  return {
-    build: build
-  };
 }
 
 module.exports = ProgrammeFactory;
