@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
 function FakeRequestParser() {
   function parse(request) {
-    var eventPattern = "^/([^/]*)/([^/]*)/(.*)$";
+    var eventPattern = '^/([^/]*)/([^/]*)/(.*)$';
 
     var parser = new RegExp(eventPattern);
-
     var match = request.url.match(parser);
+
     if (match) {
       var type  = match[1];
       var node  = match[2];

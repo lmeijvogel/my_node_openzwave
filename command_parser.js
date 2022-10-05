@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var _ = require("lodash");
-var EventEmitter = require("events").EventEmitter;
+var _ = require('lodash');
+var EventEmitter = require('events').EventEmitter;
 
 function CommandParser() {
   var nodeValueRegex    = /get (\w+) (\w+) (\w+)/;
@@ -26,7 +26,7 @@ function CommandParser() {
       var match = command.match(key);
 
       if (match) {
-        value.call(this, match);
+        value.call(null, match);
         return;
       }
     });
@@ -37,21 +37,23 @@ function CommandParser() {
     var commandClass = match[2];
     var index        = match[3];
 
-    eventEmitter.emit("nodeValueRequested", nodeId, commandClass, index);
+    eventEmitter.emit('nodeValueRequested', nodeId, commandClass, index);
   }
 
   function programmeChosen(match) {
     var programmeName = match[1];
-    eventEmitter.emit("programmeChosen", programmeName);
+
+    eventEmitter.emit('programmeChosen', programmeName);
   }
 
   function neighborsRequested(match) {
     var nodeId = parseInt(match[1], 10);
-    eventEmitter.emit("neighborsRequested", nodeId);
+
+    eventEmitter.emit('neighborsRequested', nodeId);
   }
 
   function healNetworkRequested() {
-    eventEmitter.emit("healNetworkRequested");
+    eventEmitter.emit('healNetworkRequested');
   }
 
   function on(eventName, handler) {

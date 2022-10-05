@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
-var TimeStateMachine = require("./time_state_machine");
+var TimeStateMachine = require('./time_state_machine');
 
 function StateMachineBuilder(config) {
   function call() {
