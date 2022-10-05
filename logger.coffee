@@ -27,7 +27,7 @@ class WinstonLogger
     ]
 
     if filename
-      transports.push new winston.transports.File({'filename': 'log/node-zwave.log', 'timestamp': true, 'level': 'verbose'})
+      transports.push new winston.transports.File({'filename': filename, 'timestamp': true, 'level': 'verbose'})
 
     new (winston.Logger)(
       transports: transports
