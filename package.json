@@ -11,7 +11,7 @@
     "lodash": "~4.0.0",
     "minimist": "~1.1.0",
     "openzwave-shared": "git+https://github.com/OpenZWave/node-openzwave-shared",
-    "redis": "~0.12.1",
+    "redis": "~2.8.0",
     "winston": "~0.8.0"
   },
   "devDependencies": {
