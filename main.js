@@ -29,9 +29,7 @@ Logger.enableLogToFile(logFile, config['log']['level']);
 
 Logger.info('Starting server');
 
-const runLive = argv['live'];
-
-const testMode = !runLive;
+const testMode = !argv['live'];
 
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
