@@ -9,7 +9,7 @@ EventProcessor       = require('../event_processor')
 describe "integration", ->
   before ->
     @myZWave = {
-      onEvent: (handler) => @handler = handler
+      onNodeEvent: (handler) => @handler = handler
     }
 
     @timeService = {

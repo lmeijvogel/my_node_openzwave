@@ -229,7 +229,7 @@ class FakeZWave
       8
       node8_nodeinfo
     ]
-    @emit_event "event", [
+    @emit_event "node event", [
       3
       255
     ]

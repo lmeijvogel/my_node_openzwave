@@ -69,10 +69,10 @@ class MyZWave
         when 6
           Logger.info "node%d: node alive", nodeid
 
-    zwave.on "event", (nodeid, event) =>
+    zwave.on "node event", (nodeid, event) =>
       Logger.verbose "node%d: event: %s", nodeid, event
       node = Node.find(nodeid)
-      _(@eventListeners["event"]).each (handler) =>
+      _(@eventListeners["node event"]).each (handler) =>
         handler.call this, node, event
 
     zwave.on "scan complete", ->
@@ -82,9 +82,9 @@ class MyZWave
     @registerEvents()
     @zwave.connect()
 
-  onEvent: (handler) ->
-    @eventListeners["event"] = []  unless @eventListeners["event"]
-    @eventListeners["event"].push handler
+  onNodeEvent: (handler) ->
+    @eventListeners["node event"] = []  unless @eventListeners["node event"]
+    @eventListeners["node event"].push handler
 
   onValueChange: (handler) ->
     if (!this.eventListeners['valueChange'])
