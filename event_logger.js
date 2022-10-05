@@ -3,29 +3,27 @@
 const Redis = require('redis');
 const _ = require('lodash');
 
-module.exports = function () {
-  let redis = null;
+class EventLogger {
+  constructor() {
+    this.redis = null;
+  }
 
-  function start() {
+  start() {
     const redisHost = process.env.REDIS_HOST || 'localhost';
 
-    redis = Redis.createClient(6379, redisHost);
+    this.redis = Redis.createClient(6379, redisHost);
   }
 
-  function store(event) {
+  store(event) {
     const datedEvent = _.extend({}, event, {time: new Date()});
 
-    redis.lpush('zwave_recent_events', JSON.stringify(datedEvent));
-    redis.ltrim('zwave_recent_events', 0, 50);
+    this.redis.lpush('zwave_recent_events', JSON.stringify(datedEvent));
+    this.redis.ltrim('zwave_recent_events', 0, 50);
   }
 
-  function stop() {
-    redis.end();
+  stop() {
+    this.redis.end();
   }
-
-  return {
-    start: start,
-    store: store,
-    stop: stop
-  };
 };
+
+module.exports = EventLogger;

@@ -55,7 +55,7 @@ function stopProgramme() {
 process.on('SIGINT', stopProgramme);
 process.on('SIGTERM', stopProgramme);
 
-const eventLogger = EventLogger();
+const eventLogger = new EventLogger();
 
 const redisInterface = RedisInterface();
 
