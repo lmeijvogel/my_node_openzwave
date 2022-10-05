@@ -1,5 +1,6 @@
 'use strict';
 
+const restServer = require('./rest_server');
 const minimist = require('minimist');
 const _ = require('lodash');
 
@@ -42,6 +43,7 @@ function stopProgramme() {
     event: 'Daemon stopped',
     data: null
   });
+  api.stop();
   zwave.disconnect();
   redisInterface.cleanUp();
   eventLogger.stop();
@@ -87,10 +89,6 @@ Promise.all([
 
   const programmes = programmeFactory.build(config.programmes, config.lights);
 
-  _(programmes).values().each(function (programme) {
-    redisInterface.addAvailableProgramme(programme.name, programme.displayName);
-  });
-
   const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
 
   const nextProgrammeChooser = NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
@@ -102,6 +100,10 @@ Promise.all([
     onFunction: function () { eventProcessor.programmeSelected('evening'); },
     offFunction: function () { eventProcessor.programmeSelected('off'); }
   });
+
+  const api = restServer({vacationMode: vacationMode, myZWave: myZWave});
+
+  api.start();
 
   vacationMode.onStart(function (meanStartTime, meanEndTime) {
     redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
@@ -143,19 +145,15 @@ Promise.all([
     myZWave.logValue(nodeId, commandClass, index);
   });
 
-  redisCommandParser.on('dimNode', function (nodeId, value) {
-    myZWave.setLevel(nodeId, value);
+  api.setProgrammesListFinder(function () {
+    return programmes;
   });
 
-  redisCommandParser.on('switchNode', function (nodeId, value) {
-    if (value) {
-      myZWave.switchOn(nodeId);
-    } else {
-      myZWave.switchOff(nodeId);
-    }
+  api.setLightsListFinder(function () {
+    return config.lights;
   });
 
-  redisCommandParser.on('programmeChosen', function (programmeName) {
+  api.onProgrammeChosen(function (programmeName) {
     eventProcessor.programmeSelected(programmeName);
   });
 
@@ -166,18 +164,6 @@ Promise.all([
   redisCommandParser.on('healNetworkRequested', function () {
     Logger.info('Requested healing the network');
     zwave.healNetwork();
-  });
-
-  redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
-    if (state) {
-      vacationMode.start(meanStartTime, meanEndTime);
-      Logger.info('Started Vacation mode. Mean start time:', meanStartTime,
-        'mean end time:', meanEndTime);
-    } else {
-      vacationMode.stop();
-      Logger.info('Stopped vacation mode');
-    }
-
   });
 
   redisCommandParser.on('disableSwitch', function () {
