@@ -8,13 +8,13 @@ stub = (result) ->
 describe "NextProgrammeChooser", ->
   beforeEach ->
     @stateMachines =
-      morning: {}
-      evening: {}
-      night:   {}
+      morning: {handle: ->}
+      evening: {handle: ->}
+      night:   {handle: ->}
 
     @timeService = {}
 
-    @subject = new NextProgrammeChooser(@timeService, @stateMachines)
+    @subject = NextProgrammeChooser(@timeService, @stateMachines)
 
   describe "chooseStateMachine", ->
     _(["morning" , "evening" , "night"]).each (period) ->
@@ -39,11 +39,14 @@ describe "NextProgrammeChooser", ->
   describe "handle", ->
     describe "the result", ->
       it "returns the chosen state", ->
-        mockStateMachine =
+        @timeService.getPeriod = -> "morning"
+
+        @stateMachines["morning"] = {
           handle: -> "dimmed"
           setState: ->
+        }
 
-        @subject.chooseStateMachine = (-> mockStateMachine)
+        @subject = NextProgrammeChooser(@timeService, @stateMachines)
 
         result = @subject.handle("on")
         assert.equal result, "dimmed"

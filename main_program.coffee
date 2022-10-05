@@ -76,10 +76,10 @@ programmes = programmeFactory.build(config)
 stateMachineBuilder = new StateMachineBuilder(config)
 stateMachines = stateMachineBuilder.call()
 
-timeService = new TimeService(config)
-nextProgrammeChooser = new NextProgrammeChooser(timeService, stateMachines)
+timeService = TimeService(config)
+nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines)
 
-eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser)
+eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser)
 
 myZWave.onValueChange((node, commandClass, value) ->
   lightName = _.invert(config["lights"])[""+node.nodeId]

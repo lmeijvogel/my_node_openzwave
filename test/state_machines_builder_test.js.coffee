@@ -33,4 +33,4 @@ describe 'StateMachineBuilder', ->
           default: "off"
       )
 
-      assert.deepEqual(eveningTSMachine, result.evening)
+      assert.deepEqual(eveningTSMachine._getTransitions(), result.evening._getTransitions())
