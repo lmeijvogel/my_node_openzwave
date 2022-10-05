@@ -49,11 +49,14 @@ if runHttpServer
 else
   Logger.info("Not starting HTTP server. Disabled in config.")
 
-process.on "SIGINT", ->
+stopProgramme = ->
   Logger.info("disconnecting...")
   zwave.disconnect()
   redisInterface.cleanUp()
   process.exit()
+
+process.on "SIGINT", stopProgramme
+process.on "SIGTERM", stopProgramme
 
 myZWave = new MyZWave(zwave)
 redisInterface = new RedisInterface("MyZWave")
