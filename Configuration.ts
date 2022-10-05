@@ -12,12 +12,22 @@ export class Configuration {
         return new Configuration(JSON.parse(contents));
     }
 
-    constructor(private json: any) { }
+    _programmes: IProgramme[];
+    _lights: ConfigLight[];
+
+
+    constructor(private json: any) {
+        this._lights = this.buildLights()
+        this._programmes = this.buildProgrammes(this._lights);
+    }
 
     reloadFromFile(filename: string) {
         const contents = readFileSync(filename, 'utf8');
 
         this.json = JSON.parse(contents);
+
+        this._lights = this.buildLights()
+        this._programmes = this.buildProgrammes(this._lights);
     }
 
     get logFilename(): string {
@@ -33,13 +43,7 @@ export class Configuration {
     }
 
     get lights(): ConfigLight[] {
-        const result: ConfigLight[] = [];
-
-        forOwn(this.json["lights"], (light: ConfigLight, name: string) => {
-            result.push(new ConfigLight(light.id, name, light.displayName, light.values));
-        });
-
-        return result;
+        return this._lights;
     }
 
     findLightByName(name: string): ConfigLight | undefined {
@@ -50,14 +54,30 @@ export class Configuration {
         return this.lights.find(light => light.id === id);
     }
 
+    buildLights(): ConfigLight[] {
+        const result: ConfigLight[] = [];
+
+        forOwn(this.json["lights"], (light: ConfigLight, name: string) => {
+            result.push(new ConfigLight(light.id, name, light.displayName, light.values));
+        });
+
+        return result;
+    }
+
+    /* Pass in lights as a parameter to make it more apparent that
+     * those should be built before the programmes. */
+    buildProgrammes(lights: ConfigLight[]): IProgramme[] {
+        const programmeFactory = new ProgrammeFactory();
+
+        return programmeFactory.build(this.objectToMap(this.json["programmes"]), lights);
+    }
+
     get periodStarts() {
         return this.json["periodStarts"];
     }
 
     get programmes(): IProgramme[] {
-        const programmeFactory = new ProgrammeFactory();
-
-        return programmeFactory.build(this.objectToMap(this.json["programmes"]), this.lights);
+        return this._programmes;
     }
 
     get transitions() {
