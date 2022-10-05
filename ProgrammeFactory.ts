@@ -9,8 +9,8 @@ export type ConfigProgramme = {
     values: { [name: string]: number | boolean }
 }
 
-class ProgrammeFactory {
-  build(programmesConfiguration: Map<string, ConfigProgramme>, lights: ConfigLight[]): Programme[] {
+namespace ProgrammeFactory {
+  export function build(programmesConfiguration: Map<string, ConfigProgramme>, lights: ConfigLight[]): Programme[] {
     let programmes: Programme[] = [];
 
     Logger.debug(`ProgrammeFactory.build: Received ${JSON.stringify([...programmesConfiguration])}`);

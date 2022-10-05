@@ -67,9 +67,7 @@ export class Configuration {
     /* Pass in lights as a parameter to make it more apparent that
      * those should be built before the programmes. */
     buildProgrammes(lights: ConfigLight[]): IProgramme[] {
-        const programmeFactory = new ProgrammeFactory();
-
-        return programmeFactory.build(this.objectToMap(this.json["programmes"]), lights);
+        return ProgrammeFactory.build(this.objectToMap(this.json["programmes"]), lights);
     }
 
     get periodStarts() {

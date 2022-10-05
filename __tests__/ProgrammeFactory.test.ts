@@ -36,9 +36,7 @@ input.set("morning", {
 
 describe('ProgrammeFactory', function () {
   it('it builds programmes with the right values', function () {
-    const programmeFactory = new ProgrammeFactory();
-
-    const result : IProgramme[] = programmeFactory.build(input, lights);
+    const result : IProgramme[] = ProgrammeFactory.build(input, lights);
 
     const offProgramme : Programme = <Programme>result[0];
 
