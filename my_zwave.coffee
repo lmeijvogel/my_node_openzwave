@@ -75,6 +75,10 @@ class MyZWave
       _(@eventListeners["node event"]).each (handler) =>
         handler.call this, node, event
 
+    zwave.on "neighbors", (nodeid, neighbors) =>
+      formattedNeighbors = neighbors.join(", ")
+      Logger.info "node%d: neighbors: [ %s ]", nodeid, formattedNeighbors
+
     zwave.on "scan complete", ->
       Logger.info "Scan complete, hit ^C to end program."
 
@@ -127,5 +131,8 @@ class MyZWave
 
   switchOff: (nodeid) ->
     @zwave.switchOff nodeid
+
+  getNeighbors: (nodeid) ->
+    @zwave.getNeighbors(nodeid)
 
 module.exports = MyZWave

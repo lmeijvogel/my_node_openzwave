@@ -84,6 +84,9 @@ redisInterface.on "commandReceived", (command) ->
 commandParser.on "programmeChosen", (programmeName) ->
   eventProcessor.programmeSelected(programmeName)
 
+commandParser.on "neighborsRequested", (nodeId) ->
+  zwave.getNeighbors(nodeId)
+
 eventProcessor.on "programmeSelected", (programmeName) ->
   redisInterface.programmeChanged(programmeName) if programmeName
 

@@ -26,3 +26,15 @@ describe "CommandParser", ->
         @subject.parse "programme regular"
 
         assert.equal callbackCalled, true, "programmeChosen callback should have been called"
+
+    context "when network neighbors are requested", ->
+      it "calls the given block with the nodeid", ->
+        callbackCalled = false
+
+        @subject.on "neighborsRequested", (nodeid)->
+          callbackCalled = true
+          assert.equal nodeid, 1
+
+        @subject.parse "neighbors 1"
+
+        assert.equal callbackCalled, true, "neighborsRequested callback should have been called"
