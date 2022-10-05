@@ -5,10 +5,12 @@ class CommandParser extends EventEmitter
   constructor: ->
     programmeRegex = /programme (.*)/
     getNeighborsRegex = /neighbors (.*)/
+    healNetworkRegex = /healNetwork/
 
     @handlers = [
       [programmeRegex, @programmeChosen]
       [getNeighborsRegex, @neighborsRequested],
+      [healNetworkRegex, @healNetworkRequested]
     ]
 
   parse: (command) ->
@@ -28,5 +30,8 @@ class CommandParser extends EventEmitter
   neighborsRequested: (match) ->
     nodeId = parseInt(match[1], 10)
     @emit("neighborsRequested", nodeId)
+
+  healNetworkRequested: ->
+    @emit("healNetworkRequested")
 
 module.exports = CommandParser

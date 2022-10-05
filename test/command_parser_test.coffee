@@ -38,3 +38,14 @@ describe "CommandParser", ->
         @subject.parse "neighbors 1"
 
         assert.equal callbackCalled, true, "neighborsRequested callback should have been called"
+
+    context "when a network heal is requested", ->
+      it "calls the given block", ->
+        callbackCalled = false
+
+        @subject.on "healNetworkRequested", ->
+          callbackCalled = true
+
+        @subject.parse "healNetwork"
+
+        assert.equal callbackCalled, true, "healNetworkRequested callback should have been called"

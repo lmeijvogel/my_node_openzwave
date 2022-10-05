@@ -87,6 +87,10 @@ commandParser.on "programmeChosen", (programmeName) ->
 commandParser.on "neighborsRequested", (nodeId) ->
   zwave.getNeighbors(nodeId)
 
+commandParser.on "healNetworkRequested", (nodeId) ->
+  Logger.info("Requested healing the network")
+  zwave.healNetwork()
+
 eventProcessor.on "programmeSelected", (programmeName) ->
   redisInterface.programmeChanged(programmeName) if programmeName
 
