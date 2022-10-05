@@ -4,18 +4,20 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 
 function RedisCommandParser() {
-  const nodeValueRegex    = /get (\w+) (\w+) (\w+)/;
-  const programmeRegex    = /programme (.*)/;
-  const getNeighborsRegex = /neighbors (.*)/;
-  const healNetworkRegex  = /healNetwork/;
+  const nodeValueRegex       = /get (\w+) (\w+) (\w+)/;
+  const programmeRegex       = /programme (.*)/;
+  const getNeighborsRegex    = /neighbors (.*)/;
+  const healNetworkRegex     = /healNetwork/;
+  const setVacationModeRegex = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
 
   const eventEmitter = new EventEmitter();
 
   const handlers = [
-    [nodeValueRegex,    nodeValueRequested],
-    [programmeRegex,    programmeChosen],
-    [getNeighborsRegex, neighborsRequested],
-    [healNetworkRegex,  healNetworkRequested]
+    [nodeValueRegex,       nodeValueRequested],
+    [programmeRegex,       programmeChosen],
+    [getNeighborsRegex,    neighborsRequested],
+    [healNetworkRegex,     healNetworkRequested],
+    [setVacationModeRegex, setVacationModeRequested]
   ];
 
   function parse(command) {
@@ -54,6 +56,17 @@ function RedisCommandParser() {
 
   function healNetworkRequested() {
     eventEmitter.emit('healNetworkRequested');
+  }
+
+  function setVacationModeRequested(match) {
+    if (match[1] === 'on') {
+      const meanStartTime = match[2];
+      const meanEndTime   = match[3];
+
+      eventEmitter.emit('setVacationModeRequested', true, meanStartTime, meanEndTime);
+    } else if (match[4] === 'off') {
+      eventEmitter.emit('setVacationModeRequested', false);
+    }
   }
 
   function on(eventName, handler) {

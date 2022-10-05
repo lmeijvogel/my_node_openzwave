@@ -1,6 +1,5 @@
 'use strict';
 
-const http = require('http');
 const minimist = require('minimist');
 const _ = require('lodash');
 
@@ -17,6 +16,8 @@ const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
 
+const VacationMode = require('./vacation_mode');
+
 const argv = minimist(process.argv.slice(2));
 
 const configFile = argv['config'] || './config.json';
@@ -30,28 +31,10 @@ Logger.info('Starting server');
 
 const runLive = argv['live'];
 
-const runHttpServer = config['http']['enabled'];
-const port = config['http']['port'];
 const testMode = !runLive;
 
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
-
-if (runHttpServer) {
-  http.createServer(function (req, res) {
-    let result = '';
-
-    if (testMode) {
-      result = zwave.tryParse(req, res);
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-
-    return res.end(req.url + '<br/><pre>' + result + '</pre>');
-  }).listen(port);
-  Logger.info('Listening on 0.0.0.0, port', port);
-} else {
-  Logger.info('Not starting HTTP server. Disabled in config.');
-}
 
 function stopProgramme() {
   Logger.info('disconnecting...');
@@ -86,6 +69,20 @@ Promise.all([
   const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
 
   const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+
+  const vacationMode = new VacationMode({
+    timeService: TimeService(config),
+    onFunction: function () { eventProcessor.programmeSelected('evening'); },
+    offFunction: function () { eventProcessor.programmeSelected('off'); }
+  });
+
+  vacationMode.onStart(function (meanStartTime, meanEndTime) {
+    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+  });
+
+  vacationMode.onStop(function () {
+    redisInterface.vacationModeStopped();
+  });
 
   myZWave.onValueChange(function (node, commandClass, value) {
     const lightName = _.invert(config['lights'])['' + node.nodeId];
@@ -130,9 +127,36 @@ Promise.all([
     zwave.healNetwork();
   });
 
+  redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
+    const vactionModeState = state;
+
+    if (vactionModeState) {
+      const vacationMeanStartTime = meanStartTime;
+      const vacationMeanEndTime   = meanEndTime;
+
+      vacationMode.start(meanStartTime, meanEndTime);
+      Logger.info('Started Vacation mode. Mean start time:', vacationMeanStartTime,
+        'mean end time:', vacationMeanEndTime);
+    } else {
+      vacationMode.stop();
+      Logger.info('Stopped vacation mode');
+    }
+
+  });
+
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       redisInterface.programmeChanged(programmeName);
+    }
+  });
+
+  redisInterface.getVacationMode().then(function (data) {
+    if (data.state === 'on') {
+      Logger.info('Vacation mode was still on. Enabling.');
+      const meanStartTime = data.start_time;
+      const meanEndTime   = data.end_time;
+
+      vacationMode.start(meanStartTime, meanEndTime);
     }
   });
 

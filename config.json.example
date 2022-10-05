@@ -1,9 +1,5 @@
 {
   "_comment": "A programme that includes a christmas tree that is regularly switched on while all the other lights are switched off",
-  "http": {
-    "enabled": false,
-    "port": 4567
-  },
   "log": {
     "file": "./log/openzwave.log",
     "level": "debug",
