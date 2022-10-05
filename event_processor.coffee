@@ -51,7 +51,6 @@ class EventProcessor
     try
       @programmeSelected nextProgrammeName
     catch e
-      Logger.
       Logger.error("Could not start '%s'", nextProgrammeName)
       Logger.error(e)
 
