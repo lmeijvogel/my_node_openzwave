@@ -8,29 +8,27 @@ const TimeStateMachine = require('../time_state_machine');
 describe('StateMachineBuilder', function () {
   describe('call', function () {
     it('builds the expected TimeStateMachines', function () {
-      const input = {
-        transitions: {
-          evening: {
-            on: {
-              default: 'evening',
-              evening: 'dimmed'
-            },
-
-            off: {
-              default: 'tree',
-              tree: 'off'
-            }
+      const transitions = {
+        evening: {
+          on: {
+            default: 'evening',
+            evening: 'dimmed'
           },
 
-          morning: {
-            on: {
-              default: 'morning'
-            }
+          off: {
+            default: 'tree',
+            tree: 'off'
+          }
+        },
+
+        morning: {
+          on: {
+            default: 'morning'
           }
         }
       };
 
-      const result = StateMachineBuilder(input).call();
+      const result = StateMachineBuilder(transitions).call();
 
       const eveningTSMachine = new TimeStateMachine({
         on: {
@@ -47,23 +45,21 @@ describe('StateMachineBuilder', function () {
     });
 
     it('sets a default "off" transition if it is not specified', function () {
-      const input = {
-        transitions: {
-          evening: {
-            on: {
-              default: 'evening'
-            }
-          },
+      const transitions = {
+        evening: {
+          on: {
+            default: 'evening'
+          }
+        },
 
-          morning: {
-            on: {
-              default: 'morning'
-            }
+        morning: {
+          on: {
+            default: 'morning'
           }
         }
       };
 
-      const result = StateMachineBuilder(input).call();
+      const result = StateMachineBuilder(transitions).call();
 
       const eveningTSMachine = new TimeStateMachine({
         on: {
