@@ -69,6 +69,11 @@ FakeZWave = classy.define({
 
     this.emit_event("value changed", [nodeId, 37, {label: "Switch", index: 0, value: false}]);
   },
+
+  enablePoll: function(nodeid, commandClass) {
+    console.log("FAKE: EnablePoll ", nodeid, commandClass);
+  },
+
   initializeDevices: function() {
     this.nodes[2] = {level: 0};
     this.nodes[3] = {};
