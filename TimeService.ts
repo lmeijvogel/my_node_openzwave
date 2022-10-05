@@ -10,7 +10,7 @@ interface ITimeService {
 }
 
 class TimeService implements ITimeService {
-  constructor(private config: Configuration) { }
+  constructor(private readonly config: Pick<Configuration, "periodStarts">) {}
 
   getPeriod(now): TimePeriod {
     Logger.debug(`TimeService.getPeriod: lookupTable: ${JSON.stringify([...this.lookupTable])}`);
