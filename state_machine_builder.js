@@ -5,13 +5,10 @@ const TimeStateMachine = require('./time_state_machine');
 
 function StateMachineBuilder(config) {
   function call() {
-    let result = {};
-
-    _(_.keys(config.transitions)).each(function (period) {
-      result[period] = new TimeStateMachine(config.transitions[period]);
-    });
-
-    return result;
+    return _(config.transitions).keys().reduce(function (acc, period) {
+      acc[period] = new TimeStateMachine(config.transitions[period]);
+      return acc;
+    }, {});
   }
 
   return {
