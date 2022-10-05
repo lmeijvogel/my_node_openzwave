@@ -1,13 +1,13 @@
 'use strict';
 
-const _ = require('lodash');
-const Programme = require('./programme');
+import { each } from 'lodash';
+import Programme from './programme';
 
 class ProgrammeFactory {
   build(programmesConfiguration, lights) {
     let programmes = {};
 
-    _.each(programmesConfiguration, function (programme, name) {
+    each(programmesConfiguration, function (programme, name) {
       const newProgramme = new Programme(name, programme.displayName, programme.values, lights);
 
       programmes[name] = newProgramme;
@@ -17,4 +17,4 @@ class ProgrammeFactory {
   }
 }
 
-module.exports = ProgrammeFactory;
+export default ProgrammeFactory;

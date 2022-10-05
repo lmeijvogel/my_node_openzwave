@@ -1,11 +1,12 @@
 'use strict';
 
-const _ = require('lodash');
-const Logger = require('./logger');
+import { defaults } from 'lodash';
+import Logger from './logger';
 
 class TimeStateMachine {
+  transitions : any;
   constructor(transitions) {
-    this.transitions = _.defaults({}, transitions, {
+    this.transitions = defaults({}, transitions, {
       off: {
         default: 'off'
       }
@@ -45,4 +46,4 @@ class TimeStateMachine {
   }
 }
 
-module.exports = TimeStateMachine;
+export default TimeStateMachine;

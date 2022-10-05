@@ -1,10 +1,15 @@
-'use strict';
-
-const Node = require('./node');
-const _ = require('lodash');
-const Logger = require('./logger');
+import Node from './node';
+import { each } from 'lodash';
+import Logger from './logger';
 
 class MyZWave {
+  private readonly zwave: any;
+  private readonly nodes: Object[];
+
+  private readonly eventListeners: Object;
+
+  private scanComplete: boolean;
+
   constructor(zwave) {
     this.zwave = zwave;
     this.nodes = [];
@@ -20,7 +25,7 @@ class MyZWave {
     });
 
     this.zwave.on('driver failed', () => {
-      Logger.fatal('Failed to start driver');
+      Logger.error('Failed to start driver');
       this.zwave.disconnect();
       process.exit();
     });
@@ -41,7 +46,7 @@ class MyZWave {
 
       node.setValue(comclass, value);
 
-      _.each(this.eventListeners['valueChange'], (handler) => {
+      each(this.eventListeners['valueChange'], (handler) => {
         handler.call(null, node, comclass, value);
       });
     });
@@ -90,7 +95,7 @@ class MyZWave {
 
       const node = Node.find(nodeid);
 
-      _(this.eventListeners['node event']).each((handler) => {
+      each(this.eventListeners['node event'], (handler) => {
         handler.call(null, node, event);
       });
     });
@@ -160,7 +165,7 @@ class MyZWave {
 
     return;
 
-    _(node.pollableClasses()).each((commandClass) => {
+    each(node.pollableClasses(), (commandClass) => {
       this.zwave.enablePoll(node.nodeId, commandClass);
     });
   }
@@ -194,4 +199,4 @@ class MyZWave {
   }
 }
 
-module.exports = MyZWave;
+export default MyZWave;

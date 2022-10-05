@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
-const assert = require('assert');
-const NextProgrammeChooser = require('../next_programme_chooser');
+import _ from 'lodash';
+import assert from 'assert';
+import NextProgrammeChooser from '../next_programme_chooser';
 
 const stub = (result) => function () { return result; };
 

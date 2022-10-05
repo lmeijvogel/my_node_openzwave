@@ -1,9 +1,11 @@
 'use strict';
 
-const winston = require('winston');
-const _       = require('lodash');
+import * as winston from 'winston';
+import { each, map, padStart, values } from 'lodash';
 
 class WinstonLogger {
+  private logger : winston;
+
   constructor() {
     this.logger = this.createLogger();
   }
@@ -15,34 +17,34 @@ class WinstonLogger {
   }
 
   setSilent(silent) {
-    _.each(this.logger.transports, (transport) => {
+    each(this.logger.transports, (transport) => {
       transport.silent = silent;
     });
   }
 
-  debug() {
-    this._log('debug', arguments);
+  debug(message, ...args) {
+    this._log('debug', message, ...args);
   }
-  verbose() {
-    this._log('verbose', arguments);
+  verbose(message, ...args) {
+    this._log('verbose', message, ...args);
   }
-  info() {
-    this._log('info', arguments);
+  info(message, ...args) {
+    this._log('info', message, ...args);
   }
-  warn() {
-    this._log('warn', arguments);
+  warn(message, ...args) {
+    this._log('warn', message, ...args);
   }
-  error() {
-    this._log('error', arguments);
+  error(message, ...args) {
+    this._log('error', message, ...args);
   }
 
-  _log(level, params) {
-    const args = [level].concat(_.values(params));
+  _log(level, ...params) {
+    const args = [level].concat(values(params));
 
     this.logger.log.apply(this.logger, args);
   }
 
-  createLogger(filename, level) {
+  createLogger(filename = null, level = 'info') {
     const transports = [
       new winston.transports.Console({'timestamp': this.timestamp.bind(this), 'level': 'info'})
     ];
@@ -59,8 +61,8 @@ class WinstonLogger {
   timestamp() {
     const now = new Date();
 
-    let   dateParts = this.getValues(now, ['getFullYear', 'getMonth', 'getDate']);
-    const timeParts = this.getValues(now, ['getHours', 'getMinutes', 'getSeconds']);
+    let   dateParts = [now.getFullYear(), now.getMonth(), now.getDate()];
+    const timeParts = [now.getHours(), now.getMinutes(), now.getSeconds()];
 
     dateParts[1]++;
 
@@ -70,13 +72,9 @@ class WinstonLogger {
     return datePart + ' ' + timePart;
   }
 
-  getValues(now, functionNames) {
-    return _(functionNames).map(fn => now[fn].call(now)).value();
-  }
-
   padToTwoZeros(parts) {
-    return _.map(parts, val => _.padStart('' + val, 2, '0'));
+    return map(parts, val => padStart('' + val, 2, '0'));
   }
 }
 
-module.exports = new WinstonLogger();
+export default new WinstonLogger();

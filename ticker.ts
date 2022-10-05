@@ -1,8 +1,11 @@
 'use strict';
 
-const Logger = require('./logger');
+import Logger from './logger';
 
 class Ticker {
+  private readonly name : String;
+  ticker : number;
+
   constructor(name) {
     this.ticker = null;
     this.name = name;
@@ -34,4 +37,4 @@ class Ticker {
   };
 }
 
-module.exports = Ticker;
+export default Ticker;

@@ -1,27 +1,27 @@
-'use strict';
-
-const _ = require('lodash');
+import { chain, keys, last, map } from 'lodash';
 
 class TimeService {
+  private readonly lookupTable : any;
   constructor(periodStarts) {
     this.lookupTable = periodStarts;
   }
 
-  getPeriod(now) {
-    const candidateKeys = _.chain(_.keys(this.lookupTable)).filter((k) => {
+  getPeriod(now) : string {
+    const candidateKeys = chain(keys(this.lookupTable)).filter((k) => {
       const periodStart = this.stringToTimeToday(k);
 
       return periodStart < now;
     }).value();
 
-    const key = _.last(candidateKeys);
+    const key = last(candidateKeys);
 
+    console.log("getPeriod: ", key, this.lookupTable[key]);
     return this.lookupTable[key];
   }
 
   stringToTimeToday(timeString) {
-    const splittedString = timeString.split(':');
-    const hoursMinutes = _.map(splittedString, (str) => parseInt(str, 10));
+    const splittedString : string[] = timeString.split(':');
+    const hoursMinutes : number[] = map(splittedString, (str) => parseInt(str, 10));
 
     const hours = hoursMinutes[0];
     const minutes = hoursMinutes[1];
@@ -40,4 +40,4 @@ class TimeService {
   }
 }
 
-module.exports = TimeService;
+export default TimeService;

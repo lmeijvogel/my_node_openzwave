@@ -1,12 +1,12 @@
 'use strict';
 
-const assert               = require('assert');
-const Node                 = require('../node');
-const _                    = require('lodash');
+import assert from 'assert';
+import Node from '../node';
+import _ from 'lodash';
 
-const NextProgrammeChooser = require('../next_programme_chooser');
-const TimeStateMachine     = require('../time_state_machine');
-const EventProcessor       = require('../event_processor');
+import NextProgrammeChooser from '../next_programme_chooser';
+import TimeStateMachine from '../time_state_machine';
+import EventProcessor from '../event_processor';
 
 describe('integration', function () {
   let handler;

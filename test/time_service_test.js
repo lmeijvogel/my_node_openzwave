@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
-const assert = require('assert');
+import _ from 'lodash';
+import assert from 'assert';
 
-const TimeService = require('../time_service');
+import TimeService from '../time_service';
 
 let timeService = null;
 

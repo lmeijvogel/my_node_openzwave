@@ -1,23 +1,23 @@
 'use strict';
 
-const restServer = require('./rest_server');
-const minimist = require('minimist');
-const _ = require('lodash');
+import restServer from './rest_server';
+import * as minimist from 'minimist';
+import { findKey } from 'lodash';
 
-const MyZWave = require('./my_zwave');
-const ProgrammeFactory = require('./programme_factory');
-const StateMachineBuilder = require('./state_machine_builder');
+import MyZWave from './my_zwave';
+import ProgrammeFactory from './programme_factory';
+import StateMachineBuilder from './state_machine_builder';
 
-const TimeService = require('./time_service');
-const NextProgrammeChooser = require('./next_programme_chooser');
+import TimeService from './time_service';
+import NextProgrammeChooser from './next_programme_chooser';
 
-const EventProcessor = require('./event_processor');
-const RedisInterface = require('./redis_interface');
-const ConfigReader = require('./config_reader');
-const Logger = require('./logger');
-const EventLogger = require('./event_logger');
+import EventProcessor from './event_processor';
+import RedisInterface from './redis_interface';
+import ConfigReader from './config_reader';
+import Logger from './logger';
+import EventLogger from './event_logger';
 
-const VacationMode = require('./vacation_mode');
+import VacationMode from './vacation_mode';
 
 const argv = minimist(process.argv.slice(2));
 
@@ -32,7 +32,7 @@ Logger.info('Starting server');
 
 const testMode = !argv['live'];
 
-const ZWaveFactory = require('./zwave_factory');
+import ZWaveFactory from './zwave_factory';
 const zwave = new ZWaveFactory(testMode).create();
 
 let api;
@@ -180,7 +180,7 @@ redisInterface.start();
         throw 'Main switch erroneously ignored. Exiting!'
       }
 
-      const lightName = _.findKey(lights, function (light) {
+      const lightName = findKey(lights, function (light) {
         return light.id === node.nodeId;
       });
 
@@ -222,11 +222,11 @@ redisInterface.start();
   }
 
   function initVacationMode(TimeService, eventProcessor, redisInterface) {
-    const vacationMode = new VacationMode({
-      timeService: new TimeService(config.periodStarts),
-      onFunction: function () { eventProcessor.programmeSelected('evening'); },
-      offFunction: function () { eventProcessor.programmeSelected('off'); }
-    });
+    const vacationMode = new VacationMode(
+      new TimeService(config.periodStarts),
+      () => { eventProcessor.programmeSelected('evening'); },
+      () => { eventProcessor.programmeSelected('off'); }
+    );
 
     vacationMode.onStart(function (meanStartTime, meanEndTime) {
       redisInterface.vacationModeStarted(meanStartTime, meanEndTime);

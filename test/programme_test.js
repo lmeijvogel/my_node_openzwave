@@ -1,9 +1,9 @@
 'use strict';
 
-const assert = require('assert');
-const sinon = require('sinon');
-const Programme = require('../programme');
-const MyZWave = require('../my_zwave');
+import assert from 'assert';
+import sinon from 'sinon';
+import Programme from '../programme';
+import MyZWave from '../my_zwave';
 
 let lightId1 = null;
 let lightId2 = null;

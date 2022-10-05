@@ -1,9 +1,17 @@
 'use strict';
 
-const Logger = require('./logger');
-const express = require('express');
+import Logger from './logger';
+import * as express from 'express';
 
-module.exports = function (options) {
+//export default class Server {
+  //public app : express.Application;
+
+  //public static bootstrap() : Server {
+    //return new Server();
+  //}
+//}
+
+export default function (options) {
   const app = express();
   const port = 3000;
 
@@ -18,8 +26,8 @@ module.exports = function (options) {
   let switchStateFinderCallback = function () {};
 
   let onHealNetworkRequestedCallback = function () {};
-  let onRefreshNodeRequestedCallback = function () {};
-  let onSimulateSwitchPressRequestedCallback = function () {};
+  let onRefreshNodeRequestedCallback = function (nodeid : number) {};
+  let onSimulateSwitchPressRequestedCallback = function (signal: number) {};
 
   let programmes = {};
 

@@ -1,20 +1,25 @@
 'use strict';
 
-const util = require('util');
-const _ = require('lodash');
-const Logger = require('./logger');
+import * as util from 'util';
+import { extend, filter, forIn, includes, keys as _keys, some } from 'lodash';
+import Logger from './logger';
 
 const nodes = {};
 
 const POLLABLE_CLASSES = [ 0x25, 0x26 ];
 
 class Node {
+  nodeId : number;
+  values : Object;
+  info: Object;
+  ready: boolean;
+
   static find(nodeid) {
     return nodes[parseInt(nodeid, 10)];
   };
 
   static all() {
-    return _.extend({}, nodes);
+    return extend({}, nodes);
   };
 
   static add(nodeid) {
@@ -98,10 +103,10 @@ class Node {
   toString() {
     let result = '';
 
-    _.forIn(this.values, (commandClass, commandClassIdx) => {
+    forIn(this.values, (commandClass, commandClassIdx) => {
       result += util.format('node%d: class %d\n', this.nodeId, commandClassIdx);
 
-      _.forIn(commandClass, (command) => {
+      forIn(commandClass, (command) => {
         result += util.format('node%d:   %s=%s', this.nodeId, command['label'], command['value']);
       });
     });
@@ -110,20 +115,20 @@ class Node {
   }
 
   isPollable() {
-    return _.some(this.pollableClasses());
+    return some(this.pollableClasses());
   }
 
   pollableClasses() {
-    const keys = _.keys(this.values);
+    const keys = _keys(this.values);
 
-    return _.filter(keys, function (commandClassIdx) {
+    return filter(keys, function (commandClassIdx) {
       const intCommandClassIdx = parseInt(commandClassIdx, 10);
 
       // 0x25: COMMAND_CLASS_SWITCH_BINARY
       // 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL
-      return _.includes(POLLABLE_CLASSES, intCommandClassIdx);
+      return includes(POLLABLE_CLASSES, intCommandClassIdx);
     });
   }
 }
 
-module.exports = Node;
+export default Node;

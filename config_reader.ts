@@ -1,6 +1,4 @@
-'use strict';
-
-const fs = require('fs');
+import * as fs from 'fs';
 
 class ConfigReader {
   read(filename) {
@@ -10,4 +8,4 @@ class ConfigReader {
   }
 }
 
-module.exports = ConfigReader;
+export default ConfigReader;

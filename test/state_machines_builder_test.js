@@ -1,9 +1,9 @@
 'use strict';
 
-const assert = require('assert');
+import assert from 'assert';
 
-const StateMachineBuilder = require('../state_machine_builder');
-const TimeStateMachine = require('../time_state_machine');
+import StateMachineBuilder from '../state_machine_builder';
+import TimeStateMachine from '../time_state_machine';
 
 describe('StateMachineBuilder', function () {
   describe('call', function () {

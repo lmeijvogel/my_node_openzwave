@@ -1,14 +1,16 @@
-'use strict';
-
-const _ = require('lodash');
-const Logger = require('./logger');
+import { each, map } from 'lodash';
+import Logger from './logger';
 
 class Programme {
+  private readonly name : String;
+  private readonly displayName : String;
+  private readonly actions: any[];
+
   constructor(name, displayName, data, lights) {
     this.name = name;
     this.displayName = displayName;
 
-    this.actions = _(data).map((value, key) => {
+    this.actions = map(data, (value, key) => {
       if (!lights[key]) {
         throw 'Error creating Programme "' + this.name + '": node "' + key + '" does not exist';
       }
@@ -18,12 +20,12 @@ class Programme {
         nodeid: lights[key].id,
         value: value
       };
-    }).value();
+    });
 
   }
 
   apply(zwave) {
-    _.each(this.actions, (action) => {
+    each(this.actions, (action) => {
       try {
         if (action.value === true) {
           Logger.verbose('Send command "switch on" to node %d', action.nodeid);
@@ -43,4 +45,4 @@ class Programme {
   }
 }
 
-module.exports = Programme;
+export default Programme;

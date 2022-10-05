@@ -1,8 +1,13 @@
 'use strict';
 
-const Logger = require('./logger');
+import Logger from './logger';
+import TimeService from './time_service';
+import TimeStateMachine from './time_state_machine';
 
 class NextProgrammeChooser {
+  private readonly timeService: TimeService;
+  private readonly stateMachines: any; // { 'morning': TimeStateMachine }
+
   constructor(timeService, stateMachines) {
     this.timeService = timeService;
     this.stateMachines = stateMachines;
@@ -20,7 +25,7 @@ class NextProgrammeChooser {
     return newState;
   }
 
-  chooseStateMachine() {
+  chooseStateMachine() : TimeStateMachine {
     const now = new Date();
 
     const currentPeriod = this.timeService.getPeriod(now);
@@ -34,9 +39,10 @@ class NextProgrammeChooser {
       return stateMachine;
     } else {
       Logger.error('NextProgrammeChooser.chooseStateMachine: Unknown time');
+
       return this.stateMachines.morning;
     }
   }
 }
 
-module.exports = NextProgrammeChooser;
+export default NextProgrammeChooser;
