@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var classy = require('classy');
 var Programme = require('./programme');
 
