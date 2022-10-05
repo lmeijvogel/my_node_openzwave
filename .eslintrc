@@ -16,3 +16,4 @@ globals:
   context: false
   before: false
   it: false
+  process: false

@@ -26,8 +26,8 @@ describe "Programme", ->
     data[@lightName2] = false
     data[@lightName3] = true
 
-    @programme = new Programme("name", "displayName", data, lights)
-    @zwave = new MyZWave()
+    @programme = Programme("name", "displayName", data, lights)
+    @zwave = MyZWave()
     @zwaveMock = sinon.mock(@zwave)
 
   context "when it is applied", ->

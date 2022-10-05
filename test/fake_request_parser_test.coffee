@@ -10,7 +10,7 @@ assert.deepEqual = (expected, actual) ->
   )
 
 describe "FakeRequestParser", ->
-  requestParser = new FakeRequestParser()
+  requestParser = FakeRequestParser()
   describe "when the request can't be parsed", ->
     beforeEach ->
       @request = url: "unintelligible"
