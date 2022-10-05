@@ -6,32 +6,36 @@ function NextProgrammeChooser(timeService, stateMachines) {
   let currentState = null;
 
   function setCurrentState(newCurrentState) {
-    Logger.debug('NextProgrammeChooser: Registering current state as', currentState);
+    Logger.debug('NextProgrammeChooser: Registering current state as', newCurrentState);
     currentState = newCurrentState;
   }
 
   function handle(event) {
-    Logger.debug('Leaving state', currentState);
+    Logger.debug('NextProgrammeChooser.handle: currentState: ', currentState);
 
     const currentStateMachine = chooseStateMachine();
 
     currentState = currentStateMachine.handle(event);
 
-    Logger.verbose('Entering state', currentState);
+    Logger.verbose('NextProgrammeChooser.handle: new currentState: ', currentState);
 
     return currentState;
   }
 
   function chooseStateMachine() {
     const now = new Date();
+
     const currentPeriod = timeService.getPeriod(now);
+
+    Logger.debug('NextProgrammeChooser.chooseStateMachine: Time is ', now);
+    Logger.debug('NextProgrammeChooser.chooseStateMachine: currentPeriod is ', currentPeriod);
 
     const stateMachine = stateMachines[currentPeriod];
 
     if (stateMachine) {
       return stateMachine;
     } else {
-      Logger.error('NextProgrammeChooser#chooseStateMachine: Unknown time');
+      Logger.error('NextProgrammeChooser.chooseStateMachine: Unknown time');
       return stateMachines.morning;
     }
   }

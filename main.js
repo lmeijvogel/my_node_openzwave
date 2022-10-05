@@ -90,14 +90,20 @@ Promise.all([
   myZWave.onValueChange(function (node, commandClass, value) {
     const lightName = _.invert(config['lights'])['' + node.nodeId];
 
+    Logger.debug('Received value change from ', node.nodeId);
+    Logger.debug('New value: ', commandClass, ': ', value);
+
     redisInterface.storeValue(lightName, commandClass, value);
   });
 
   redisInterface.on('commandReceived', function (command) {
+    Logger.debug('Received command via Redis: ', command);
+
     redisCommandParser.parse(command);
   });
 
   myZWave.onNodeEvent(function (node, event) {
+    Logger.debug('Event from node ', node.nodeId);
     if (node.nodeId === 3) {
       eventProcessor.mainSwitchPressed(event);
     } else {
