@@ -181,17 +181,6 @@ function MyZWave(zwave) {
     }
   }
 
-  function getNeighbors(nodeid) {
-    zwave.getNeighbors(nodeid);
-  }
-
-  function logValue(nodeId, commandClass, index) {
-    const node = Node.find(nodeId);
-    const value = node.getValue(commandClass, index);
-
-    Logger.info('Node value requested: node %d: %d:%s: %s', nodeId, commandClass, value['label'], value['value']);
-  }
-
   function healNetwork() {
     zwave.healNetwork();
   }
@@ -204,8 +193,6 @@ function MyZWave(zwave) {
     setLevel:      setLevel,
     switchOn:      switchOn,
     switchOff:     switchOff,
-    getNeighbors:  getNeighbors,
-    logValue:      logValue,
     healNetwork:   healNetwork
   };
 }

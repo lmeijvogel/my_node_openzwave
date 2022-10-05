@@ -1,5 +1,6 @@
 'use strict';
 
+const restServer = require('./rest_server');
 const minimist = require('minimist');
 const _ = require('lodash');
 
@@ -11,7 +12,6 @@ const TimeService = require('./time_service');
 const NextProgrammeChooser = require('./next_programme_chooser');
 
 const EventProcessor = require('./event_processor');
-const RedisCommandParser = require('./redis_command_parser');
 const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
@@ -35,6 +35,8 @@ const testMode = !argv['live'];
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
 
+let api;
+
 function stopProgramme() {
   Logger.info('disconnecting...');
   eventLogger.store({
@@ -42,6 +44,7 @@ function stopProgramme() {
     event: 'Daemon stopped',
     data: null
   });
+  api.stop();
   zwave.disconnect();
   redisInterface.cleanUp();
   eventLogger.stop();
@@ -54,19 +57,13 @@ process.on('SIGTERM', stopProgramme);
 
 const eventLogger = EventLogger();
 
-const redisInterface = RedisInterface('MyZWave');
-
-const redisCommandParser = RedisCommandParser();
+const redisInterface = RedisInterface();
 
 redisInterface.start();
-Promise.all([
-  redisInterface.clearCurrentLightLevels(),
-  redisInterface.clearAvailableProgrammes()
-]).then(function () {
+// TODO: Remove Promise.resolve()
+Promise.resolve().then(function () {
   let currentProgramme = null;
   let switchEnabled = true;
-
-  redisInterface.switchEnabled();
 
   eventLogger.start();
 
@@ -79,17 +76,7 @@ Promise.all([
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
 
-  _(config.lights).each(function (light, key) {
-    const lightName = key;
-
-    redisInterface.storeNode(lightName, light.id, light.displayName);
-  });
-
   const programmes = programmeFactory.build(config.programmes, config.lights);
-
-  _(programmes).values().each(function (programme) {
-    redisInterface.addAvailableProgramme(programme.name, programme.displayName);
-  });
 
   const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
 
@@ -102,6 +89,10 @@ Promise.all([
     onFunction: function () { eventProcessor.programmeSelected('evening'); },
     offFunction: function () { eventProcessor.programmeSelected('off'); }
   });
+
+  api = restServer({vacationMode: vacationMode, myZWave: myZWave});
+
+  api.start();
 
   vacationMode.onStart(function (meanStartTime, meanEndTime) {
     redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
@@ -116,16 +107,13 @@ Promise.all([
       return light.id === node.nodeId;
     });
 
+    if (!config.lights[lightName].values) {
+      config.lights[lightName].values = {};
+    }
+    config.lights[lightName].values[commandClass] = value;
+
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
-
-    redisInterface.storeValue(lightName, node.nodeId, commandClass, value);
-  });
-
-  redisInterface.on('commandReceived', function (command) {
-    Logger.debug('Received command via Redis: ', command);
-
-    redisCommandParser.parse(command);
   });
 
   myZWave.onNodeEvent(function (node, event) {
@@ -139,63 +127,52 @@ Promise.all([
 
   });
 
-  redisCommandParser.on('nodeValueRequested', function (nodeId, commandClass, index) {
-    myZWave.logValue(nodeId, commandClass, index);
+  api.setProgrammesListFinder(function () {
+    return programmes;
   });
 
-  redisCommandParser.on('dimNode', function (nodeId, value) {
-    myZWave.setLevel(nodeId, value);
+  api.setLightsListFinder(function () {
+    return config.lights;
   });
 
-  redisCommandParser.on('switchNode', function (nodeId, value) {
-    if (value) {
-      myZWave.switchOn(nodeId);
-    } else {
-      myZWave.switchOff(nodeId);
-    }
+  api.setCurrentProgrammeFinder(function () {
+    return currentProgramme;
   });
 
-  redisCommandParser.on('programmeChosen', function (programmeName) {
+  api.onProgrammeChosen(function (programmeName) {
     eventProcessor.programmeSelected(programmeName);
   });
 
-  redisCommandParser.on('neighborsRequested', function (nodeId) {
-    zwave.getNeighbors(nodeId);
+  api.setMainSwitchStateFinder(function () {
+    return switchEnabled;
   });
 
-  redisCommandParser.on('healNetworkRequested', function () {
+  api.onSwitchStateChangeRequested(function (enabled) {
+    if (enabled) {
+      Logger.info('Enabling switch');
+    } else {
+      Logger.info('Disabling switch');
+    }
+
+    switchEnabled = enabled;
+  });
+
+  api.onHealNetworkRequested(function () {
     Logger.info('Requested healing the network');
     zwave.healNetwork();
   });
 
-  redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
-    if (state) {
-      vacationMode.start(meanStartTime, meanEndTime);
-      Logger.info('Started Vacation mode. Mean start time:', meanStartTime,
-        'mean end time:', meanEndTime);
-    } else {
-      vacationMode.stop();
-      Logger.info('Stopped vacation mode');
-    }
-
+  api.onRefreshNodeRequested(function (nodeId) {
+    zwave.refreshNodeInfo(nodeId);
   });
 
-  redisCommandParser.on('disableSwitch', function () {
-    Logger.info('Disabling switch');
-    redisInterface.switchDisabled();
-    switchEnabled = false;
-  });
-
-  redisCommandParser.on('enableSwitch', function () {
-    Logger.info('Enabling switch');
-    redisInterface.switchEnabled();
-    switchEnabled = true;
+  api.onSimulateSwitchPressRequested(function (signal) {
+    switchPressed(signal);
   });
 
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       currentProgramme = programmeName;
-      redisInterface.programmeChanged(programmeName);
 
       eventLogger.store({
         initiator: 'event processor',
@@ -204,15 +181,6 @@ Promise.all([
       });
     }
   });
-
-  redisCommandParser.on('simulateSwitchPress', function (event) {
-    switchPressed(event);
-  });
-
-  redisCommandParser.on('refreshNodeRequested', function (nodeid) {
-    zwave.refreshNodeInfo(nodeid);
-  });
-
 
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
