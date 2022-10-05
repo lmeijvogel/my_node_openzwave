@@ -1,16 +1,17 @@
-import * as util from "util";
-import { extend, filter, forIn, includes, keys as _keys, map, some } from "lodash";
+import { extend, map, without } from "lodash";
 import { Logger } from "./Logger";
 
 const nodes = new Map<number, Node>();
 
-// 0x25: COMMAND_CLASS_SWITCH_BINARY
-// 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL
-const POLLABLE_CLASSES = [0x25, 0x26];
+const COMMAND_CLASS_SWITCH_BINARY = 0x25;
+const COMMAND_CLASS_SWITCH_MULTILEVEL = 0x26;
+
+const POLLABLE_CLASSES = [COMMAND_CLASS_SWITCH_BINARY, COMMAND_CLASS_SWITCH_MULTILEVEL];
 
 // Copied from openzwave-shared.d.ts, since I can't seem to import it correctly.
 interface ValueId {
   value_id?: number;
+  value?: string;
   node_id: number;
   class_id: number;
   instance: number;
@@ -20,7 +21,7 @@ interface ValueId {
 
 class Node {
   nodeId: number;
-  values: Object;
+  values: Map<number, ValueId[]>;
   info: Object;
   ready: boolean;
 
@@ -38,17 +39,17 @@ class Node {
 
   constructor(nodeId) {
     this.nodeId = nodeId;
-    this.values = {};
+    this.values = new Map<number, ValueId[]>();
     this.info = {};
     this.ready = false;
   }
 
   addValue(commandClass: number, value: ValueId) {
     if (!this.commandClassExists(commandClass)) {
-      this.values[commandClass] = [];
+      this.values.set(commandClass, []);
     }
 
-    this.values[commandClass][value.index] = value;
+    this.values.get(commandClass)[value.index] = value;
   }
 
   setValue(commandClass: number, value) {
@@ -75,25 +76,27 @@ class Node {
         );
       }
 
-      this.values[commandClass][value.index] = value;
+      this.values.get(commandClass)[value.index] = value;
     }
   }
 
   getValue(commandClass: number, index) {
     if (this.commandClassExists(commandClass)) {
-      return this.values[commandClass][index];
+      return this.values.get(commandClass)[index];
     } else {
       return { label: "Unknown", value: "-" };
     }
   }
 
   commandClassExists(commandClass: number) {
-    return !!this.values[commandClass];
+    return this.values.has(commandClass);
   }
 
   removeValue(commandClass: number, index) {
-    if (this.commandClassExists(commandClass) && this.values[commandClass][index]) {
-      delete this.values[commandClass][index];
+    if (this.commandClassExists(commandClass)) {
+      const filteredCommandClass = without(this.values[commandClass], index);
+
+      this.values.set(commandClass, filteredCommandClass);
     }
   }
 
@@ -117,39 +120,37 @@ class Node {
   }
 
   toString() {
-    let result = "";
+    let result = `node ${this.nodeId}: (`;
 
-    forIn(this.values, (commandClass, commandClassIdx) => {
-      result += util.format("node%d: class %d\n", this.nodeId, commandClassIdx);
+    this.values.forEach((commandClass, commandClassIdx) => {
+      result += `class ${commandClassIdx}: {`;
 
       if (commandClass) {
-        forIn(commandClass, command => {
+        result += commandClass.map(command => {
           if (command) {
-            result += util.format("node%d:   %s=%s", this.nodeId, command["label"], command["value"]);
-          } else {
-            Logger.error(`Unexpected null value in 'command' for Node '${this.nodeId}', commandClassIndex ${commandClassIdx}.`);
+            return `${command.label}=${command.value}`;
           }
-        });
-      } else {
-        Logger.error(`Unexpected null value in 'commandClass' for Node '${this.nodeId}', commandClassIndex ${commandClassIdx}.`);
+        }).filter(el => !!el).join(", ");
       }
+
+      result += "}";
     });
+
+    result += ")";
 
     return result;
   }
 
   isPollable() {
-    return some(this.pollableClasses());
+    return this.pollableClasses().length > 0;
   }
 
   pollableClasses(): number[] {
-    const keys = _keys(this.values);
+    const keys = this.values.keys;
 
     const numericKeys = map(keys, commandClassIdx => parseInt(commandClassIdx, 10));
 
-    return filter(numericKeys, function(commandClass) {
-      return includes(POLLABLE_CLASSES, commandClass);
-    });
+    return numericKeys.filter(commandClass => POLLABLE_CLASSES.includes(commandClass));
   }
 }
 
