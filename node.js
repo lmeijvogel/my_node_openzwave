@@ -1,17 +1,17 @@
 'use strict';
 
-var util = require('util');
-var _ = require('lodash');
-var Logger = require('./logger');
+const util = require('util');
+const _ = require('lodash');
+const Logger = require('./logger');
 
-var nodes = {};
+const nodes = {};
 
-var POLLABLE_CLASSES = [ 0x25, 0x26 ];
+const POLLABLE_CLASSES = [ 0x25, 0x26 ];
 
 function Node(nodeId) {
-  var values = {};
-  var info = {};
-  var ready = null;
+  let values = {};
+  let info = {};
+  let ready = null;
 
   function addValue(commandClass, value) {
     if (!commandClassExists(commandClass)) {
@@ -81,7 +81,7 @@ function Node(nodeId) {
   }
 
   function toString() {
-    var result = '';
+    let result = '';
 
     _.forIn(values, function (commandClass, commandClassIdx) {
       result += util.format('node%d: class %d\n', nodeId, commandClassIdx);
@@ -99,10 +99,10 @@ function Node(nodeId) {
   }
 
   function pollableClasses() {
-    var keys = _.keys(values);
+    const keys = _.keys(values);
 
     return _.select(keys, function (commandClassIdx) {
-      var intCommandClassIdx = parseInt(commandClassIdx, 10);
+      const intCommandClassIdx = parseInt(commandClassIdx, 10);
 
       // 0x25: COMMAND_CLASS_SWITCH_BINARY
       // 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL

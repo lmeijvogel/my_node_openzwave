@@ -12,18 +12,18 @@
  * switch, reporting as little as possible.
  */
 
-var _                 = require('lodash');
+const _                 = require('lodash');
 
-var FakeRequestParser = require('./fake_request_parser');
-var Logger            = require('./logger');
+const FakeRequestParser = require('./fake_request_parser');
+const Logger            = require('./logger');
 
 function FakeZWave() {
-  var callbacks = {};
-  var nodes = {};
-  var SWITCH_BINARY = 37;
-  var SWITCH_MULTILEVEL = 38;
+  let callbacks = {};
+  let nodes = {};
+  const SWITCH_BINARY = 37;
+  const SWITCH_MULTILEVEL = 38;
 
-  var fakeRequestParser = FakeRequestParser();
+  const fakeRequestParser = FakeRequestParser();
 
   function on(eventName, callback) {
     if (!callbacks[eventName]) {
@@ -34,7 +34,7 @@ function FakeZWave() {
   }
 
   function connect() {
-    var homeId = '128';
+    const homeId = '128';
 
     emitEvent('driver ready', [homeId]);
 
@@ -56,7 +56,7 @@ function FakeZWave() {
   }
 
   function tryParse(req) {
-    var result = fakeRequestParser.parse(req);
+    const result = fakeRequestParser.parse(req);
 
     if (result) {
       emitEvent(result.type, [
@@ -67,7 +67,7 @@ function FakeZWave() {
   }
 
   function logValue(nodeId, commandClass) {
-    var value = {label: 'TestLabel', value: 12};
+    const value = {label: 'TestLabel', value: 12};
 
     Logger.info('Node value requested: node %d: %d:%s: %s',
       parseInt(nodeId, 10),
@@ -141,7 +141,7 @@ function FakeZWave() {
     nodes[8] = {level: 0};
     nodes[9] = {level: 0};
 
-    var node2NodeInfo = {
+    const node2NodeInfo = {
       manufacturer: 'Aeon Labs',
       manufacturerid: '0086',
       product: 'Smart Energy Illuminator',
@@ -153,9 +153,9 @@ function FakeZWave() {
     };
 
     // node 3 is never ready, since it is on battery and doesn't listen to events to save power
-    // var node3_nodeinfo = {};
+    // const node3_nodeinfo = {};
 
-    var node5NodeInfo = {
+    const node5NodeInfo = {
       manufacturer: 'FIBARO System',
       manufacturerid: '010f',
       product: '',
@@ -165,7 +165,7 @@ function FakeZWave() {
       name: '',
       loc: ''
     };
-    var node7NodeInfo = {
+    const node7NodeInfo = {
       manufacturer: 'Z-Wave.Me',
       manufacturerid: '0115',
       product: 'ZME_054313Z Flush-Mountable Switch',
@@ -176,7 +176,7 @@ function FakeZWave() {
       loc: ''
     };
 
-    var node8NodeInfo = {
+    const node8NodeInfo = {
       manufacturer: 'Z-Wave.Me',
       manufacturerid: '0115',
       product: 'ZME_06433 Wall Flush-Mountable Dimmer',
@@ -187,7 +187,7 @@ function FakeZWave() {
       loc: ''
     };
 
-    var node9NodeInfo = {
+    const node9NodeInfo = {
       manufacturer: 'Aeon Labs',
       manufacturerid: '0086',
       product: 'Smart Energy Illuminator',
@@ -204,7 +204,7 @@ function FakeZWave() {
     emitEvent('node added', [7]);
     emitEvent('node added', [8]);
     emitEvent('node added', [9]);
-    var dimValue = {
+    const dimValue = {
       type: 'byte',
       genre: 'user',
       instance: 1,
@@ -218,7 +218,7 @@ function FakeZWave() {
       value: 0
     };
 
-    var switchValue = {
+    const switchValue = {
       type: 'bool',
       genre: 'user',
       instance: 1,
@@ -232,7 +232,7 @@ function FakeZWave() {
       value: false
     };
 
-    var standaloneSwitchValue = {
+    const standaloneSwitchValue = {
       type: 'byte',
       genre: 'all',
       instance: 1,

@@ -1,45 +1,45 @@
 'use strict';
 
-var http = require('http');
-var minimist = require('minimist');
-var _ = require('lodash');
+const http = require('http');
+const minimist = require('minimist');
+const _ = require('lodash');
 
-var MyZWave = require('./my_zwave');
-var ProgrammeFactory = require('./programme_factory');
-var StateMachineBuilder = require('./state_machine_builder');
+const MyZWave = require('./my_zwave');
+const ProgrammeFactory = require('./programme_factory');
+const StateMachineBuilder = require('./state_machine_builder');
 
-var TimeService = require('./time_service');
-var NextProgrammeChooser = require('./next_programme_chooser');
+const TimeService = require('./time_service');
+const NextProgrammeChooser = require('./next_programme_chooser');
 
-var EventProcessor = require('./event_processor');
-var CommandParser = require('./command_parser');
-var RedisInterface = require('./redis_interface');
-var ConfigReader = require('./config_reader');
-var Logger = require('./logger');
+const EventProcessor = require('./event_processor');
+const CommandParser = require('./command_parser');
+const RedisInterface = require('./redis_interface');
+const ConfigReader = require('./config_reader');
+const Logger = require('./logger');
 
-var argv = minimist(process.argv.slice(2));
+const argv = minimist(process.argv.slice(2));
 
-var logFile = argv['logfile'] || './log/openzwave.log';
+const logFile = argv['logfile'] || './log/openzwave.log';
 
-var configFile = argv['config'] || './config.json';
-var config = ConfigReader().read(configFile);
+const configFile = argv['config'] || './config.json';
+const config = ConfigReader().read(configFile);
 
 Logger.enableLogToFile(logFile);
 
 Logger.info('Starting server');
 
-var runLive = argv['live'];
+const runLive = argv['live'];
 
-var runHttpServer = config['http']['enabled'];
-var port = config['http']['port'];
-var testMode = !runLive;
+const runHttpServer = config['http']['enabled'];
+const port = config['http']['port'];
+const testMode = !runLive;
 
-var ZWaveFactory = require('./zwave_factory');
-var zwave = ZWaveFactory(testMode).create();
+const ZWaveFactory = require('./zwave_factory');
+const zwave = ZWaveFactory(testMode).create();
 
 if (runHttpServer) {
   http.createServer(function (req, res) {
-    var result = '';
+    let result = '';
 
     if (testMode) {
       result = zwave.tryParse(req, res);
@@ -63,31 +63,29 @@ function stopProgramme() {
 process.on('SIGINT', stopProgramme);
 process.on('SIGTERM', stopProgramme);
 
-var myZWave = MyZWave(zwave);
-var redisInterface = RedisInterface('MyZWave');
-var commandParser = CommandParser();
+const myZWave = MyZWave(zwave);
+const redisInterface = RedisInterface('MyZWave');
+const commandParser = CommandParser();
 
 redisInterface.start();
 
 redisInterface.clearAvailableProgrammes();
-var programmeFactory = ProgrammeFactory();
+const programmeFactory = ProgrammeFactory();
 
 programmeFactory.onProgrammeCreated(function (programme) {
   redisInterface.addAvailableProgramme(programme.name, programme.displayName);
 });
 
-var programmes = programmeFactory.build(config);
+const programmes = programmeFactory.build(config);
 
-var stateMachineBuilder = StateMachineBuilder(config);
-var stateMachines = stateMachineBuilder.call();
+const stateMachines = StateMachineBuilder(config).call();
 
-var timeService = TimeService(config);
-var nextProgrammeChooser = NextProgrammeChooser(timeService, stateMachines);
+const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
 
-var eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
 myZWave.onValueChange(function (node, commandClass, value) {
-  var lightName = _.invert(config['lights'])['' + node.nodeId];
+  const lightName = _.invert(config['lights'])['' + node.nodeId];
 
   redisInterface.storeValue(lightName, commandClass, value);
 });

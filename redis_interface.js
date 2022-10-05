@@ -1,14 +1,14 @@
 'use strict';
 
-var Redis = require('redis');
-var Logger = require('./logger');
-var EventEmitter = require('events').EventEmitter;
+const Redis = require('redis');
+const Logger = require('./logger');
+const EventEmitter = require('events').EventEmitter;
 
 function RedisInterface(commandChannel) {
-  var subscriptionRedis;
-  var dataRedis;
+  let subscriptionRedis;
+  let dataRedis;
 
-  var eventEmitter = new EventEmitter();
+  const eventEmitter = new EventEmitter();
 
   function start() {
     subscriptionRedis = Redis.createClient();

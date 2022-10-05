@@ -1,11 +1,11 @@
 'use strict';
 
-var winston = require('winston');
-var moment  = require('moment');
-var _       = require('lodash');
+const winston = require('winston');
+const moment  = require('moment');
+const _       = require('lodash');
 
 function WinstonLogger() {
-  var logger = createLogger();
+  let logger = createLogger();
 
   // Don't enable logging to file by default since it would then also do
   // that while running tests
@@ -36,13 +36,13 @@ function WinstonLogger() {
   }
 
   function _log(level, params) {
-    var args = [level].concat(_.values(params));
+    const args = [level].concat(_.values(params));
 
     logger.log.apply(logger, args);
   }
 
   function createLogger(filename) {
-    var transports = [
+    const transports = [
       new winston.transports.Console({'timestamp': timestamp, 'level': 'info'})
     ];
 
