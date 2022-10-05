@@ -163,8 +163,16 @@ var MyZWave = classy.define({
     });
   },
 
-  setLevel: function(node, level) {
-    this.zwave.setLevel(node.nodeId, level);
+  setLevel: function(nodeid, level) {
+    this.zwave.setLevel(nodeid, level);
+  },
+
+  switchOn:  function(nodeid) {
+    this.zwave.switchOn(nodeid);
+  },
+
+  switchOff: function(nodeid) {
+    this.zwave.switchOff(nodeid);
   }
 });
 
