@@ -30,37 +30,6 @@ function RedisInterface(commandChannel) {
     dataRedis.set('zwave_programme', name);
   }
 
-  function storeNode(lightName, nodeId, displayName) {
-    dataRedis.hset('node_' + lightName, 'node_id', nodeId);
-    dataRedis.hset('node_' + lightName, 'display_name', displayName);
-
-    Logger.debug('Stored in Redis: ', lightName, nodeId, displayName);
-  }
-
-  function storeValue(lightName, nodeId, commandClass, value) {
-    dataRedis.hset('node_' + lightName, 'class_' + commandClass, value.value);
-
-    Logger.debug('Stored in Redis: ', lightName, nodeId, commandClass, value.value);
-  }
-
-  function clearCurrentLightLevels() {
-    return new Promise(function (resolve, reject) {
-      dataRedis.keys('node_*', function (err, keys) {
-        const deletePromises = _.map(keys, function (key) {
-          return new Promise(function (resolveDelete, rejectDelete) {
-            dataRedis.del(key, function () {
-              resolveDelete();
-            });
-          });
-        });
-
-        Promise.all(deletePromises).then(function () {
-          resolve();
-        });
-      });
-    });
-  }
-
   function getVacationMode() {
     return new Promise(function (resolve, reject) {
       dataRedis.hgetall('zwave_vacation_mode', function (err, values) {
@@ -117,9 +86,6 @@ function RedisInterface(commandChannel) {
     getVacationMode:          getVacationMode,
     vacationModeStarted:      vacationModeStarted,
     vacationModeStopped:      vacationModeStopped,
-    storeNode:                storeNode,
-    storeValue:               storeValue,
-    clearCurrentLightLevels:  clearCurrentLightLevels,
     clearAvailableProgrammes: clearAvailableProgrammes,
     addAvailableProgramme:    addAvailableProgramme,
     switchEnabled:            switchEnabled,
