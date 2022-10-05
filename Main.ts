@@ -35,7 +35,7 @@ Logger.enableLogToFile(logFile, config["log"]["level"]);
 
 Logger.info("Starting server");
 
-const testMode = !argv["live"];
+const testMode = argv["_"].indexOf("live") === -1;
 
 import { ZWaveFactory } from "./ZWaveFactory";
 
