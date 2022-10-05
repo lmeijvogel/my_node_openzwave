@@ -46,7 +46,7 @@ describe('Programme', function () {
     data[lightName2] = false;
     data[lightName3] = true;
 
-    programme = Programme('name', 'displayName', data, lights);
+    programme = new Programme('name', 'displayName', data, lights);
     zwave = MyZWave();
     zwaveMock = sinon.mock(zwave);
   });
@@ -60,7 +60,7 @@ describe('Programme', function () {
       const lights = [];
 
       assert.throws(function () {
-        programme = Programme('name', 'displayName', lightValues, lights);
+        programme = new Programme('name', 'displayName', lightValues, lights);
       }, /node "nonexistent" does not exist/);
     });
   });

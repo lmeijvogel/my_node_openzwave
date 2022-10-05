@@ -8,98 +8,113 @@ const nodes = {};
 
 const POLLABLE_CLASSES = [ 0x25, 0x26 ];
 
-function Node(nodeId) {
-  let values = {};
-  let info = {};
-  let ready = null;
+class Node {
+  static find(nodeid) {
+    return nodes[parseInt(nodeid, 10)];
+  };
 
-  function addValue(commandClass, value) {
-    if (!commandClassExists(commandClass)) {
-      values[commandClass] = [];
-    }
+  static all() {
+    return _.extend({}, nodes);
+  };
 
-    values[commandClass][value.index] = value;
+  static add(nodeid) {
+    nodes[nodeid] = new Node(nodeid);
+  };
+
+  constructor(nodeId) {
+    this.nodeId = nodeId;
+    this.values = {};
+    this.info = {};
+    this.ready = null;
   }
 
-  function setValue(commandClass, value) {
-    if (!commandClassExists(commandClass)) {
-      throw 'Command class "' +  commandClass  + '" was never added to this node (' +  nodeId  + ')';
+  addValue(commandClass, value) {
+    if (!this.commandClassExists(commandClass)) {
+      this.values[commandClass] = [];
     }
 
-    if (getValue(commandClass, value.index).value !== value.value) {
-      if (isReady()) {
+    this.values[commandClass][value.index] = value;
+  }
+
+  setValue(commandClass, value) {
+    if (!this.commandClassExists(commandClass)) {
+      throw 'Command class "' +  commandClass  + '" was never added to this node (' +  this.nodeId  + ')';
+    }
+
+    if (this.getValue(commandClass, value.index).value !== value.value) {
+      if (this.isReady()) {
         if (commandClass === 38 || commandClass === 37) {
-          Logger.info('Received node change: node %d: %s => %s', nodeId, value['label'], value['value']);
+          Logger.info('Received node change: node %d: %s => %s', this.nodeId, value['label'], value['value']);
         } else {
           Logger.verbose('Received node change: node %d: %d:%s:%s => %s',
-            nodeId, commandClass, value['label'], getValue(commandClass, value.index)['value'], value['value']);
+            this.nodeId, commandClass, value['label'], this.getValue(commandClass, value.index)['value'], value['value']);
         }
       } else {
         Logger.debug('Received node change: node %d: %d:%s:%s => %s (before nodeReady event)',
-          nodeId, commandClass, value['label'], getValue(commandClass, value.index)['value'], value['value']);
+          this.nodeId, commandClass, value['label'], this.getValue(commandClass, value.index)['value'], value['value']);
       }
 
-      values[commandClass][value.index] = value;
+      this.values[commandClass][value.index] = value;
     }
   }
 
-  function getValue(commandClass, index) {
-    if (commandClassExists(commandClass)) {
-      return values[commandClass][index];
+  getValue(commandClass, index) {
+    if (this.commandClassExists(commandClass)) {
+      return this.values[commandClass][index];
     } else {
       return {label: 'Unknown', value: '-'};
     }
   }
 
-  function commandClassExists(commandClass) {
-    return !!values[commandClass];
+  commandClassExists(commandClass) {
+    return !!this.values[commandClass];
   }
 
-  function removeValue(commandClass, index) {
-    if (commandClassExists(commandClass) && values[commandClass][index]) {
-      delete values[commandClass][index];
+  removeValue(commandClass, index) {
+    if (this.commandClassExists(commandClass) && this.values[commandClass][index]) {
+      delete this.values[commandClass][index];
     }
   }
 
-  function setReady() {
-    ready = true;
+  setReady() {
+    this.ready = true;
   }
 
-  function isReady() {
-    return ready;
+  isReady() {
+    return this.ready;
   }
 
-  function setNodeInfo(nodeInfo) {
-    info['manufacturer'] = nodeInfo.manufacturer;
-    info['manufacturerid'] = nodeInfo.manufacturerid;
-    info['product'] = nodeInfo.product;
-    info['producttype'] = nodeInfo.producttype;
-    info['productid'] = nodeInfo.productid;
-    info['type'] = nodeInfo.type;
-    info['name'] = nodeInfo.name;
-    info['loc'] = nodeInfo.loc;
+  setNodeInfo(nodeInfo) {
+    this.info['manufacturer'] = nodeInfo.manufacturer;
+    this.info['manufacturerid'] = nodeInfo.manufacturerid;
+    this.info['product'] = nodeInfo.product;
+    this.info['producttype'] = nodeInfo.producttype;
+    this.info['productid'] = nodeInfo.productid;
+    this.info['type'] = nodeInfo.type;
+    this.info['name'] = nodeInfo.name;
+    this.info['loc'] = nodeInfo.loc;
   }
 
-  function toString() {
+  toString() {
     let result = '';
 
-    _.forIn(values, function (commandClass, commandClassIdx) {
-      result += util.format('node%d: class %d\n', nodeId, commandClassIdx);
+    _.forIn(this.values, (commandClass, commandClassIdx) => {
+      result += util.format('node%d: class %d\n', this.nodeId, commandClassIdx);
 
-      _.forIn(commandClass, function (command) {
-        result += util.format('node%d:   %s=%s', nodeId, command['label'], command['value']);
+      _.forIn(commandClass, (command) => {
+        result += util.format('node%d:   %s=%s', this.nodeId, command['label'], command['value']);
       });
     });
 
     return result;
   }
 
-  function isPollable() {
-    return _.some(pollableClasses());
+  isPollable() {
+    return _.some(this.pollableClasses());
   }
 
-  function pollableClasses() {
-    const keys = _.keys(values);
+  pollableClasses() {
+    const keys = _.keys(this.values);
 
     return _.filter(keys, function (commandClassIdx) {
       const intCommandClassIdx = parseInt(commandClassIdx, 10);
@@ -109,32 +124,6 @@ function Node(nodeId) {
       return _.includes(POLLABLE_CLASSES, intCommandClassIdx);
     });
   }
-
-  return {
-    nodeId:          nodeId,
-    addValue:        addValue,
-    setValue:        setValue,
-    getValue:        getValue,
-    removeValue:     removeValue,
-    setReady:        setReady,
-    isReady:         isReady,
-    setNodeInfo:     setNodeInfo,
-    toString:        toString,
-    isPollable:      isPollable,
-    pollableClasses: pollableClasses
-  };
 }
-
-Node.find = function (nodeid) {
-  return nodes[parseInt(nodeid, 10)];
-};
-
-Node.all = function () {
-  return _.extend({}, nodes);
-};
-
-Node.add = function (nodeid) {
-  nodes[nodeid] = new Node(nodeid);
-};
 
 module.exports = Node;
