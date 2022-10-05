@@ -1,5 +1,6 @@
 import { keys, find, forOwn, toPairs } from "lodash";
 import { Logger } from "./Logger";
+import { SwitchPressName } from "./SwitchPressName";
 import { TimeStateMachine } from "./TimeStateMachine";
 import { IProgramme } from "./Programme";
 
@@ -59,13 +60,13 @@ class StateMachineBuilder {
     });
   }
 
-  private toNestedMap(input): Map<string, Transitions> {
-    let result = new Map<string, Transitions>();
+  private toNestedMap(input): Map<SwitchPressName, Transitions> {
+    let result = new Map<SwitchPressName, Transitions>();
 
-    forOwn(input, (transitionsInput, event) => {
+    forOwn(input, (transitionsInput, switchPressName: SwitchPressName) => {
       let transitions: Transitions = new Map(toPairs(transitionsInput));
 
-      result.set(event, transitions);
+      result.set(switchPressName, transitions);
     });
 
     return result;

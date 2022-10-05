@@ -1,4 +1,3 @@
-import { each } from "lodash";
 import { IZWave } from "./IZWave";
 import { IMyZWave } from "./IMyZWave";
 import { Node, ValueId } from "./Node";
@@ -6,19 +5,19 @@ import { Logger } from "./Logger";
 
 const DEVICE_PATH = "/dev/ttyUSB0";
 
-type EventHandler = (node: Node, commandClass: number, value: ValueId) => void;
+export type ValueChangeEventHandler = (node: Node, commandClass: string, value: ValueId) => void;
+export type NodeEventHandler = (node: Node, event: number) => void;
 
 class MyZWave implements IMyZWave {
   private readonly nodes: object[];
 
-  private readonly eventListeners: Map<string, EventHandler[]>;
+  private readonly valueChangeEventListeners: ValueChangeEventHandler[] = [];
+  private readonly nodeEventListeners: NodeEventHandler[] = [];
 
   private scanComplete: boolean;
 
   constructor(private readonly zwave: IZWave) {
     this.nodes = [];
-
-    this.eventListeners = new Map<string, EventHandler[]>();
 
     this.scanComplete = false;
   }
@@ -50,9 +49,7 @@ class MyZWave implements IMyZWave {
 
       node.setValue(comclass, value);
 
-      each(this.eventListeners.get("valueChange"), handler => {
-        handler.call(null, node, comclass, value);
-      });
+      this.valueChangeEventListeners.forEach(handler => handler(node, comclass, value) );
     });
 
     this.zwave.on("value removed", (nodeid: number, comclass, index) => {
@@ -99,9 +96,7 @@ class MyZWave implements IMyZWave {
 
       const node = Node.find(nodeid);
 
-      each(this.eventListeners.get("node event"), handler => {
-        handler.call(null, node, event);
-      });
+      this.nodeEventListeners.forEach(handler => handler(node, event));
     });
 
     this.zwave.on("neighbors", (nodeid: number, neighbors) => {
@@ -122,18 +117,12 @@ class MyZWave implements IMyZWave {
     this.zwave.connect(DEVICE_PATH);
   }
 
-  onNodeEvent(handler: EventHandler) {
-    if (!this.eventListeners.has("node event")) {
-      this.eventListeners.set("node event", []);
-    }
-    this.eventListeners.get("node event").push(handler);
+  onNodeEvent(handler: NodeEventHandler) {
+    this.nodeEventListeners.push(handler);
   }
 
-  onValueChange(handler: EventHandler) {
-    if (!this.eventListeners.has("valueChange")) {
-      this.eventListeners.set("valueChange", []);
-    }
-    this.eventListeners.get("valueChange").push(handler);
+  onValueChange(handler: ValueChangeEventHandler) {
+    this.valueChangeEventListeners.push(handler);
   }
 
   addNode(nodeid: number) {

@@ -1,33 +1,33 @@
 import { Logger } from "./Logger";
+import { SwitchPressName } from "./SwitchPressName";
 
 interface ITimeStateMachine {
-  handle(event, currentState): string;
+  handle(switchPressName: SwitchPressName, currentState): string;
 }
 
 class TimeStateMachine implements ITimeStateMachine {
-  transitions: Map<string, Map<string, string>>;
+  transitions: Map<SwitchPressName, Map<string, string>>;
 
-  constructor(transitions: Map<string, Map<string, string>>) {
+  constructor(transitions: Map<SwitchPressName, Map<string, string>>) {
     Logger.debug(
       `TimeStateMachine.constructor: Building TimeStateMachine with transitions: ${JSON.stringify([...transitions])}`
     );
     this.transitions = transitions;
 
-    if (!this.transitions.has("off")) {
+    if (!this.transitions.has(SwitchPressName.SingleOff)) {
       Logger.info('TimeStateMachine.constructor: Adding default "off" constructor');
-      this.transitions.set("off", new Map<string, string>([["default", "off"]]));
+      this.transitions.set(SwitchPressName.SingleOff, new Map<string, string>([["default", "off"]]));
     }
   }
 
-  // event: 'on' | 'off'
-  handle(event: string, currentState: string): string {
-    Logger.debug(`TimeStateMachine.handle: Handling event: ${event}`);
+  handle(switchPressName: SwitchPressName, currentState: string): string {
+    Logger.debug(`TimeStateMachine.handle: Handling event: ${switchPressName}`);
     Logger.debug(`TimeStateMachine.handle: Current state: ${JSON.stringify(currentState)}`);
 
-    const currentTransitions: Map<string, string> | undefined = this.transitions.get(event);
+    const currentTransitions: Map<string, string> | undefined = this.transitions.get(switchPressName);
 
     if (!currentTransitions) {
-      Logger.warn(`No transition from "${currentState}" for event "${event}"`);
+      Logger.warn(`No transition from "${currentState}" for event "${switchPressName}"`);
       return currentState;
     }
 
