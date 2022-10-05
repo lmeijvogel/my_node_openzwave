@@ -7,6 +7,8 @@ module.exports = function (options) {
   const app = express();
   const port = 3000;
 
+  let server;
+
   let programmeChosenCallbacks = [];
 
   let programmesListFinderCallback = function () {};
@@ -74,12 +76,12 @@ module.exports = function (options) {
   });
 
   const start = () => {
-    app.listen(port);
+    server = app.listen(port);
     Logger.info("REST interface listening on port", port);
   };
 
   const stop = () => {
-    app.close();
+    server.close();
     Logger.info("Stopped REST interface");
   };
 

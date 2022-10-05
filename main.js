@@ -36,6 +36,8 @@ const testMode = !argv['live'];
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
 
+let api;
+
 function stopProgramme() {
   Logger.info('disconnecting...');
   eventLogger.store({
@@ -101,7 +103,7 @@ Promise.all([
     offFunction: function () { eventProcessor.programmeSelected('off'); }
   });
 
-  const api = restServer({vacationMode: vacationMode, myZWave: myZWave});
+  api = restServer({vacationMode: vacationMode, myZWave: myZWave});
 
   api.start();
 
