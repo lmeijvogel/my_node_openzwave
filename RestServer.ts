@@ -121,8 +121,7 @@ const RestServer = function(options) {
   });
 
   const start = () => {
-    // Only bind to localhost, so I don't have to implement API tokens just yet :)
-    server = app.listen(port, "localhost");
+    server = app.listen(port);
     Logger.info(`REST interface listening on port ${port}`);
   };
 
