@@ -7,7 +7,6 @@ function RedisCommandParser() {
   const nodeValueRegex           = /get (\w+) (\w+) (\w+)/;
   const getNeighborsRegex        = /neighbors (.*)/;
   const healNetworkRegex         = /healNetwork/;
-  const setVacationModeRegex     = /vacationMode (?:(on) start:(\d\d:\d\d) end:(\d\d:\d\d))|(off)/;
   const simulateSwitchPressRegex = /simulateSwitchPress (\d+)/;
   const refreshNodeRegex         = /refreshNode (\d+)/;
 
@@ -17,7 +16,6 @@ function RedisCommandParser() {
     [nodeValueRegex,           nodeValueRequested],
     [getNeighborsRegex,        neighborsRequested],
     [healNetworkRegex,         healNetworkRequested],
-    [setVacationModeRegex,     setVacationModeRequested],
     [simulateSwitchPressRegex, simulateSwitchPress],
     [refreshNodeRegex,         refreshNodeRequested]
   ];
@@ -52,17 +50,6 @@ function RedisCommandParser() {
 
   function healNetworkRequested() {
     eventEmitter.emit('healNetworkRequested');
-  }
-
-  function setVacationModeRequested(match) {
-    if (match[1] === 'on') {
-      const meanStartTime = match[2];
-      const meanEndTime   = match[3];
-
-      eventEmitter.emit('setVacationModeRequested', true, meanStartTime, meanEndTime);
-    } else if (match[4] === 'off') {
-      eventEmitter.emit('setVacationModeRequested', false);
-    }
   }
 
   function simulateSwitchPress(match) {
