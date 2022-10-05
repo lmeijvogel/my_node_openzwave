@@ -72,8 +72,8 @@ Promise.all([
 
   const vacationMode = new VacationMode({
     timeService: TimeService(config),
-    onFunction: function () { eventProcessor.programmeSelected('evening'); },
-    offFunction: function () { eventProcessor.programmeSelected('off'); }
+    onFunction: function () { Logger.info('Would have started "on" programme'); },
+    offFunction: function () { Logger.info('Would have started "off" programme'); }
   });
 
   vacationMode.onStart(function (meanStartTime, meanEndTime) {
