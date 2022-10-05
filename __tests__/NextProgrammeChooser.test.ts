@@ -1,8 +1,8 @@
-import * as _ from 'lodash';
-import * as assert from 'assert';
-import { NextProgrammeChooser } from '../NextProgrammeChooser';
-import { ITimeStateMachine } from '../TimeStateMachine';
-import { MockTimeService } from './mock_time_service';
+import * as _ from "lodash";
+import * as assert from "assert";
+import { NextProgrammeChooser } from "../NextProgrammeChooser";
+import { ITimeStateMachine } from "../TimeStateMachine";
+import { MockTimeService } from "./MockTimeService";
 
 const stub = (result) => function () { return result; };
 

@@ -5,11 +5,11 @@ import { objectToNestedMap } from "./objectToNestedMap";
 import { objectToMap } from "./objectToNestedMap";
 import { NextProgrammeChooser } from "../NextProgrammeChooser";
 import { TimeStateMachine } from "../TimeStateMachine";
-import { MockTimeService } from "./mock_time_service";
+import { MockTimeService } from "./MockTimeService";
 import { EventProcessor } from "../EventProcessor";
 import { IProgramme } from "../Programme";
 
-import { IMyZWave } from "../ImyZWave";
+import { IMyZWave } from "../IMyZWave";
 
 class MockProgramme implements IProgramme {
   public readonly name: string;

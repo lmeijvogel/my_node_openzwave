@@ -189,7 +189,6 @@ redisInterface.start();
 
     myZWave.onValueChange(function(node, commandClass, value) {
       if (node.nodeId === 3) {
-        Logger.info(`Received value from main switch: (${commandClass}, ${value.value})`);
         Logger.error(
           "ERROR: Main switch is now probably ignored by OpenZWave. Exiting process so it can be restarted."
         );
