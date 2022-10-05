@@ -6,7 +6,7 @@ const Logger = require('./logger');
 function Programme(name, displayName, data, lights) {
   function apply(zwave) {
     _.forIn(data, function (value, key) {
-      const nodeid = lights[key];
+      const nodeid = lights[key].id;
 
       try {
         if (value === true) {

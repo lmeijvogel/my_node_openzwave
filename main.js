@@ -112,7 +112,9 @@ Promise.all([
   });
 
   myZWave.onValueChange(function (node, commandClass, value) {
-    const lightName = _.invert(config['lights'])['' + node.nodeId];
+    const lightName = _.findKey(config.lights, function (light) {
+      return light.id === node.nodeId;
+    });
 
     Logger.debug('Received value change from ', node.nodeId);
     Logger.debug('New value: ', commandClass, ': ', value);
