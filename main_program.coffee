@@ -62,7 +62,15 @@ myZWave = new MyZWave(zwave)
 redisInterface = new RedisInterface("MyZWave")
 commandParser = new CommandParser()
 
+redisInterface.start()
+
+redisInterface.clearAvailableProgrammes()
 programmeFactory = new ProgrammeFactory()
+
+programmeFactory.onProgrammeCreated( (programme) ->
+  redisInterface.addAvailableProgramme(programme.name, programme.displayName)
+)
+
 programmes = programmeFactory.build(config)
 
 stateMachineBuilder = new StateMachineBuilder(config)
@@ -96,7 +104,5 @@ commandParser.on "healNetworkRequested", (nodeId) ->
 
 eventProcessor.on "programmeSelected", (programmeName) ->
   redisInterface.programmeChanged(programmeName) if programmeName
-
-redisInterface.start()
 
 myZWave.connect()

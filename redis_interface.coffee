@@ -29,6 +29,12 @@ class RedisInterface extends EventEmitter
 
     Logger.debug("Stored in Redis: ", lightName, commandClass, value.value)
 
+  clearAvailableProgrammes: ->
+    @dataRedis.del("zwave_available_programmes")
+
+  addAvailableProgramme: (name, displayName) ->
+    @dataRedis.hset("zwave_available_programmes", name, displayName)
+
   cleanUp: ->
     @subscriptionRedis.unsubscribe()
     @subscriptionRedis.end()
