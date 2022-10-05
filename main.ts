@@ -101,8 +101,6 @@ redisInterface.start();
 
   api = RestServer({vacationMode: vacationMode, myZWave: myZWave});
 
-  api.start();
-
   api.setProgrammesListFinder(function () {
     return programmes;
   });
@@ -143,6 +141,8 @@ redisInterface.start();
   api.onSimulateSwitchPressRequested(function (signal) {
     switchPressed(signal);
   });
+
+  api.start();
 
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
