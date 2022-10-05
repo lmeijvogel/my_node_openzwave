@@ -17,6 +17,7 @@ create = (http_server) ->
 _ = require("lodash")
 
 FakeRequestParser = require("./fake_request_parser")
+Logger = require('./logger')
 
 class FakeZWave
   callbacks: {}
@@ -94,7 +95,7 @@ class FakeZWave
     ]
 
   enablePoll: (nodeid, commandClass) ->
-    console.log "FAKE: EnablePoll ", nodeid, commandClass
+    Logger.debug("FAKE: EnablePoll", nodeid, commandClass)
 
   initializeDevices: ->
     @nodes[2] = level: 0

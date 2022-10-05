@@ -9,6 +9,9 @@ CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
 ConfigReader = require("./config_reader")
 
+Logger = require('./logger')
+Logger.enableLogToFile('log/openzwave.log')
+
 config = new ConfigReader().read("config.json")
 
 runHttpServer = config["http"]["enabled"]
@@ -27,12 +30,12 @@ if runHttpServer
 
     res.end req.url + "<br/><pre>" + result + "</pre>"
   ).listen port
-  console.log "Listening on 0.0.0.0:%d", port
+  Logger.info("Listening on 0.0.0.0, port", port)
 else
-  console.log "Not starting HTTP server. Disabled in config."
+  Logger.info("Not starting HTTP server. Disabled in config.")
 
 process.on "SIGINT", ->
-  console.log "disconnecting..."
+  Logger.info("disconnecting...")
   zwave.disconnect()
   redisInterface.cleanUp()
   process.exit()
@@ -47,7 +50,6 @@ programmes = programmeFactory.build(config)
 eventProcessor = new EventProcessor(myZWave, programmes)
 
 myZWave.onValueChange((node, commandClass, value) ->
-  console.log(config)
   lightName = _.invert(config["lights"])[""+node.nodeId]
   redisInterface.storeValue(lightName, commandClass, value)
 )

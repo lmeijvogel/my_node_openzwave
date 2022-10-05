@@ -1,5 +1,6 @@
 TimeService = require("./time_service")
 TimeStateMachine = require("./time_state_machine")
+Logger = require('./logger')
 
 class NextProgrammeChooser
   programme: null
@@ -18,7 +19,7 @@ class NextProgrammeChooser
     currentStateMachine = @chooseStateMachine()
     currentStateMachine.setState @currentState
     @currentState = currentStateMachine.handle(event)
-    console.log "Entering state", @currentState
+    Logger.verbose("Entering state", @currentState)
     @currentState
 
   chooseStateMachine: ->
@@ -26,7 +27,7 @@ class NextProgrammeChooser
     else if @timeService.isMorning() then @stateMachines.morning
     else if @timeService.isNight()   then @stateMachines.night
     else
-      console.log "WARNING: Unknown time"
+      Logger.error("NextProgrammeChooser#chooseStateMachine: Unknown time")
       @stateMachines.morning
 
   buildStateMachines: ->

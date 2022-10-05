@@ -1,4 +1,6 @@
 NextProgrammeChooser = require("./next_programme_chooser")
+Logger = require('./logger')
+
 _ = require("lodash")
 
 class EventProcessor
@@ -16,8 +18,8 @@ class EventProcessor
         onOff = (if (event == 255) then "on" else "off")
         @mainSwitchPressed onOff
       else
-        console.log "Event from unexpected node ", node
-        console.log ".. event: ", event
+        Logger.warn "Event from unexpected node ", node
+        Logger.verbose ".. event: ", event
 
   programmeSelected: (programmeName) ->
     programme = @programmes[programmeName]
@@ -26,12 +28,14 @@ class EventProcessor
       programme.apply @zwave
       @nextProgrammeChooser.setProgramme programme
 
-      console.log "Programme selected:", programmeName
+      Logger.info("Programme selected: %s", programmeName)
     else
-      console.log "ERROR: Programme '" + programmeName + "' not found."
+      Logger.error("Programme '%s' not found.", programmeName)
 
-  mainSwitchPressed: (event) ->
-    nextProgrammeName = @nextProgrammeChooser.handle(event)
+  mainSwitchPressed: (onOff) ->
+    Logger.info("Switch pressed: #{onOff}")
+
+    nextProgrammeName = @nextProgrammeChooser.handle(onOff)
     nextProgramme = @programmes[nextProgrammeName]
 
     return  unless nextProgramme?
@@ -39,7 +43,8 @@ class EventProcessor
     try
       @programmeSelected nextProgrammeName
     catch e
-      console.log "ERROR: Could not start '" + nextProgrammeName + "'"
-      console.log e
+      Logger.
+      Logger.error("Could not start '%s'", nextProgrammeName)
+      Logger.error(e)
 
 module.exports = EventProcessor
