@@ -30,10 +30,11 @@ function RedisInterface(commandChannel) {
     dataRedis.set('zwave_programme', name);
   }
 
-  function storeValue(lightName, commandClass, value) {
+  function storeValue(lightName, nodeId, commandClass, value) {
+    dataRedis.hset('node_' + lightName, 'node_id', nodeId);
     dataRedis.hset('node_' + lightName, 'class_' + commandClass, value.value);
 
-    Logger.debug('Stored in Redis: ', lightName, commandClass, value.value);
+    Logger.debug('Stored in Redis: ', lightName, nodeId, commandClass, value.value);
   }
 
   function clearCurrentLightLevels() {
