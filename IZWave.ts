@@ -10,7 +10,6 @@ export interface IZWave {
     setNodeOn(nodeId: number): void;
     setNodeOff(nodeId): void;
 
-    setValue(nodeId, commandClass, instance, index, value): void;
     refreshNodeInfo(nodeid): void;
 
     healNetwork(): void;
