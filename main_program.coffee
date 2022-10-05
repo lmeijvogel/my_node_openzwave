@@ -1,6 +1,7 @@
 http = require("http")
 fs = require("fs")
-_  = require("lodash")
+minimist = require("minimist")
+_ = require("lodash")
 
 MyZWave = require("./my_zwave")
 ProgrammeFactory = require("./programme_factory")
@@ -9,14 +10,19 @@ CommandParser = require("./command_parser")
 RedisInterface = require("./redis_interface")
 ConfigReader = require("./config_reader")
 
+config = new ConfigReader().read("config.json")
+
 Logger = require('./logger')
 Logger.enableLogToFile('log/openzwave.log')
 
-config = new ConfigReader().read("config.json")
+argv = minimist(process.argv.slice(2))
+
+config = new ConfigReader().read(argv['config'] ||"./config.json")
+runLive = argv['live']
 
 runHttpServer = config["http"]["enabled"]
 port = config["http"]["port"]
-testMode = process.argv[2] isnt "live"
+testMode = !runLive
 
 ZWaveFactory = require("./zwave_factory")
 zwave = new ZWaveFactory(testMode).create()

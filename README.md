@@ -17,7 +17,7 @@ Nodejs:
 Clone nodejs from github
 `sudo apt-get -y install libudev-dev npm`
 
-`npm install moment winston lodash mocha sinon coffee-script git+https://github.com/lmeijvogel/node-openzwave`
+`npm install minimist moment winston lodash mocha sinon coffee-script git+https://github.com/lmeijvogel/node-openzwave`
 
 ## Notes
 
