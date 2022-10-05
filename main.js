@@ -17,6 +17,9 @@ const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
 
+const Ticker = require('./ticker');
+const AutomaticRunner = require('./automatic_runner');
+
 const argv = minimist(process.argv.slice(2));
 
 const configFile = argv['config'] || './config.json';
@@ -52,6 +55,10 @@ if (runHttpServer) {
 } else {
   Logger.info('Not starting HTTP server. Disabled in config.');
 }
+
+let vacationMode = false;
+let vacationMeanStartTime = null;
+let vacationMeanEndTime = null;
 
 function stopProgramme() {
   Logger.info('disconnecting...');
@@ -130,11 +137,79 @@ Promise.all([
     zwave.healNetwork();
   });
 
+  redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
+    vacationMode = state;
+
+    if (vacationMode) {
+      vacationMeanStartTime = meanStartTime;
+      vacationMeanEndTime   = meanEndTime;
+
+      startVacationMode(meanStartTime, meanEndTime);
+      Logger.info('Started Vacation mode. Mean start time:', vacationMeanStartTime,
+        'mean end time:', vacationMeanEndTime);
+    } else {
+      vacationMeanStartTime = 'no start time set';
+      vacationMeanEndTime   = 'no end time set';
+
+      stopVacationMode();
+      Logger.info('Stopped vacation mode');
+    }
+
+  });
+
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       redisInterface.programmeChanged(programmeName);
+      currentProgramme = programmeName;
     }
   });
+
+  let currentProgramme = null;
+
+  let onTicker = null;
+  let offTicker = null;
+
+  function startVacationMode(meanStartTime, meanEndTime) {
+    function eveningFunction() {
+      eventProcessor.programmeSelected('evening');
+    }
+
+    function offFunction() {
+      eventProcessor.programmeSelected('off');
+    }
+
+    const offsetProvider = () => 15 - Math.round(Math.random() * 30);
+
+    onTicker = new Ticker('startProgramme');
+    onTicker.start(AutomaticRunner(eveningFunction, {
+      periodStart: meanStartTime,
+      periodEnd: meanEndTime,
+      timeService: TimeService(config),
+      offsetProvider: offsetProvider
+    }), 15000);
+
+    offTicker = new Ticker('endProgramme');
+    offTicker.start(AutomaticRunner(offFunction, {
+      periodStart: meanEndTime,
+      periodEnd: '23:59',
+      timeService: TimeService(config),
+      offsetProvider: offsetProvider
+    }), 15000);
+
+    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+  }
+
+  function stopVacationMode() {
+    redisInterface.vacationModeStopped();
+
+    if (onTicker) {
+      onTicker.stop();
+    }
+
+    if (offTicker) {
+      offTicker.stop();
+    }
+  }
 
   myZWave.connect();
 });
