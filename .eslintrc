@@ -2,6 +2,7 @@
 extends:
   - "defaults"
   - "defaults/configurations/google"
+parser: "typescript-eslint-parser"
 rules:
   no-new: 2
   max-len: [2, 120]
