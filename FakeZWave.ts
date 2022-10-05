@@ -10,7 +10,6 @@
  * switch, reporting as little as possible.
  */
 
-import { each } from "lodash";
 import { Logger } from "./Logger";
 import { ValueId } from "./Node";
 import { IZWave } from "./IZWave";
@@ -42,7 +41,7 @@ class FakeZWave implements IZWave {
 
     this.initializeDevices();
 
-    this.emitEvent("scan complete");
+    this.emitEvent("scan complete", []);
     this.setLevel(2, 38, 1, 0, 99);
 
     this.setLevel(5, 38, 1, 0, 99);
@@ -64,7 +63,7 @@ class FakeZWave implements IZWave {
     }
   }
 
-  private setLevel(nodeId: number, commandClass: number, instance: number, index: number, level: number) {
+  private setLevel(nodeId: number, _commandClass: number, _instance: number, index: number, level: number) {
     this.nodes[nodeId]["level"] = level;
     this.emitEvent("value changed", [
       nodeId,
@@ -77,7 +76,7 @@ class FakeZWave implements IZWave {
     ]);
   }
 
-  private setSwitch(nodeId: number, commandClass: number, instance: number, index: number, state: boolean) {
+  private setSwitch(nodeId: number, commandClass: number, _instance: number, _index: number, state: boolean) {
     this.nodes[nodeId]["value"] = state;
     this.emitEvent("value changed", [
       nodeId,
@@ -232,10 +231,10 @@ class FakeZWave implements IZWave {
     this.emitEvent("node event", [3, 0]);
   }
 
-  private emitEvent(eventName, params = {}) {
-    each(this.callbacks[eventName], function(callback) {
-      callback.apply(null, params);
-    });
+  private emitEvent(eventName, params: any[]) {
+    const callbacksForEvent = this.callbacks[eventName] || [];
+
+    callbacksForEvent.forEach(callback => callback(...params));
   }
 }
 

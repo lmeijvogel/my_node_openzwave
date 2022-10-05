@@ -1,13 +1,13 @@
 import * as winston from "winston";
 import * as Transport from "winston-transport";
 
-import { each, map, padStart, values } from "lodash";
+import { each, map, padStart } from "lodash";
 
 class WinstonLogger {
     private logger: winston.Logger;
 
-    constructor() {
-        this.logger = this.createLogger();
+    constructor(filename = null, level = "info") {
+        this.logger = this.createLogger(filename, level);
     }
 
     // Don't enable logging to file by default since it would then also do
@@ -43,7 +43,7 @@ class WinstonLogger {
     }
 
     createLogger(filename = null, level = "info") {
-        const transports: Transport[] = [new winston.transports.Console({ level: "debug" })];
+        const transports: Transport[] = [new winston.transports.Console({ level: level })];
 
         if (filename) {
             const fileLogger = new winston.transports.File({ filename: filename, level: level });
@@ -90,6 +90,6 @@ function mapToString(map: Map<string, any>): string {
     return result;
 }
 
-const Logger = new WinstonLogger();
+const Logger = new WinstonLogger(null, "error");
 
 export { Logger, mapToString };
