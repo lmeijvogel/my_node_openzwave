@@ -29,6 +29,17 @@ FakeZWave = classy.define({
     this.initializeDevices();
 
     this.emit_event('scan complete');
+
+    // This is for testing to see some feedbak.
+    this.setLevel(2, 99);
+    this.setLevel(5, 99);
+    this.switchOn(7);
+    this.setLevel(8, 99);
+
+    this.setLevel(2, 0);
+    this.setLevel(5, 0);
+    this.switchOff(7);
+    this.setLevel(8, 0);
   },
 
   disconnect: function() {
