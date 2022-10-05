@@ -60,8 +60,8 @@ const eventLogger = EventLogger();
 const redisInterface = RedisInterface();
 
 redisInterface.start();
-// TODO: Remove Promise.resolve()
-Promise.resolve().then(function () {
+
+(function () {
   let currentProgramme = null;
   let switchEnabled = true;
 
@@ -204,8 +204,5 @@ Promise.resolve().then(function () {
       Logger.warn('Switch pressed but temporarily disabled.');
     }
   }
-}).catch(function (error) {
-  console.error(error);
 
-  process.exit(1);
-});
+})();
