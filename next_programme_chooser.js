@@ -3,23 +3,16 @@
 const Logger = require('./logger');
 
 function NextProgrammeChooser(timeService, stateMachines) {
-  let currentState = null;
-
-  function setCurrentState(newCurrentState) {
-    Logger.debug('NextProgrammeChooser: Registering current state as', newCurrentState);
-    currentState = newCurrentState;
-  }
-
-  function handle(event) {
+  function handle(event, currentState) {
     Logger.debug('NextProgrammeChooser.handle: currentState: ', currentState);
 
     const currentStateMachine = chooseStateMachine();
 
-    currentState = currentStateMachine.handle(event, currentState);
+    const newState = currentStateMachine.handle(event, currentState);
 
-    Logger.verbose('NextProgrammeChooser.handle: new currentState: ', currentState);
+    Logger.verbose('NextProgrammeChooser.handle: new currentState: ', newState);
 
-    return currentState;
+    return newState;
   }
 
   function chooseStateMachine() {
@@ -42,8 +35,7 @@ function NextProgrammeChooser(timeService, stateMachines) {
 
   return {
     handle: handle,
-    chooseStateMachine: chooseStateMachine,
-    setCurrentState: setCurrentState
+    chooseStateMachine: chooseStateMachine
   };
 }
 

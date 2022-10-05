@@ -55,6 +55,8 @@ Promise.all([
   redisInterface.clearCurrentLightLevels(),
   redisInterface.clearAvailableProgrammes()
 ]).then(function () {
+  let currentProgramme = null;
+
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
 
@@ -102,7 +104,7 @@ Promise.all([
   myZWave.onNodeEvent(function (node, event) {
     Logger.debug('Event from node ', node.nodeId);
     if (node.nodeId === 3) {
-      eventProcessor.mainSwitchPressed(event);
+      eventProcessor.mainSwitchPressed(event, currentProgramme);
     } else {
       Logger.warn('Event from unexpected node ', node);
       Logger.verbose('.. event: ', event);

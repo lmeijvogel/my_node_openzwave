@@ -15,7 +15,6 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
 
     if (programme) {
       programme.apply(zwave);
-      nextProgrammeChooser.setCurrentState(programme.name);
 
       eventEmitter.emit('programmeSelected', programmeName);
 
@@ -25,12 +24,12 @@ function EventProcessor(zwave, programmes, nextProgrammeChooser) {
     }
   }
 
-  function mainSwitchPressed(value) {
+  function mainSwitchPressed(value, currentProgramme) {
     const onOff = value === 255 ? 'on' : 'off';
 
     Logger.info('Switch pressed: ' + onOff);
 
-    const nextProgrammeName = nextProgrammeChooser.handle(onOff);
+    const nextProgrammeName = nextProgrammeChooser.handle(onOff, currentProgramme);
     const nextProgramme = programmes[nextProgrammeName];
 
     if (!nextProgramme) {
