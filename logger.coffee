@@ -1,5 +1,6 @@
 winston = require('winston')
-moment = require('moment')
+moment  = require('moment')
+_       = require('lodash')
 
 class WinstonLogger
   constructor: ->
@@ -9,6 +10,11 @@ class WinstonLogger
   # that while running tests
   enableLogToFile: (filename) ->
     @logger = @createLogger(filename)
+
+  setSilent: (silent) ->
+    _.each(@logger.transports, (transport) ->
+      transport.silent = silent
+    )
 
   debug: (str...) ->
     @logger.log("debug", str...)
