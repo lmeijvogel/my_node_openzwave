@@ -1,6 +1,5 @@
 'use strict';
 
-const http = require('http');
 const minimist = require('minimist');
 const _ = require('lodash');
 
@@ -32,28 +31,10 @@ Logger.info('Starting server');
 
 const runLive = argv['live'];
 
-const runHttpServer = config['http']['enabled'];
-const port = config['http']['port'];
 const testMode = !runLive;
 
 const ZWaveFactory = require('./zwave_factory');
 const zwave = ZWaveFactory(testMode).create();
-
-if (runHttpServer) {
-  http.createServer(function (req, res) {
-    let result = '';
-
-    if (testMode) {
-      result = zwave.tryParse(req, res);
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-
-    return res.end(req.url + '<br/><pre>' + result + '</pre>');
-  }).listen(port);
-  Logger.info('Listening on 0.0.0.0, port', port);
-} else {
-  Logger.info('Not starting HTTP server. Disabled in config.');
-}
 
 function stopProgramme() {
   Logger.info('disconnecting...');
