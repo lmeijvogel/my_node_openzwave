@@ -20,7 +20,8 @@
     "eslint-config-defaults": "~7.1.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "node main"
   },
   "repository": {
     "type": "git",
