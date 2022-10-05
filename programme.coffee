@@ -1,4 +1,5 @@
 _ = require("lodash")
+Logger = require('./logger')
 
 class Programme
   name: null
@@ -17,6 +18,6 @@ class Programme
         else
           zwave.setLevel nodeid, value
       catch e
-        console.log "ERROR in programme '" + @name + "': Could not switch node '" + key + "'"
+        Logger.error("ERROR in programme '" + @name + "': Could not switch node '" + key + "'")
 
 module.exports = Programme

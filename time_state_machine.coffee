@@ -1,4 +1,5 @@
 _ = require("lodash")
+Logger = require('./logger')
 
 class TimeStateMachine
   transitions: null
@@ -11,9 +12,15 @@ class TimeStateMachine
 
   handle: (event) ->
     currentTransitions = @transitions[event]
-    return  unless currentTransitions
+
+    unless currentTransitions
+      Logger.warn("No transition from ", @state, " for event ", event)
+      return
+
     newState = currentTransitions[@state]
     newState = currentTransitions["default"]  unless newState
+
+    Logger.verbose("TimeStateMachine: Transition to", newState)
     @setState newState
     newState
 
