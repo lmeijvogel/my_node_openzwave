@@ -2,36 +2,20 @@ import { Ticker } from './Ticker';
 import { AutomaticRunner } from './AutomaticRunner';
 import { TimeService } from './TimeService';
 
-import { each } from 'lodash';
+export class VacationMode {
+  private readonly startCallbacks : ((startTime: string, endTime: string) => void)[] = [];
+  private readonly stopCallbacks : (() => void)[] = [];
 
-class VacationMode {
-  private readonly timeService : TimeService;
-  private readonly onFunction : () => void;
-  private readonly offFunction : () => void;
+  private onTicker : Ticker | null = null;
+  private offTicker : Ticker | null = null;
 
-  private readonly startCallbacks : ((startTime: string, endTime: string) => void)[];
-  private readonly stopCallbacks : (() => void)[];
+  private _meanStartTime : String | null = null;
+  private _meanEndTime : String | null = null;
 
-  private onTicker : Ticker | null;
-  private offTicker : Ticker | null;
-
-  private _meanStartTime : String | null;
-  private _meanEndTime : String | null;
-
-  constructor(timeService : TimeService, onFunction : () => void, offFunction : () => void) {
-    this.timeService = timeService;
-    this.onFunction  = onFunction;
-    this.offFunction = offFunction;
-
-    this.startCallbacks = [];
-    this.stopCallbacks  = [];
-
-    this.onTicker  = null;
-    this.offTicker = null;
-
-    this._meanStartTime = null;
-    this._meanEndTime = null;
-  }
+  constructor(
+      private readonly timeService : TimeService,
+      private readonly onFunction : () => void,
+      private readonly offFunction : () => void) { }
 
   start(meanStartTime : string, meanEndTime : string) {
     const offsetProvider = () => 15 - Math.round(Math.random() * 30);
@@ -82,13 +66,13 @@ class VacationMode {
   }
 
   triggerStarted(startTime : string, endTime : string) {
-    each(this.startCallbacks, (callback) => {
+    this.startCallbacks.forEach((callback) => {
       callback(startTime, endTime);
     });
   }
 
   triggerStopped() {
-    each(this.stopCallbacks, (callback) => {
+    this.stopCallbacks.forEach((callback) => {
       callback();
     });
   }
@@ -101,5 +85,3 @@ class VacationMode {
     };
   }
 };
-
-export { VacationMode };
