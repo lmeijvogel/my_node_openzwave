@@ -60,11 +60,11 @@ Promise.all([
   const myZWave = MyZWave(zwave);
   const programmeFactory = ProgrammeFactory();
 
-  programmeFactory.onProgrammeCreated(function (programme) {
+  const programmes = programmeFactory.build(config);
+
+  _(programmes).values().each(function (programme) {
     redisInterface.addAvailableProgramme(programme.name, programme.displayName);
   });
-
-  const programmes = programmeFactory.build(config);
 
   const stateMachines = StateMachineBuilder(config).call();
 
