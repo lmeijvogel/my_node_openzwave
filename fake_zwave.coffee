@@ -1,11 +1,11 @@
 
-# This is for testing to see some feedbak.
+# This is for testing to see some feedback.
 
 # To make it possible to test interactions
 #   * without actually having to connect the ZWave
 #   * unit: Web requests can be used to simulate a
 #   * button press.
-#   
+#
 
 # Node will never be ready since it is a battery powered
 # switch, reporting as little as possible.
@@ -15,21 +15,20 @@
 create = (http_server) ->
   new FakeZWave()
 _ = require("lodash")
-classy = require("classy")
+
 FakeRequestParser = require("./fake_request_parser")
-FakeZWave = classy.define(
+
+class FakeZWave
   callbacks: {}
   nodes: {}
   SWITCH_BINARY: 37
   SWITCH_MULTILEVEL: 38
-  init: ->
+  constructor: ->
     @fakeRequestParser = new FakeRequestParser()
-    return
 
   on: (event_name, callback) ->
     @callbacks[event_name] = []  unless @callbacks[event_name]?
     @callbacks[event_name].push callback
-    return
 
   connect: ->
     homeId = "128"
@@ -45,11 +44,9 @@ FakeZWave = classy.define(
     @setLevel 5, 0
     @switchOff 7
     @setLevel 8, 0
-    return
 
   disconnect: ->
     @connected = false
-    return
 
   tryParse: (req, res) ->
     result = @fakeRequestParser.parse(req)
@@ -71,7 +68,6 @@ FakeZWave = classy.define(
         value: level
       }
     ]
-    return
 
   switchOn: (nodeId) ->
     @nodes[nodeId]["value"] = true
@@ -84,7 +80,6 @@ FakeZWave = classy.define(
         value: true
       }
     ]
-    return
 
   switchOff: (nodeId) ->
     @nodes[nodeId]["value"] = false
@@ -97,11 +92,9 @@ FakeZWave = classy.define(
         value: false
       }
     ]
-    return
 
   enablePoll: (nodeid, commandClass) ->
     console.log "FAKE: EnablePoll ", nodeid, commandClass
-    return
 
   initializeDevices: ->
     @nodes[2] = level: 0
@@ -239,13 +232,9 @@ FakeZWave = classy.define(
       3
       255
     ]
-    return
 
   emit_event: (event_name, params) ->
     _.each @callbacks[event_name], (callback) ->
       callback.apply this, params
-      return
 
-    return
-)
 module.exports = FakeZWave

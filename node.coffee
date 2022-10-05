@@ -1,8 +1,7 @@
-classy = require("classy")
 util = require("util")
 _ = require("lodash")
 nodes = {}
-Node = classy.define(
+class Node
   POLLABLE_CLASSES: [
     0x25
     0x26
@@ -10,31 +9,25 @@ Node = classy.define(
   values: null
   info: null
   ready: null
-  init: (nodeId) ->
-    @nodeId = nodeId
+  constructor: (@nodeId) ->
     @values = {}
     @info = {}
-    return
 
   addValue: (commandClass, value) ->
     @values[commandClass] = []  unless @values[commandClass]
     @setValue commandClass, value
-    return
 
   setValue: (commandClass, value) ->
     @values[commandClass][value.index] = value
-    return
 
   getValue: (commandClass, index) ->
     @values[commandClass][index]
 
   removeValue: (commandClass, index) ->
-    delete @values[commandClass][index]  if @values[commandClass] and @values[commandClass][index]
-    return
+    delete @values[commandClass][index]  if @values[commandClass] && @values[commandClass][index]
 
   setReady: ->
     @ready = true
-    return
 
   isReady: ->
     @ready
@@ -48,7 +41,6 @@ Node = classy.define(
     @info["type"] = nodeInfo.type
     @info["name"] = nodeInfo.name
     @info["loc"] = nodeInfo.loc
-    return
 
   toString: ->
     result = ""
@@ -64,17 +56,15 @@ Node = classy.define(
     _.any @pollableClasses()
 
   pollableClasses: ->
-    self = this
     keys = _.keys(@values)
-    _.select keys, (commandClassIdx) ->
-      commandClass = self.values[commandClassIdx]
+    _.select keys, (commandClassIdx) =>
+      commandClass = @values[commandClassIdx]
       intCommandClassIdx = parseInt(commandClassIdx, 10)
-      
+
       # 0x25: COMMAND_CLASS_SWITCH_BINARY
       # 0x26: COMMAND_CLASS_SWITCH_MULTILEVEL
-      _.contains self.POLLABLE_CLASSES, intCommandClassIdx
+      _.contains @POLLABLE_CLASSES, intCommandClassIdx
 
-)
 Node.find = (nodeid) ->
   nodes[parseInt(nodeid, 10)]
 
@@ -83,6 +73,5 @@ Node.all = ->
 
 Node.add = (nodeid) ->
   nodes[nodeid] = new Node(nodeid)
-  return
 
 module.exports = Node

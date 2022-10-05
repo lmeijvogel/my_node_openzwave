@@ -1,14 +1,13 @@
-classy = require("classy")
 _ = require("lodash")
-TimeStateMachine = classy.define(
+
+class TimeStateMachine
   transitions: null
   state: null
-  init: (transitions) ->
+  constructor: (transitions) ->
     @transitions = _.defaults(transitions,
       off:
         default: "off"
     )
-    return
 
   handle: (event) ->
     currentTransitions = @transitions[event]
@@ -20,6 +19,5 @@ TimeStateMachine = classy.define(
 
   setState: (newState) ->
     @state = newState
-    return
-)
+
 module.exports = TimeStateMachine

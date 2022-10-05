@@ -1,6 +1,8 @@
 fs = require("fs")
-read = (filename) ->
-  contents = fs.readFileSync(filename, "utf8")
-  JSON.parse contents
 
-exports.read = read
+class ConfigReader
+  read: (filename) ->
+    contents = fs.readFileSync(filename, "utf8")
+    JSON.parse contents
+
+module.exports = ConfigReader
