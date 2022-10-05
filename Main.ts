@@ -222,7 +222,9 @@ redisInterface.start();
       lights[lightName].values[commandClass] = value;
 
       Logger.debug(`Received value change from ${node.nodeId}`);
-      Logger.debug(`New value: ${commandClass}: ${value}`);
+
+      const valueToString = `${value.value_id}, ${value.label}`;
+      Logger.debug(`New value for node ${node.nodeId}: ${valueToString}`);
     });
 
     myZWave.onNodeEvent(function(node, event) {
