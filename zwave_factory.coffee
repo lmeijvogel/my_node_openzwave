@@ -13,6 +13,7 @@ class ZWaveFactory
       OpenZWave = require("openzwave")
       new OpenZWave("/dev/ttyUSB0",
         saveconfig: true
+        retrytimeout: 3000
       )
 
 module.exports = ZWaveFactory
