@@ -9,47 +9,45 @@ var NextProgrammeChooser = classy.define({
 
   handle: function(event) {
     if (event == "on") {
-      this.onPressed();
+      return this.onPressed();
     } else {
-      this.offPressed();
+      return this.offPressed();
     }
-
-    return this.programme;
   },
 
   onPressed: function() {
-    var cycled = this.tryCycle();
+    var cycledProgramme = this.tryCycle();
 
-    if (!cycled) {
-      if (this.isEvening()) {
-        this.programme = "evening";
-      } else if (this.isMorning()) {
-        this.programme = "morning";
-      } else if (this.isNight()) {
-        this.programme = "night";
-      } else {
-        // This should not occur, but make sure the lights can come on anyway.
-        this.programme = "evening";
-      }
+    if (cycledProgramme != null) {
+      return cycledProgramme;
+    }
+
+    if (this.isEvening()) {
+      return "evening";
+    } else if (this.isMorning()) {
+      return "morning";
+    } else if (this.isNight()) {
+      return "night";
+    } else {
+      // This should not occur, but make sure the lights can come on anyway.
+      return "evening";
     }
   },
 
   offPressed: function() {
-    this.programme = "off";
+    return "off";
   },
 
   tryCycle: function() {
     if (this.programme == "evening") {
-      this.programme = "dimmed";
-      return true;
+      return "dimmed";
     }
 
     if (this.programme == "dimmed") {
-      this.programme = "evening";
-      return true;
+      return "evening";
     }
 
-    return false;
+    return null;
   },
 
   isMorning: function() {

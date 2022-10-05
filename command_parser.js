@@ -2,11 +2,9 @@ var classy = require('classy');
 var _ = require('lodash');
 
 var CommandParser = classy.define({
-  programmes: null,
   programmeSelectedCallbacks: null,
 
-  init: function(programmes) {
-    this.programmes = programmes;
+  init: function() {
     this.programmeSelectedCallbacks = [];
   },
 
@@ -17,9 +15,7 @@ var CommandParser = classy.define({
     if (match) {
       var programmeName = match[1];
 
-      if (this.programmes[programmeName]) {
-        this.callProgrammeSelectedCallbacks(programmeName);
-      }
+      this.callProgrammeSelectedCallbacks(programmeName);
     }
   },
 

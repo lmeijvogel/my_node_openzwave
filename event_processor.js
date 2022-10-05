@@ -29,22 +29,33 @@ var EventProcessor = classy.define({
     }
   },
 
+  programmeSelected: function(programmeName) {
+    var programme = this.programmes[programmeName];
+
+    if (programme) {
+      programme.apply(this.zwave);
+      this.nextProgrammeChooser.setProgramme(programme);
+
+      console.log("Programme selected:", programmeName);
+    } else {
+      console.log("ERROR: Programme '"+ programmeName +"' not found.");
+    }
+  },
+
   mainSwitchPressed: function(event) {
     var nextProgrammeName = this.nextProgrammeChooser.handle(event);
     var nextProgramme = this.programmes[nextProgrammeName];
 
     if (nextProgramme == null) {
-      console.log("ERROR: Programme '"+ nextProgrammeName +"' not found.");
       return;
     }
 
     try {
-      nextProgramme.apply(this.zwave);
-
-      console.log(nextProgramme);
+      this.programmeSelected(nextProgrammeName);
     }
     catch(e) {
       console.log("ERROR: Could not start '"+ nextProgrammeName +"'");
+      console.log(e);
     }
   }
 });
