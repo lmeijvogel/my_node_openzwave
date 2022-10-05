@@ -81,7 +81,7 @@ redisInterface.start();
 
   const stateMachines = StateMachineBuilder(config.transitions, programmes).call();
 
-  const nextProgrammeChooser = NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
+  const nextProgrammeChooser = new NextProgrammeChooser(TimeService(config.periodStarts), stateMachines);
 
   const eventProcessor = new EventProcessor(myZWave, programmes, nextProgrammeChooser);
 
