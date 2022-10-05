@@ -17,8 +17,7 @@ const RedisInterface = require('./redis_interface');
 const ConfigReader = require('./config_reader');
 const Logger = require('./logger');
 
-const Ticker = require('./ticker');
-const AutomaticRunner = require('./automatic_runner');
+const VacationMode = require('./vacation_mode');
 
 const argv = minimist(process.argv.slice(2));
 
@@ -56,10 +55,6 @@ if (runHttpServer) {
   Logger.info('Not starting HTTP server. Disabled in config.');
 }
 
-let vacationMode = false;
-let vacationMeanStartTime = null;
-let vacationMeanEndTime = null;
-
 function stopProgramme() {
   Logger.info('disconnecting...');
   zwave.disconnect();
@@ -93,6 +88,20 @@ Promise.all([
   const nextProgrammeChooser = NextProgrammeChooser(TimeService(config), stateMachines);
 
   const eventProcessor = EventProcessor(myZWave, programmes, nextProgrammeChooser);
+
+  const vacationMode = new VacationMode({
+    timeService: TimeService(config),
+    onFunction: function () { eventProcessor.programmeSelected('evening'); },
+    offFunction: function () { eventProcessor.programmeSelected('off'); }
+  });
+
+  vacationMode.onStart(function (meanStartTime, meanEndTime) {
+    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
+  });
+
+  vacationMode.onStop(function () {
+    redisInterface.vacationModeStopped();
+  });
 
   myZWave.onValueChange(function (node, commandClass, value) {
     const lightName = _.invert(config['lights'])['' + node.nodeId];
@@ -138,20 +147,17 @@ Promise.all([
   });
 
   redisCommandParser.on('setVacationModeRequested', function (state, meanStartTime, meanEndTime) {
-    vacationMode = state;
+    const vactionModeState = state;
 
-    if (vacationMode) {
-      vacationMeanStartTime = meanStartTime;
-      vacationMeanEndTime   = meanEndTime;
+    if (vactionModeState) {
+      const vacationMeanStartTime = meanStartTime;
+      const vacationMeanEndTime   = meanEndTime;
 
-      startVacationMode(meanStartTime, meanEndTime);
+      vacationMode.start(meanStartTime, meanEndTime);
       Logger.info('Started Vacation mode. Mean start time:', vacationMeanStartTime,
         'mean end time:', vacationMeanEndTime);
     } else {
-      vacationMeanStartTime = 'no start time set';
-      vacationMeanEndTime   = 'no end time set';
-
-      stopVacationMode();
+      vacationMode.stop();
       Logger.info('Stopped vacation mode');
     }
 
@@ -160,56 +166,8 @@ Promise.all([
   eventProcessor.on('programmeSelected', function (programmeName) {
     if (programmeName) {
       redisInterface.programmeChanged(programmeName);
-      currentProgramme = programmeName;
     }
   });
-
-  let currentProgramme = null;
-
-  let onTicker = null;
-  let offTicker = null;
-
-  function startVacationMode(meanStartTime, meanEndTime) {
-    function eveningFunction() {
-      eventProcessor.programmeSelected('evening');
-    }
-
-    function offFunction() {
-      eventProcessor.programmeSelected('off');
-    }
-
-    const offsetProvider = () => 15 - Math.round(Math.random() * 30);
-
-    onTicker = new Ticker('startProgramme');
-    onTicker.start(AutomaticRunner(eveningFunction, {
-      periodStart: meanStartTime,
-      periodEnd: meanEndTime,
-      timeService: TimeService(config),
-      offsetProvider: offsetProvider
-    }), 15000);
-
-    offTicker = new Ticker('endProgramme');
-    offTicker.start(AutomaticRunner(offFunction, {
-      periodStart: meanEndTime,
-      periodEnd: '23:59',
-      timeService: TimeService(config),
-      offsetProvider: offsetProvider
-    }), 15000);
-
-    redisInterface.vacationModeStarted(meanStartTime, meanEndTime);
-  }
-
-  function stopVacationMode() {
-    redisInterface.vacationModeStopped();
-
-    if (onTicker) {
-      onTicker.stop();
-    }
-
-    if (offTicker) {
-      offTicker.stop();
-    }
-  }
 
   redisInterface.getVacationMode().then(function (data) {
     if (data.state === 'on') {
@@ -217,7 +175,7 @@ Promise.all([
       const meanStartTime = data.start_time;
       const meanEndTime   = data.end_time;
 
-      startVacationMode(meanStartTime, meanEndTime);
+      vacationMode.start(meanStartTime, meanEndTime);
     }
   });
 
