@@ -173,14 +173,29 @@ redisInterface.start();
     const myZWave = MyZWave(zwave);
 
     myZWave.onValueChange(function (node, commandClass, value) {
+      if (node.nodeId === 3) {
+        Logger.verbose('Received value from main switch: %d, %d -- Ignoring', commandClass, value.value);
+
+        return
+      }
+
       const lightName = _.findKey(lights, function (light) {
         return light.id === node.nodeId;
       });
 
       if (!lightName) {
-        Logger.error('Unknown light with nodeId %d. Command class: %d, value: "', node.nodeId, commandClass, value, '"');
+        Logger.error('Unknown light with nodeId %d. Command class: %d, value: "',
+          node.nodeId,
+          commandClass,
+          value,
+          '"');
       } else if (!lights[lightName]) {
-        Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: "', lightName, node.nodeId, commandClass, value, '"');
+        Logger.error('Unknown light with name "%s" (id: %d). Command class: %d, value: "',
+          lightName,
+          node.nodeId,
+          commandClass,
+          value,
+          '"');
       }
 
       if (!lights[lightName].values) {
